@@ -1,0 +1,10 @@
+# private working notes — keep local, never publish
+SESSION_LOG.md
+CLAUDE.md
+avatar-512.png
+
+# leftover empty scaffold folder — real app is web/
+webpv/
+
+# disabled scaffold git dir (renamed aside from web/.git)
+web/.git_disabled_scaffold/
