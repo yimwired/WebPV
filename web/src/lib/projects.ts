@@ -54,7 +54,7 @@ export const projects: Project[] = [
     th: {
       tagline: "แพร่เชื้อ กลายพันธุ์ เอาตัวรอด",
       description:
-        "เกมบนเบราว์เซอร์ที่ให้คุณสวมบทเป็นไวรัส — บุกยึดเซลล์ของโฮสต์ สะสมแต้มวิวัฒนาการเพื่อปลดล็อกการกลายพันธุ์ใหม่ๆ แล้วแพร่กระจายให้ทัน ก่อนระบบภูมิคุ้มกันจะไล่ตามคุณสำเร็จ",
+        "เกมบนเบราว์เซอร์ที่ได้สวมบทเป็นไวรัส บุกยึดเซลล์ของโฮสต์ เก็บแต้มวิวัฒนาการไว้ปลดล็อกการกลายพันธุ์ใหม่ แล้วรีบแพร่เชื้อให้ทั่ว ก่อนภูมิคุ้มกันจะไล่ทัน",
     },
   },
   {
@@ -72,7 +72,7 @@ export const projects: Project[] = [
     th: {
       tagline: "เทอร์มินัลเทรดทองอัตโนมัติ XAU/USD",
       description:
-        "บอทเทรดทองที่รันจริงบน MT5 — 12 strategy engines สแกนตามจังหวะของแต่ละ session คุมความเสี่ยงแบบ real-time พร้อม trade tape และ kill switch สร้างเองและรันจริงครบทั้งระบบ",
+        "บอทเทรดทองบน MT5 ที่รันจริงอยู่ตอนนี้ ใช้ 12 strategy engines สแกนตามจังหวะแต่ละ session คุมความเสี่ยงแบบ real-time พร้อม trade tape และ kill switch ทำเองครบทั้งระบบ",
     },
   },
   {
@@ -90,7 +90,7 @@ export const projects: Project[] = [
     th: {
       tagline: "ระบบหลังบ้านสินค้าและคอนเทนต์สำหรับ Shopee",
       description:
-        "เครื่องมือจัดการแคตตาล็อกสินค้ากิฟฟารีนบน Shopee — ติดตามรายการสินค้า ใช้ AI ช่วยเขียนคำโฆษณา สร้าง prompt รูปและวิดีโอ ทำรูปไดคัทอัตโนมัติ แล้ว export ทั้งหมดเป็น CSV",
+        "เครื่องมือคุมแคตตาล็อกกิฟฟารีนบน Shopee ติดตามรายการสินค้าได้ครบ ให้ AI ช่วยเขียนคำโฆษณา สร้าง prompt รูปกับวิดีโอ ไดคัทรูปอัตโนมัติ เสร็จแล้ว export เป็น CSV ได้เลย",
     },
   },
   {
@@ -108,7 +108,7 @@ export const projects: Project[] = [
     th: {
       tagline: "โพสต์เดียว ไปครบทุกแพลตฟอร์ม",
       description:
-        "Affiliate Publisher — แค่เข้าคิวสินค้า ระบบจะสร้าง asset และวิดีโอจาก prompt แล้วกระจายโพสต์ขึ้น YouTube, TikTok, Shopee Shorts และ Lemon8 พร้อมกันในครั้งเดียว แจ้งเตือนทุกความเคลื่อนไหวผ่าน Telegram",
+        "Affiliate Publisher แค่เข้าคิวสินค้าไว้ ระบบจะสร้าง asset กับวิดีโอจาก prompt ให้ แล้วกระจายโพสต์ขึ้น YouTube TikTok Shopee Shorts และ Lemon8 ในครั้งเดียว พร้อมแจ้งเตือนผ่าน Telegram ทุกความเคลื่อนไหว",
     },
   },
   {
@@ -126,7 +126,7 @@ export const projects: Project[] = [
     th: {
       tagline: "กองยาน AI 11 agents ใต้ผู้บัญชาการเดียว",
       description:
-        "MOON FLEET — ระบบ commander ที่สั่งการ Claude agents เฉพาะทางทั้ง 11 ตัว (scout, researcher, builder, critic, scheduler…) ผ่าน pipeline ตั้งแต่ research, build, intake จนถึงโหมด auto พร้อม mission queue แบบเรียลไทม์",
+        "MOON FLEET ระบบ commander คุม Claude agents เฉพาะทาง 11 ตัว (scout, researcher, builder, critic, scheduler…) ทำงานผ่าน pipeline ตั้งแต่ research, build, intake ยันโหมด auto พร้อม mission queue แบบสดๆ",
     },
   },
 ];
