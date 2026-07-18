@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { href: "#work", label: "Work" },
-  { href: "#about", label: "About" },
-  { href: "/labs", label: "Labs" },
-  { href: "#contact", label: "Contact" },
-];
+import { useLocale } from "@/lib/i18n";
+import { LanguageSwitch } from "./language-switch";
 
 export function Navbar() {
+  const { t } = useLocale();
+  const links = [
+    { href: "#work", label: t.nav.work },
+    { href: "#about", label: t.nav.about },
+    { href: "/labs", label: t.nav.labs },
+    { href: "#contact", label: t.nav.contact },
+  ];
   const [scrolled, setScrolled] = useState(false);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
@@ -67,12 +69,15 @@ export function Navbar() {
           })}
         </nav>
 
-        <a
-          href="#contact"
-          className="rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95"
-        >
-          Get in touch
-        </a>
+        <div className="flex items-center gap-2.5">
+          <LanguageSwitch />
+          <a
+            href="#contact"
+            className="hidden rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95 sm:inline-block"
+          >
+            {t.nav.cta}
+          </a>
+        </div>
       </div>
 
       {/* scroll progress */}

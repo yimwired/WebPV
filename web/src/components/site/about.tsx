@@ -1,10 +1,7 @@
-import { Reveal } from "./reveal";
+"use client";
 
-const stats = [
-  { value: "4+", label: "Active projects" },
-  { value: "End-to-end", label: "Design → build → ship" },
-  { value: "AI-first", label: "Automation mindset" },
-];
+import { Reveal } from "./reveal";
+import { useLocale } from "@/lib/i18n";
 
 const skills = [
   "Python",
@@ -18,6 +15,8 @@ const skills = [
 ];
 
 export function About() {
+  const { t } = useLocale();
+
   return (
     <section
       id="about"
@@ -26,22 +25,14 @@ export function About() {
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
         <Reveal>
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            About
+            {t.about.label}
           </p>
           <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            I turn ideas into working systems.
+            {t.about.title}
           </h2>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
-            <p>
-              I&apos;m Film — I build trading bots, AI assistants, dashboards
-              and content pipelines. I like owning a project from the first
-              sketch to the thing running in production.
-            </p>
-            <p>
-              My default is to ship: small, real, and improving over time.
-              Whether it&apos;s an automated strategy or a short-form video
-              system, the goal is the same — make it work, then make it better.
-            </p>
+            <p>{t.about.p1}</p>
+            <p>{t.about.p2}</p>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-2">
@@ -57,7 +48,7 @@ export function About() {
         </Reveal>
 
         <Reveal delay={0.15} className="flex flex-col justify-center gap-4">
-          {stats.map((s) => (
+          {t.about.stats.map((s) => (
             <div
               key={s.label}
               className="rounded-2xl border border-white/10 bg-card/40 p-6 backdrop-blur-md"

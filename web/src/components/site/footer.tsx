@@ -1,5 +1,8 @@
+"use client";
+
 import { ArrowUpRight, Mail } from "lucide-react";
 import { Reveal } from "./reveal";
+import { useLocale } from "@/lib/i18n";
 
 const socials = [
   // add YouTube / X here when the channels are ready
@@ -7,6 +10,8 @@ const socials = [
 ];
 
 export function Footer() {
+  const { t } = useLocale();
+
   return (
     <footer
       id="contact"
@@ -14,15 +19,12 @@ export function Footer() {
     >
       <Reveal className="rounded-[2rem] border border-white/10 bg-card/40 p-8 backdrop-blur-md sm:p-14">
         <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-          Contact
+          {t.footer.label}
         </p>
         <h2 className="mt-3 max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          Let&apos;s build something.
+          {t.footer.title}
         </h2>
-        <p className="mt-4 max-w-md text-muted-foreground">
-          Got a project, a collaboration, or just want to say hi? My inbox is
-          open.
-        </p>
+        <p className="mt-4 max-w-md text-muted-foreground">{t.footer.sub}</p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
@@ -50,8 +52,10 @@ export function Footer() {
       </Reveal>
 
       <div className="mt-10 flex flex-col items-center justify-between gap-3 text-sm text-muted-foreground sm:flex-row">
-        <span>© {new Date().getFullYear()} Film. All rights reserved.</span>
-        <span>Built with Next.js · Tailwind · Framer Motion</span>
+        <span>
+          © {new Date().getFullYear()} Film. {t.footer.rights}
+        </span>
+        <span>{t.footer.builtWith}</span>
       </div>
     </footer>
   );

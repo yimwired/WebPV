@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { STATUS_LABEL, type Project } from "@/lib/projects";
+import { useLocale } from "@/lib/i18n";
 
 const statusDot: Record<Project["status"], string> = {
   live: "bg-emerald-400",
@@ -50,7 +51,12 @@ function CardMedia({ project }: { project: Project }) {
 }
 
 export function ProjectCard({ project }: { project: Project }) {
+  const { locale, t } = useLocale();
   const external = project.href.startsWith("http");
+  const tagline = locale === "th" ? project.th.tagline : project.tagline;
+  const description =
+    locale === "th" ? project.th.description : project.description;
+  const hasCaseStudy = project.href.startsWith("/work/");
 
   return (
     <motion.a
@@ -98,22 +104,31 @@ export function ProjectCard({ project }: { project: Project }) {
         className="relative z-10 mt-1 text-sm font-medium"
         style={{ color: project.accent }}
       >
-        {project.tagline}
+        {tagline}
       </p>
 
       <p className="relative z-10 mt-3 text-sm leading-relaxed text-muted-foreground">
-        {project.description}
+        {description}
       </p>
 
-      <div className="relative z-10 mt-6 flex flex-wrap gap-2">
-        {project.tags.map((t) => (
+      <div className="relative z-10 mt-6 flex flex-wrap items-center gap-2">
+        {project.tags.map((tag) => (
           <span
-            key={t}
+            key={tag}
             className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-muted-foreground"
           >
-            {t}
+            {tag}
           </span>
         ))}
+        {hasCaseStudy && (
+          <span
+            className="ml-auto inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+            style={{ color: project.accent }}
+          >
+            {t.work.caseStudy}
+            <ArrowUpRight className="h-3 w-3" />
+          </span>
+        )}
       </div>
     </motion.a>
   );

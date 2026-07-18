@@ -1,9 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { projects } from "@/lib/projects";
 import { ProjectCard } from "./project-card";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import { useLocale } from "@/lib/i18n";
 
 export function Projects() {
+  const { t } = useLocale();
   return (
     <section id="work" className="scroll-mt-24">
       {/* Cinematic scroll reveal — tilts up and flattens as you scroll into Work */}
@@ -11,10 +15,10 @@ export function Projects() {
         titleComponent={
           <div className="pb-2">
             <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-              Selected work
+              {t.work.label}
             </p>
             <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-              Things I&apos;ve built &amp; shipped
+              {t.work.title}
             </h2>
           </div>
         }

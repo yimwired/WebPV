@@ -24,6 +24,11 @@ export interface Project {
    * and set e.g. "/projects/aurum.png". If omitted, a styled placeholder shows.
    */
   image?: string;
+  /** Thai copy for the card — base fields above stay English. */
+  th: {
+    tagline: string;
+    description: string;
+  };
 }
 
 export const STATUS_LABEL: Record<ProjectStatus, string> = {
@@ -46,6 +51,11 @@ export const projects: Project[] = [
     href: "#",
     accent: "#34d399", // emerald
     image: "/projects/you-are-the-virus.png",
+    th: {
+      tagline: "แพร่เชื้อ กลายพันธุ์ เอาตัวรอด",
+      description:
+        "เกมเบราว์เซอร์ที่คุณเล่นเป็นไวรัส — บุกเซลล์ของโฮสต์ ใช้แต้มวิวัฒนาการปลดล็อกความสามารถใหม่ แล้วแพร่กระจายให้ทันก่อนร่างกายจะตอบโต้กลับ",
+    },
   },
   {
     id: "aurum",
@@ -56,9 +66,14 @@ export const projects: Project[] = [
     category: "Trading",
     tags: ["XAU/USD", "MT5", "12 engines", "Python"],
     status: "active",
-    href: "#",
+    href: "/work/aurum",
     accent: "#f59e0b", // amber/gold
     image: "/projects/aurum.png",
+    th: {
+      tagline: "ระบบเทรดทองอัตโนมัติ XAU/USD",
+      description:
+        "บอทเทรดทองบน MT5 ที่รันจริง — 12 strategy engines, สแกนตาม session, จัดการความเสี่ยง real-time, trade tape และ kill switch ครบ สร้างและรันเองครบวงจร",
+    },
   },
   {
     id: "product-dashboard",
@@ -72,6 +87,11 @@ export const projects: Project[] = [
     href: "#",
     accent: "#60a5fa", // blue
     image: "/projects/product-dashboard.png",
+    th: {
+      tagline: "ระบบจัดการสินค้าและคอนเทนต์สำหรับ Shopee",
+      description:
+        "จัดการแคตตาล็อกกิฟฟารีนสำหรับ Shopee — ติดตามรายการสินค้า สร้างคำโฆษณา, prompt รูป/วิดีโอ และรูปไดคัทด้วย AI แล้ว export คอนเทนต์เป็น CSV",
+    },
   },
   {
     id: "affiliate",
@@ -85,6 +105,11 @@ export const projects: Project[] = [
     href: "#",
     accent: "#a78bfa", // violet
     image: "/projects/affiliate.png",
+    th: {
+      tagline: "โพสต์เดียว → ทุกแพลตฟอร์ม",
+      description:
+        "Affiliate Publisher — เข้าคิวสินค้า สร้าง asset และวิดีโอจาก prompt แล้วโพสต์ทีเดียวขึ้น YouTube, TikTok, Shopee Shorts และ Lemon8 พร้อมแจ้งเตือนทาง Telegram",
+    },
   },
   {
     id: "jarvis-moon",
@@ -98,5 +123,10 @@ export const projects: Project[] = [
     href: "#",
     accent: "#22d3ee", // cyan
     image: "/projects/jarvis-moon.png",
+    th: {
+      tagline: "กองยาน AI หลาย agent ผู้บัญชาการคนเดียว",
+      description:
+        "MOON FLEET — commander สั่งการ Claude agents เฉพาะทาง 11 ตัว (scout, researcher, builder, critic, scheduler…) ผ่าน pipeline research / build / intake / auto พร้อม mission queue สด",
+    },
   },
 ];

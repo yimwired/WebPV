@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown, Sparkles } from "lucide-react";
+import { useLocale } from "@/lib/i18n";
 
 const container: Variants = {
   hidden: {},
@@ -19,6 +20,7 @@ const item: Variants = {
 };
 
 export function Hero() {
+  const { t } = useLocale();
   return (
     <section
       id="top"
@@ -31,21 +33,20 @@ export function Hero() {
           className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-md transition-colors hover:text-foreground"
         >
           <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
-          Builder of bots, tools &amp; content
+          {t.hero.badge}
         </motion.a>
 
         <motion.h1
           variants={item}
           className="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-7xl md:text-8xl"
         >
-          Hi, I&apos;m{" "}
+          {t.hero.greeting}{" "}
           <span className="bg-gradient-to-br from-white via-white to-white/50 bg-clip-text text-transparent">
             Film
           </span>
-          .
           <br />
           <span className="bg-gradient-to-r from-indigo-300 via-cyan-200 to-violet-300 bg-clip-text text-transparent">
-            I build things that ship.
+            {t.hero.headline}
           </span>
         </motion.h1>
 
@@ -53,8 +54,7 @@ export function Hero() {
           variants={item}
           className="mx-auto mt-7 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
         >
-          Trading systems, AI assistants, dashboards, and content — designed,
-          built and shipped end to end. This is where it all lives.
+          {t.hero.sub}
         </motion.p>
 
         <motion.div
@@ -65,14 +65,14 @@ export function Hero() {
             href="#work"
             className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-7 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95"
           >
-            View my work
+            {t.hero.viewWork}
             <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
           </a>
           <a
             href="#contact"
             className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/5 px-7 text-sm font-medium text-foreground backdrop-blur-md transition-colors hover:bg-white/10"
           >
-            Get in touch
+            {t.hero.contact}
           </a>
         </motion.div>
       </motion.div>

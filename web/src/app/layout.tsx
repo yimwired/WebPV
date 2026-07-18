@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { LocaleProvider } from "@/lib/i18n";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,6 +25,12 @@ export const metadata: Metadata = {
       "Trading systems, AI assistants, dashboards, and content — built end to end.",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Film — Builder of bots, tools & content",
+    description:
+      "Trading systems, AI assistants, dashboards, and content — built end to end.",
+  },
 };
 
 export default function RootLayout({
@@ -37,7 +44,9 @@ export default function RootLayout({
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-background text-foreground">{children}</body>
+      <body className="min-h-full bg-background text-foreground">
+        <LocaleProvider>{children}</LocaleProvider>
+      </body>
     </html>
   );
 }
