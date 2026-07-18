@@ -54,7 +54,7 @@ export const projects: Project[] = [
     th: {
       tagline: "แพร่เชื้อ กลายพันธุ์ เอาตัวรอด",
       description:
-        "เกมเบราว์เซอร์ที่คุณเล่นเป็นไวรัส — บุกเซลล์ของโฮสต์ ใช้แต้มวิวัฒนาการปลดล็อกความสามารถใหม่ แล้วแพร่กระจายให้ทันก่อนร่างกายจะตอบโต้กลับ",
+        "เกมบนเบราว์เซอร์ที่ให้คุณสวมบทเป็นไวรัส — บุกยึดเซลล์ของโฮสต์ สะสมแต้มวิวัฒนาการเพื่อปลดล็อกการกลายพันธุ์ใหม่ๆ แล้วแพร่กระจายให้ทัน ก่อนระบบภูมิคุ้มกันจะไล่ตามคุณสำเร็จ",
     },
   },
   {
@@ -70,9 +70,9 @@ export const projects: Project[] = [
     accent: "#f59e0b", // amber/gold
     image: "/projects/aurum.png",
     th: {
-      tagline: "ระบบเทรดทองอัตโนมัติ XAU/USD",
+      tagline: "เทอร์มินัลเทรดทองอัตโนมัติ XAU/USD",
       description:
-        "บอทเทรดทองบน MT5 ที่รันจริง — 12 strategy engines, สแกนตาม session, จัดการความเสี่ยง real-time, trade tape และ kill switch ครบ สร้างและรันเองครบวงจร",
+        "บอทเทรดทองที่รันจริงบน MT5 — 12 strategy engines สแกนตามจังหวะของแต่ละ session คุมความเสี่ยงแบบ real-time พร้อม trade tape และ kill switch สร้างเองและรันจริงครบทั้งระบบ",
     },
   },
   {
@@ -88,9 +88,9 @@ export const projects: Project[] = [
     accent: "#60a5fa", // blue
     image: "/projects/product-dashboard.png",
     th: {
-      tagline: "ระบบจัดการสินค้าและคอนเทนต์สำหรับ Shopee",
+      tagline: "ระบบหลังบ้านสินค้าและคอนเทนต์สำหรับ Shopee",
       description:
-        "จัดการแคตตาล็อกกิฟฟารีนสำหรับ Shopee — ติดตามรายการสินค้า สร้างคำโฆษณา, prompt รูป/วิดีโอ และรูปไดคัทด้วย AI แล้ว export คอนเทนต์เป็น CSV",
+        "เครื่องมือจัดการแคตตาล็อกสินค้ากิฟฟารีนบน Shopee — ติดตามรายการสินค้า ใช้ AI ช่วยเขียนคำโฆษณา สร้าง prompt รูปและวิดีโอ ทำรูปไดคัทอัตโนมัติ แล้ว export ทั้งหมดเป็น CSV",
     },
   },
   {
@@ -106,9 +106,9 @@ export const projects: Project[] = [
     accent: "#a78bfa", // violet
     image: "/projects/affiliate.png",
     th: {
-      tagline: "โพสต์เดียว → ทุกแพลตฟอร์ม",
+      tagline: "โพสต์เดียว ไปครบทุกแพลตฟอร์ม",
       description:
-        "Affiliate Publisher — เข้าคิวสินค้า สร้าง asset และวิดีโอจาก prompt แล้วโพสต์ทีเดียวขึ้น YouTube, TikTok, Shopee Shorts และ Lemon8 พร้อมแจ้งเตือนทาง Telegram",
+        "Affiliate Publisher — แค่เข้าคิวสินค้า ระบบจะสร้าง asset และวิดีโอจาก prompt แล้วกระจายโพสต์ขึ้น YouTube, TikTok, Shopee Shorts และ Lemon8 พร้อมกันในครั้งเดียว แจ้งเตือนทุกความเคลื่อนไหวผ่าน Telegram",
     },
   },
   {
@@ -124,9 +124,9 @@ export const projects: Project[] = [
     accent: "#22d3ee", // cyan
     image: "/projects/jarvis-moon.png",
     th: {
-      tagline: "กองยาน AI หลาย agent ผู้บัญชาการคนเดียว",
+      tagline: "กองยาน AI 11 agents ใต้ผู้บัญชาการเดียว",
       description:
-        "MOON FLEET — commander สั่งการ Claude agents เฉพาะทาง 11 ตัว (scout, researcher, builder, critic, scheduler…) ผ่าน pipeline research / build / intake / auto พร้อม mission queue สด",
+        "MOON FLEET — ระบบ commander ที่สั่งการ Claude agents เฉพาะทางทั้ง 11 ตัว (scout, researcher, builder, critic, scheduler…) ผ่าน pipeline ตั้งแต่ research, build, intake จนถึงโหมด auto พร้อม mission queue แบบเรียลไทม์",
     },
   },
 ];
