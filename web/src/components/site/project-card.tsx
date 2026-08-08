@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { STATUS_LABEL, type Project } from "@/lib/projects";
@@ -16,11 +17,13 @@ function CardMedia({ project }: { project: Project }) {
   return (
     <div className="relative z-10 mb-6 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
       {project.image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={project.image}
           alt={`${project.name} preview`}
-          className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+          fill
+          // one card per row on phones, two from md up inside a 6xl container
+          sizes="(max-width: 768px) 100vw, 640px"
+          className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
         />
       ) : (
         <div

@@ -2,17 +2,8 @@
 
 import { Reveal } from "./reveal";
 import { useLocale } from "@/lib/i18n";
-
-const skills = [
-  "Python",
-  "Next.js / React",
-  "Trading systems (SMC)",
-  "AI / Claude",
-  "Automation",
-  "Video & content",
-  "Dashboards",
-  "ffmpeg",
-];
+import { projects } from "@/lib/projects";
+import { skills } from "@/lib/skills";
 
 export function About() {
   const { t } = useLocale();
@@ -54,7 +45,8 @@ export function About() {
               className="rounded-2xl border border-white/10 bg-card/40 p-6 backdrop-blur-md"
             >
               <div className="text-2xl font-semibold tracking-tight">
-                {s.value}
+                {/* keeps the project count honest as projects.ts grows */}
+                {s.value.replace("{projects}", String(projects.length))}
               </div>
               <div className="mt-1 text-sm text-muted-foreground">
                 {s.label}

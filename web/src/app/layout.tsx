@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { LocaleProvider } from "@/lib/i18n";
+import { MotionProvider } from "@/components/site/motion-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -45,7 +46,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full bg-background text-foreground">
-        <LocaleProvider>{children}</LocaleProvider>
+        <LocaleProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
