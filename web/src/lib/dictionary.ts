@@ -13,6 +13,8 @@ const en = {
     labs: "Labs",
     contact: "Contact",
     cta: "Get in touch",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
   },
   hero: {
     badge: "Builder of bots, tools & content",
@@ -33,7 +35,7 @@ const en = {
     p1: "I'm Film. I build trading bots, AI assistants, dashboards and content pipelines. I like owning a project from the first sketch to the thing running in production.",
     p2: "My default is to ship: small, real, and improving over time. Whether it's an automated strategy or a short-form video system, the goal is the same: make it work, then make it better.",
     stats: [
-      { value: "4+", label: "Active projects" },
+      { value: "{projects}", label: "Active projects" },
       { value: "End-to-end", label: "Design → build → ship" },
       { value: "AI-first", label: "Automation mindset" },
     ],
@@ -216,6 +218,8 @@ const th: typeof en = {
     labs: "Labs",
     contact: "ติดต่อ",
     cta: "ทักมาคุยกัน",
+    openMenu: "เปิดเมนู",
+    closeMenu: "ปิดเมนู",
   },
   hero: {
     badge: "สร้างบอท · เครื่องมือ · คอนเทนต์",
@@ -236,7 +240,7 @@ const th: typeof en = {
     p1: "ผมชื่อฟิล์ม สร้างบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดทำโปรเจกต์แบบจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
     p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นบอทเทรดหรือระบบทำวิดีโอสั้นก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
     stats: [
-      { value: "4+", label: "โปรเจกต์ที่รันอยู่จริง" },
+      { value: "{projects}", label: "โปรเจกต์ที่รันอยู่จริง" },
       { value: "ครบวงจร", label: "ออกแบบ → สร้าง → ส่งมอบ" },
       { value: "AI-first", label: "คิดเป็น automation ตั้งแต่ต้น" },
     ],
