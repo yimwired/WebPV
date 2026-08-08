@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-//  Project data — EDIT THIS to change what shows on the site.
+//  Project data. EDIT THIS to change what shows on the site.
 //  แก้ไฟล์นี้ไฟล์เดียวเพื่อเปลี่ยนผลงานบนเว็บ (ชื่อ/คำอธิบาย/ลิงก์/สถานะ/สี)
 // ─────────────────────────────────────────────────────────────
 
@@ -10,12 +10,12 @@ export interface Project {
   name: string;
   /** one short line shown under the title */
   tagline: string;
-  /** 1–2 sentences for the card body */
+  /** 1-2 sentences for the card body */
   description: string;
   category: string;
   tags: string[];
   status: ProjectStatus;
-  /** where the "open" button goes — set to a real URL when deployed */
+  /** where the "open" button goes; set to a real URL when deployed */
   href: string;
   /** accent colour used for the card glow/badge (any CSS colour) */
   accent: string;
@@ -24,7 +24,7 @@ export interface Project {
    * and set e.g. "/projects/aurum.png". If omitted, a styled placeholder shows.
    */
   image?: string;
-  /** Thai copy for the card — base fields above stay English. */
+  /** Thai copy for the card. Base fields above stay English. */
   th: {
     tagline: string;
     description: string;
@@ -44,7 +44,7 @@ export const projects: Project[] = [
     name: "You Are the Virus",
     tagline: "Infect, mutate, survive",
     description:
-      "A browser game where you play as a virus — infect a host's cells, spend evolution points to mutate new abilities, and spread while the host's vitals fight back.",
+      "A browser game where you play as a virus. Infect a host's cells, spend evolution points to mutate new abilities, and spread while the host's vitals fight back.",
     category: "Game",
     tags: ["Game", "Strategy", "Bio-sim", "Web"],
     status: "active",
@@ -80,7 +80,7 @@ export const projects: Project[] = [
     name: "Product Dashboard",
     tagline: "Product & content ops for Shopee",
     description:
-      "Manage a Giffarine catalog for Shopee — track listings and generate product copy, image/video prompts and background-removed images with AI, then export content as CSV.",
+      "Manage a Giffarine catalog for Shopee: track listings and generate product copy, image/video prompts and background-removed images with AI, then export content as CSV.",
     category: "Tooling",
     tags: ["Shopee", "AI content", "Catalog", "Export"],
     status: "active",
@@ -98,7 +98,7 @@ export const projects: Project[] = [
     name: "Affiliate",
     tagline: "One post → every platform",
     description:
-      "Affiliate Publisher — queue a product, generate assets and video from a prompt, then publish one post to YouTube, TikTok, Shopee Shorts and Lemon8 at once, with Telegram alerts.",
+      "Affiliate Publisher: queue a product, generate assets and video from a prompt, then publish one post to YouTube, TikTok, Shopee Shorts and Lemon8 at once, with Telegram alerts.",
     category: "Growth",
     tags: ["YouTube", "TikTok", "Shopee", "Lemon8"],
     status: "active",
@@ -116,7 +116,7 @@ export const projects: Project[] = [
     name: "Jarvis (Moon)",
     tagline: "Multi-agent AI fleet, one commander",
     description:
-      "MOON FLEET — a commander orchestrating 11 specialized Claude agents (scout, researcher, builder, critic, scheduler…) across research / build / intake / auto pipelines, with a live mission queue.",
+      "MOON FLEET: a commander orchestrating 11 specialized Claude agents (scout, researcher, builder, critic, scheduler...) across research / build / intake / auto pipelines, with a live mission queue.",
     category: "AI",
     tags: ["Multi-agent", "Claude", "Orchestration", "Voice"],
     status: "active",
@@ -126,7 +126,7 @@ export const projects: Project[] = [
     th: {
       tagline: "กองยาน AI 11 agents ใต้ผู้บัญชาการเดียว",
       description:
-        "MOON FLEET ระบบ commander คุม Claude agents เฉพาะทาง 11 ตัว (scout, researcher, builder, critic, scheduler…) ทำงานผ่าน pipeline ตั้งแต่ research, build, intake ยันโหมด auto พร้อม mission queue แบบสดๆ",
+        "MOON FLEET ระบบ commander คุม Claude agents เฉพาะทาง 11 ตัว (scout, researcher, builder, critic, scheduler...) ทำงานผ่าน pipeline ตั้งแต่ research, build, intake ยันโหมด auto พร้อม mission queue แบบสดๆ",
     },
   },
 ];

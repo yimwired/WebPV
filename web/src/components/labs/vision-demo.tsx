@@ -31,7 +31,7 @@ function Statement({
 }
 
 /**
- * "Vision" — Apple-Vision-Pro-style cinematic scroll: pure black,
+ * "Vision": Apple-Vision-Pro-style cinematic scroll. Pure black,
  * gradient display type, pinned crossfading statements, then the
  * portfolio as floating spatial glass windows with parallax.
  */
@@ -218,7 +218,7 @@ export function VisionDemo() {
         </motion.div>
 
         <p className="absolute bottom-10 text-xs text-white/30">
-          A style study — no headsets were harmed.
+          A style study. No headsets were harmed.
         </p>
       </section>
     </main>

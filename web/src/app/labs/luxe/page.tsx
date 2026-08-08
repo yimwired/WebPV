@@ -9,7 +9,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Maison — The Lab · Film",
+  title: "Maison | The Lab · Film",
   description: "Luxury editorial style study: ivory paper, serif headlines, hairline gold rules.",
 };
 

@@ -7,7 +7,7 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const;
 const RED = "#e11d48";
 
 /**
- * "Grid" — International Typographic Style: white page, strict columns,
+ * "Grid": International Typographic Style. White page, strict columns,
  * uppercase mono labels, generous whitespace, exactly one accent colour.
  * No decoration that doesn't carry information.
  */
@@ -56,7 +56,7 @@ export function MinimalDemo() {
               real and running.
             </p>
             <div className="font-mono text-[11px] tracking-widest text-neutral-400 uppercase sm:text-right">
-              <p>{projects.length} projects — all active</p>
+              <p>{projects.length} projects, all active</p>
               <p className="mt-1">Next.js / Python / MT5 / Claude</p>
             </div>
           </motion.div>

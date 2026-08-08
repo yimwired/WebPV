@@ -3,7 +3,7 @@ import { NebulaDemo } from "@/components/labs/nebula-demo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata: Metadata = {
-  title: "Nebula — The Lab · Film",
+  title: "Nebula | The Lab · Film",
   description: "Premium SaaS style study: violet gradients, oversized type, floating chrome.",
 };
 

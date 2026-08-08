@@ -39,7 +39,7 @@ export function LabsGallery() {
             .
           </h1>
           <p className="mt-5 max-w-xl text-neutral-400 sm:text-lg">
-            The same work, rebuilt in radically different visual languages —
+            The same work, rebuilt in radically different visual languages,
             because a website is a design decision, not a template. Pick a
             universe and step in.
           </p>
@@ -157,7 +157,7 @@ export function LabsGallery() {
         </div>
 
         <p className="mt-14 text-center text-sm text-neutral-600">
-          Built with Next.js · Tailwind · Framer Motion — no templates.
+          Built with Next.js · Tailwind · Framer Motion. No templates.
         </p>
       </div>
     </main>

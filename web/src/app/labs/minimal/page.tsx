@@ -3,7 +3,7 @@ import { MinimalDemo } from "@/components/labs/minimal-demo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata: Metadata = {
-  title: "Grid — The Lab · Film",
+  title: "Grid | The Lab · Film",
   description: "Swiss minimal style study: white space, strict grid, one red accent.",
 };
 

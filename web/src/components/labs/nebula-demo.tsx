@@ -6,7 +6,7 @@ import { projects } from "@/lib/projects";
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
 /**
- * "Nebula" — the maximal AI-startup look from the reference clip:
+ * "Nebula": the maximal AI-startup look from the reference clip:
  * deep violet radial gradients, oversized tracking-tight type,
  * a floating chrome-like shape, glass nav, marquee.
  */
@@ -63,7 +63,7 @@ export function NebulaDemo() {
             transition={{ duration: 0.7, delay: 0.25, ease }}
             className="mt-6 max-w-md text-white/60 sm:text-lg"
           >
-            Bots, tools and content pipelines that think ahead — designed and
+            Bots, tools and content pipelines that think ahead, designed and
             shipped end to end by one person and a fleet of agents.
           </motion.p>
 
