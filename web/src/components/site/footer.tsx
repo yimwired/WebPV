@@ -1,8 +1,12 @@
 "use client";
 
-import { ArrowUpRight, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Check, Copy, Mail } from "lucide-react";
 import { Reveal } from "./reveal";
+import { ContactForm } from "./contact-form";
 import { useLocale } from "@/lib/i18n";
+
+const EMAIL = "yimwired@gmail.com";
 
 const socials = [
   // add YouTube / X here when the channels are ready
@@ -11,6 +15,22 @@ const socials = [
 
 export function Footer() {
   const { t } = useLocale();
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+    } catch {
+      // clipboard blocked (insecure context or denied): the mailto button still works
+    }
+  };
 
   return (
     <footer
@@ -26,15 +46,29 @@ export function Footer() {
         </h2>
         <p className="mt-4 max-w-md text-muted-foreground">{t.footer.sub}</p>
 
+        <ContactForm />
+
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
-            href="mailto:yimwired@gmail.com"
-            className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-7 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95"
+            href={`mailto:${EMAIL}`}
+            className="group inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-sm font-medium text-foreground/90 transition-colors hover:bg-white/10 hover:text-foreground"
           >
             <Mail className="h-4 w-4" />
-            yimwired@gmail.com
+            {EMAIL}
           </a>
           <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={copyEmail}
+              className="inline-flex h-12 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-5 text-sm text-foreground/80 transition-colors hover:bg-white/10 hover:text-foreground"
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+              {copied ? t.form.copied : t.form.copyEmail}
+            </button>
             {socials.map((s) => (
               <a
                 key={s.label}
