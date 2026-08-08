@@ -156,6 +156,30 @@ export function LabsGallery() {
           ))}
         </div>
 
+        <div className="mt-16 rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 text-center backdrop-blur-md sm:p-12">
+          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            Like one of these?
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-neutral-400">
+            Pick a direction and I&apos;ll build your site in it. Same code,
+            same care, your content.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/services"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-white px-7 text-sm font-medium text-neutral-950 transition-transform hover:scale-[1.03] active:scale-95"
+            >
+              See what I build
+            </Link>
+            <Link
+              href="/#contact"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              Get in touch
+            </Link>
+          </div>
+        </div>
+
         <p className="mt-14 text-center text-sm text-neutral-600">
           Built with Next.js · Tailwind · Framer Motion. No templates.
         </p>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,11 +11,19 @@ import { LanguageSwitch } from "./language-switch";
 
 export function Navbar() {
   const { t } = useLocale();
+  const pathname = usePathname();
+  const onHome = pathname === "/";
+
+  // section anchors only exist on the home page, so they need it as a prefix
+  // everywhere else
+  const section = (hash: string) => (onHome ? hash : `/${hash}`);
+
   const links = [
-    { href: "#work", label: t.nav.work },
-    { href: "#about", label: t.nav.about },
+    { href: section("#work"), label: t.nav.work },
+    { href: "/services", label: t.nav.services },
+    { href: section("#about"), label: t.nav.about },
     { href: "/labs", label: t.nav.labs },
-    { href: "#contact", label: t.nav.contact },
+    { href: section("#contact"), label: t.nav.contact },
   ];
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -85,7 +94,7 @@ export function Navbar() {
             "mt-2 sm:mt-3 sm:max-w-5xl sm:rounded-full sm:border sm:border-white/10 sm:bg-background/60 sm:px-6 sm:backdrop-blur-xl sm:shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
         )}
       >
-        <a href="#top" className="group flex items-center gap-2">
+        <a href={onHome ? "#top" : "/"} className="group flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-foreground text-background font-semibold">
             F
           </span>
@@ -101,7 +110,7 @@ export function Navbar() {
         <div className="flex items-center gap-2.5">
           <LanguageSwitch />
           <a
-            href="#contact"
+            href={section("#contact")}
             className="hidden rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95 sm:inline-block"
           >
             {t.nav.cta}
@@ -156,7 +165,7 @@ export function Navbar() {
                 )
               )}
               <a
-                href="#contact"
+                href={section("#contact")}
                 onClick={() => setMenuOpen(false)}
                 className="mt-1 rounded-2xl bg-foreground px-4 py-3 text-center text-base font-medium text-background transition-transform active:scale-[0.98]"
               >
