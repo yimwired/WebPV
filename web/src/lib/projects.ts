@@ -48,7 +48,7 @@ export const projects: Project[] = [
     category: "Game",
     tags: ["Game", "Strategy", "Bio-sim", "Web"],
     status: "active",
-    href: "#",
+    href: "/work/you-are-the-virus",
     accent: "#34d399", // emerald
     image: "/projects/you-are-the-virus.png",
     th: {
@@ -84,7 +84,7 @@ export const projects: Project[] = [
     category: "Tooling",
     tags: ["Shopee", "AI content", "Catalog", "Export"],
     status: "active",
-    href: "#",
+    href: "/work/product-dashboard",
     accent: "#60a5fa", // blue
     image: "/projects/product-dashboard.png",
     th: {
@@ -102,7 +102,7 @@ export const projects: Project[] = [
     category: "Growth",
     tags: ["YouTube", "TikTok", "Shopee", "Lemon8"],
     status: "active",
-    href: "#",
+    href: "/work/affiliate",
     accent: "#a78bfa", // violet
     image: "/projects/affiliate.png",
     th: {
@@ -120,7 +120,7 @@ export const projects: Project[] = [
     category: "AI",
     tags: ["Multi-agent", "Claude", "Orchestration", "Voice"],
     status: "active",
-    href: "#",
+    href: "/work/jarvis-moon",
     accent: "#22d3ee", // cyan
     image: "/projects/jarvis-moon.png",
     th: {
