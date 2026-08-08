@@ -4,7 +4,10 @@ import { useState, type FormEvent } from "react";
 import { Check, Loader2, Send } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 
-const FORM_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID;
+// Not a secret: Formspree ids are visible in the form endpoint either way.
+// Keeping the default here means a fresh clone or preview deploy has a working
+// form without any env setup; set NEXT_PUBLIC_FORMSPREE_ID to point elsewhere.
+const FORM_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || "xdenayky";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
