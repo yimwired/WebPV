@@ -8,7 +8,7 @@ import { labs } from "@/lib/labs";
 import { cn } from "@/lib/utils";
 
 /**
- * Floating pill shown on every lab demo — switch style or exit back
+ * Floating pill shown on every lab demo: switch style or exit back
  * to the gallery. Kept visually neutral so it works on both dark
  * and light demos.
  */

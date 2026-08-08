@@ -30,7 +30,7 @@ function CardMedia({ project }: { project: Project }) {
           }}
         >
           <div className="bg-grid absolute inset-0 opacity-40" />
-          {/* faux window chrome — signals "screenshot goes here" */}
+          {/* faux window chrome, signals "screenshot goes here" */}
           <div className="absolute left-3 top-3 flex gap-1.5">
             <span className="h-2 w-2 rounded-full bg-white/20" />
             <span className="h-2 w-2 rounded-full bg-white/20" />

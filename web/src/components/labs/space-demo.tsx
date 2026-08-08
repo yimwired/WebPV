@@ -6,7 +6,7 @@ import { projects } from "@/lib/projects";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
-/** Animated starfield on <canvas> — slow drift + twinkle, DPR-aware. */
+/** Animated starfield on <canvas>: slow drift + twinkle, DPR-aware. */
 function Starfield() {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -64,7 +64,7 @@ function Starfield() {
 }
 
 /**
- * "Deep Space" — the portfolio as a spacecraft dashboard: black void,
+ * "Deep Space": the portfolio as a spacecraft dashboard. Black void,
  * live starfield, glowing planet on the horizon, HUD mono labels and
  * projects presented as a mission log.
  */
@@ -116,7 +116,7 @@ export function SpaceDemo() {
           className="mt-6 max-w-xl text-sm leading-relaxed text-slate-400"
         >
           Mission commander: Film. Payload: trading systems, AI agent fleets,
-          dashboards and content machines — all built solo, all operational.
+          dashboards and content machines, all built solo, all operational.
         </motion.p>
 
         {/* telemetry row */}

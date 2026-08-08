@@ -8,7 +8,7 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const;
 const GOLD = "#a8823c";
 
 /**
- * "Maison" — printed-matter luxury: ivory paper, serif display type,
+ * "Maison": printed-matter luxury. Ivory paper, serif display type,
  * hairline rules, gold accents, an editorial index of works.
  * Deliberately no glass, no glow, no gradients.
  */
@@ -25,7 +25,7 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
           style={{ color: GOLD }}
         >
           <span>Est. 2026</span>
-          <span>Bangkok — Online</span>
+          <span>Bangkok · Online</span>
         </motion.div>
         <div className="mt-4 h-px bg-[#1c1917]/20" />
       </header>
@@ -63,7 +63,7 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
           className="mx-auto mt-8 max-w-md text-[15px] leading-relaxed text-[#57534e]"
         >
           A private atelier of trading systems, intelligent assistants and
-          content machines — each piece designed, built and finished by hand.
+          content machines, each piece designed, built and finished by hand.
         </motion.p>
 
         <motion.div
@@ -118,7 +118,7 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
                   </span>
                 </h3>
                 <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#57534e]">
-                  {p.tagline} — {p.category.toLowerCase()}.
+                  {p.tagline}, {p.category.toLowerCase()}.
                 </p>
               </div>
               <span className="text-[10px] tracking-[0.3em] text-[#a8a29e] uppercase">

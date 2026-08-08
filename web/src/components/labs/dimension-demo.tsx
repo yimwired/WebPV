@@ -10,13 +10,13 @@ const DimensionScene = dynamic(() => import("./dimension-scene"), {
   ssr: false,
   loading: () => (
     <div className="grid h-full w-full place-items-center text-xs tracking-[0.4em] text-slate-500 uppercase">
-      loading scene…
+      loading scene...
     </div>
   ),
 });
 
 /**
- * "Dimension" — an actual WebGL scene as the hero: chrome torus knot,
+ * "Dimension": an actual WebGL scene as the hero. Chrome torus knot,
  * iridescent lighting, drag to orbit. Content floats above the canvas.
  */
 export function DimensionDemo() {
@@ -59,7 +59,7 @@ export function DimensionDemo() {
               className="mx-auto mt-6 max-w-md text-sm text-slate-400 sm:text-base"
             >
               Real-time WebGL, running in your browser right now. Drag the
-              chrome — it&apos;s not a video.
+              chrome, it&apos;s not a video.
             </motion.p>
           </div>
 

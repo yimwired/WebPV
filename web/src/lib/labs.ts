@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-//  Lab data — design experiments shown under /labs.
+//  Lab data. Design experiments shown under /labs.
 //  Each entry is a full standalone landing page in its own style.
 //  แก้ไฟล์นี้เพื่อเพิ่ม/แก้ style demo (ชื่อ, คำอธิบาย, สี card)
 // ─────────────────────────────────────────────────────────────
@@ -9,7 +9,7 @@ export interface Lab {
   name: string;
   /** short vibe label shown on the card + switcher */
   vibe: string;
-  /** 1–2 sentences for the gallery card */
+  /** 1-2 sentences for the gallery card */
   description: string;
   /** accent used for glows/badges */
   accent: string;
@@ -23,7 +23,7 @@ export const labs: Lab[] = [
     name: "Dimension",
     vibe: "Real-time 3D",
     description:
-      "An actual WebGL scene as the hero — chrome torus knot, iridescent lighting, drag to orbit. Not a video, not a render: live in your browser.",
+      "An actual WebGL scene as the hero, with a chrome torus knot, iridescent lighting and drag to orbit. Not a video, not a render: live in your browser.",
     accent: "#f0abfc",
     preview: { from: "#0f172a", to: "#312e81" },
   },
@@ -32,7 +32,7 @@ export const labs: Lab[] = [
     name: "Vision",
     vibe: "Spatial cinematic",
     description:
-      "Pure black, a glowing visor, statements that fade in as you scroll and apps floating as glass windows in space — the Apple keynote treatment.",
+      "Pure black, a glowing visor, statements that fade in as you scroll and apps floating as glass windows in space. The Apple keynote treatment.",
     accent: "#2997ff",
     preview: { from: "#000000", to: "#101828" },
   },
@@ -41,7 +41,7 @@ export const labs: Lab[] = [
     name: "Nebula",
     vibe: "Premium SaaS",
     description:
-      "Deep violet gradients, oversized type and floating chrome shapes — the maximal AI-startup look, tuned to feel expensive instead of noisy.",
+      "Deep violet gradients, oversized type and floating chrome shapes. The maximal AI-startup look, tuned to feel expensive instead of noisy.",
     accent: "#a78bfa",
     preview: { from: "#2e1065", to: "#6d28d9" },
   },
@@ -59,7 +59,7 @@ export const labs: Lab[] = [
     name: "Maison",
     vibe: "Luxury editorial",
     description:
-      "Ivory paper, serif headlines and hairline gold rules. Quiet, printed-matter luxury — the opposite of a tech landing page.",
+      "Ivory paper, serif headlines and hairline gold rules. Quiet, printed-matter luxury. The opposite of a tech landing page.",
     accent: "#c8a24a",
     preview: { from: "#f5efe4", to: "#d9c8a3" },
   },

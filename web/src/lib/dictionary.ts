@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-//  UI copy in both languages — EDIT THIS to change site text.
+//  UI copy in both languages. EDIT THIS to change site text.
 //  แก้ข้อความบนเว็บ (ทั้ง EN และไทย) ที่ไฟล์นี้ไฟล์เดียว
 //  Project names/descriptions live in `projects.ts`.
 // ─────────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ const en = {
     badge: "Builder of bots, tools & content",
     greeting: "Hi, I'm",
     headline: "I build things that ship.",
-    sub: "Trading systems, AI assistants, dashboards, and content — designed, built and shipped end to end. This is where it all lives.",
+    sub: "Trading systems, AI assistants, dashboards and content. Every one designed, built and shipped end to end. This is where it all lives.",
     viewWork: "View my work",
     contact: "Get in touch",
   },
@@ -30,8 +30,8 @@ const en = {
   about: {
     label: "About",
     title: "I turn ideas into working systems.",
-    p1: "I'm Film — I build trading bots, AI assistants, dashboards and content pipelines. I like owning a project from the first sketch to the thing running in production.",
-    p2: "My default is to ship: small, real, and improving over time. Whether it's an automated strategy or a short-form video system, the goal is the same — make it work, then make it better.",
+    p1: "I'm Film. I build trading bots, AI assistants, dashboards and content pipelines. I like owning a project from the first sketch to the thing running in production.",
+    p2: "My default is to ship: small, real, and improving over time. Whether it's an automated strategy or a short-form video system, the goal is the same: make it work, then make it better.",
     stats: [
       { value: "4+", label: "Active projects" },
       { value: "End-to-end", label: "Design → build → ship" },
@@ -47,7 +47,7 @@ const en = {
   },
   notFound: {
     title: "This page doesn't exist. Yet.",
-    sub: "Like half the ideas in my backlog — it might get built someday. Meanwhile, everything that does exist lives on the home page.",
+    sub: "Like half the ideas in my backlog, it might get built someday. Meanwhile, everything that does exist lives on the home page.",
     home: "Back to home",
     labs: "Visit The Lab",
   },
@@ -56,7 +56,7 @@ const en = {
     back: "Back to home",
     label: "Case study",
     ctaTitle: "Want a system built like this?",
-    ctaSub: "I design and build automation end to end — trading, AI, dashboards, content.",
+    ctaSub: "I design and build automation end to end: trading, AI, dashboards, content.",
     ctaButton: "Get in touch",
   },
   // Per-project copy, keyed by the project id in `projects.ts`.
@@ -74,26 +74,26 @@ const en = {
       sections: [
         {
           h: "The problem",
-          p: "Trading gold manually means missing setups while you sleep, exiting on emotion, and applying risk rules inconsistently. Gold moves around the clock across Asia, London and New York sessions — a human can't watch all of them, and shouldn't have to.",
+          p: "Trading gold manually means missing setups while you sleep, exiting on emotion, and applying risk rules inconsistently. Gold moves around the clock across Asia, London and New York sessions. No one can watch all of them, and no one should have to.",
         },
         {
           h: "The approach",
-          p: "Instead of one strategy trying to do everything, AURUM runs 12 focused engines — each one scans for a single setup type it's good at. Scanning is session-aware, because gold behaves differently in Asia than it does when London or New York opens. Every signal must pass real-time risk checks before a single order is placed.",
+          p: "Instead of one strategy trying to do everything, AURUM runs 12 focused engines. Each one scans for a single setup type it's good at. Scanning is session-aware, because gold behaves differently in Asia than it does when London or New York opens. Every signal must pass real-time risk checks before a single order is placed.",
         },
         {
           h: "The details that matter",
-          p: "Every decision the bot makes is logged to a trade tape, so there's never a mystery position. A kill switch flattens everything and halts trading with one action. Daily loss limits are enforced by the system, not by discipline. These unglamorous pieces took longer than the strategies — and they're what makes it trustworthy enough to run live.",
+          p: "Every decision the bot makes is logged to a trade tape, so there's never a mystery position. A kill switch flattens everything and halts trading with one action. Daily loss limits are enforced by the system, not by discipline. These unglamorous pieces took longer than the strategies, and they're what makes it trustworthy enough to run live.",
         },
         {
           h: "Where it is now",
-          p: "AURUM runs end to end on MetaTrader 5 with a live terminal dashboard for monitoring. The biggest lesson: the hard part of a trading bot isn't the entry logic — it's risk plumbing, failure states, and knowing exactly what the system did and why.",
+          p: "AURUM runs end to end on MetaTrader 5 with a live terminal dashboard for monitoring. The biggest lesson: the hard part of a trading bot isn't the entry logic. It's risk plumbing, failure states, and knowing exactly what the system did and why.",
         },
       ],
     },
     "you-are-the-virus": {
       title: "You Are the Virus",
       subtitle: "A game where the villain is you",
-      imageAlt: "You Are the Virus — gameplay",
+      imageAlt: "You Are the Virus gameplay",
       meta: [
         { k: "Role", v: "Design + build, solo" },
         { k: "Engine", v: "Godot 4 · GDScript" },
@@ -103,26 +103,26 @@ const en = {
       sections: [
         {
           h: "The idea",
-          p: "Most virus games hand you the cure. This one hands you the virus. You drift through a host's bloodstream, infect cells for DNA, dodge the immune system and evolve — and somewhere along the way you learn the host is a child. Every run ends on the same choice: mutate and win, or self-destruct so the kid lives.",
+          p: "Most virus games hand you the cure. This one hands you the virus. You drift through a host's bloodstream, infect cells for DNA, dodge the immune system and evolve. Somewhere along the way you learn the host is a child. Every run ends on the same choice: mutate and win, or self-destruct so the kid lives.",
         },
         {
           h: "The approach",
-          p: "The vessel scrolls past on its own, so the pressure never lets up. Three verbs carry the whole game: infect, evade, evolve. A run starts at a random peripheral entry — hand, foot, nose or mouth — then climbs five tiers of the body toward the brain, and every body part brings its own hazard: mucus that makes you slide, saliva enzymes that chip away at you, capillaries too narrow to hide in.",
+          p: "The vessel scrolls past on its own, so the pressure never lets up. Three verbs carry the whole game: infect, evade, evolve. A run starts at a random peripheral entry (hand, foot, nose or mouth), then climbs five tiers of the body toward the brain, and every body part brings its own hazard: mucus that makes you slide, saliva enzymes that chip away at you, capillaries too narrow to hide in.",
         },
         {
           h: "The details that matter",
-          p: "The abilities come from real virology — glycoprotein shift, lytic burst, endocytosis hiding — and each one costs DNA and carries a trade-off, so no build cheeses the game. The HUD is an ECG that reacts to the host's vitals, the audio (12 SFX, 6 tracks) is generated procedurally, and memory fragments drop between levels to reveal exactly who you're killing.",
+          p: "The abilities come from real virology: glycoprotein shift, lytic burst, endocytosis hiding. Each one costs DNA and carries a trade-off, so no build cheeses the game. The HUD is an ECG that reacts to the host's vitals, the audio (12 SFX, 6 tracks) is generated procedurally, and memory fragments drop between levels to reveal exactly who you're killing.",
         },
         {
           h: "Where it is now",
-          p: "The full loop plays end to end — intro, levels, fragments, both endings. The side-scroll rework is going in system by system, and each piece heads straight into playtest. The target is a 10–15 minute run worth replaying for the other ending.",
+          p: "The full loop plays end to end: intro, levels, fragments, both endings. The side-scroll rework is going in system by system, and each piece heads straight into playtest. The target is a 10-15 minute run worth replaying for the other ending.",
         },
       ],
     },
     "product-dashboard": {
       title: "Product Dashboard",
       subtitle: "Product & content ops for a Shopee store",
-      imageAlt: "Product Dashboard — Giffarine catalog with AI content tools",
+      imageAlt: "Product Dashboard showing the Giffarine catalog and its AI content tools",
       meta: [
         { k: "Role", v: "Design + build, solo" },
         { k: "Catalog", v: "900+ items" },
@@ -132,19 +132,19 @@ const en = {
       sections: [
         {
           h: "The problem",
-          p: "Running a Giffarine store on Shopee means the same loop for every product: write the description, find an image, cut the background out, script a short video, list it, repeat. With hundreds of items in the catalog and only a fraction of them listed, the bottleneck was never selling — it was producing content fast enough to list anything at all.",
+          p: "Running a Giffarine store on Shopee means the same loop for every product: write the description, find an image, cut the background out, script a short video, list it, repeat. With hundreds of items in the catalog and only a fraction of them listed, the bottleneck was never selling. It was producing content fast enough to list anything at all.",
         },
         {
           h: "The approach",
-          p: "One dashboard holds the whole catalog and knows where every product stands: listed on Shopee, not listed yet, or newly added from the Giffarine range. From any row, one click generates whatever that product is missing — a description, an image prompt, a background-removed cut-out, a video prompt, or a partner product to bundle it with.",
+          p: "One dashboard holds the whole catalog and knows where every product stands: listed on Shopee, not listed yet, or newly added from the Giffarine range. From any row, one click generates whatever that product is missing: a description, an image prompt, a background-removed cut-out, a video prompt, or a partner product to bundle it with.",
         },
         {
           h: "The details that matter",
-          p: "Filter by category, search by name or SKU, and switch between three views — table, cards, split — depending on the job. Every row carries status ticks, so what's done and what's missing reads at a glance. Finished content exports as a CSV in the shape the marketplace expects.",
+          p: "Filter by category, search by name or SKU, and switch between three views (table, cards, split) depending on the job. Every row carries status ticks, so what's done and what's missing reads at a glance. Finished content exports as a CSV in the shape the marketplace expects.",
         },
         {
           h: "Where it is now",
-          p: "It's the daily driver for the store: 50 products live on Shopee, a queue waiting behind them, hundreds more in the catalog ready to go. The lesson was that a catalog tool lives or dies on tracking state — knowing what's done — far more than on how good the AI copy is.",
+          p: "It's the daily driver for the store: 50 products live on Shopee, a queue waiting behind them, hundreds more in the catalog ready to go. The lesson was that a catalog tool lives or dies on tracking state, on knowing what's done, far more than on how good the AI copy is.",
         },
       ],
     },
@@ -165,7 +165,7 @@ const en = {
         },
         {
           h: "The approach",
-          p: "Before writing a line of code I checked what each platform actually allows: YouTube has a real upload API, TikTok's needs app approval and quota, Shopee Shorts and Lemon8 can't be posted to from a desktop at all. So the system is honest semi-automation — API where one exists, browser automation where it doesn't, assist-manual where the platform forces you into its app. One publisher adapter per platform keeps those differences in a single place.",
+          p: "Before writing a line of code I checked what each platform actually allows: YouTube has a real upload API, TikTok's needs app approval and quota, Shopee Shorts and Lemon8 can't be posted to from a desktop at all. So the system is honest semi-automation: API where one exists, browser automation where it doesn't, assist-manual where the platform forces you into its app. One publisher adapter per platform keeps those differences in a single place.",
         },
         {
           h: "The details that matter",
@@ -180,7 +180,7 @@ const en = {
     "jarvis-moon": {
       title: "Moon",
       subtitle: "A multi-agent fleet, and a voice to command it",
-      imageAlt: "MOON FLEET — multi-agent orchestrator",
+      imageAlt: "MOON FLEET, the multi-agent orchestrator",
       meta: [
         { k: "Role", v: "Design + build, solo" },
         { k: "Fleet", v: "11 specialist agents" },
@@ -190,19 +190,19 @@ const en = {
       sections: [
         {
           h: "The idea",
-          p: "An assistant that answers one question at a time throws away the best thing about agents: several of them can work at once. Moon is a commander that holds the goal and hands the work out to a fleet — a scout to find things, a researcher to read them, a builder to make something, a critic to tear it apart, a scheduler to keep it all running.",
+          p: "An assistant that answers one question at a time throws away the best thing about agents: several of them can work at once. Moon is a commander that holds the goal and hands the work out to a fleet: a scout to find things, a researcher to read them, a builder to make something, a critic to tear it apart, a scheduler to keep it all running.",
         },
         {
           h: "The approach",
-          p: "11 specialized Claude agents sit behind four pipelines — research, build, intake, and an auto mode that picks its own work. Every job lands on a live mission queue, so the fleet can be watched and corrected mid-flight instead of trusted blindly. Each agent gets one job and a narrow prompt; the commander is the only piece holding the full context.",
+          p: "11 specialized Claude agents sit behind four pipelines: research, build, intake, and an auto mode that picks its own work. Every job lands on a live mission queue, so the fleet can be watched and corrected mid-flight instead of trusted blindly. Each agent gets one job and a narrow prompt; the commander is the only piece holding the full context.",
         },
         {
           h: "The details that matter",
-          p: "Voice is the front door. Say “Hey Moon” and a small orb appears at the top of the screen, Siri-style — it listens, answers, and keeps the conversation open until you say you're done. Wake-word detection runs offline, speech-to-text handles Thai, and voice, Telegram and the web all talk to the same brain. One system, three doors, no duplicated logic.",
+          p: "Voice is the front door. Say \"Hey Moon\" and a small orb appears at the top of the screen, Siri-style. It listens, answers, and keeps the conversation open until you say you're done. Wake-word detection runs offline, speech-to-text handles Thai, and voice, Telegram and the web all talk to the same brain. One system, three doors, no duplicated logic.",
         },
         {
           h: "Where it is now",
-          p: "It starts with the machine at login: the fleet, the voice server, the Telegram bot and scheduled jobs like a morning brief. It's the tool I use to run everything else — including this site.",
+          p: "It starts with the machine at login: the fleet, the voice server, the Telegram bot and scheduled jobs like a morning brief. It's the tool I use to run everything else, including this site.",
         },
       ],
     },

@@ -10,7 +10,7 @@ export function Projects() {
   const { t } = useLocale();
   return (
     <section id="work" className="scroll-mt-24">
-      {/* Cinematic scroll reveal — tilts up and flattens as you scroll into Work */}
+      {/* Cinematic scroll reveal: tilts up and flattens as you scroll into Work */}
       <ContainerScroll
         titleComponent={
           <div className="pb-2">
@@ -25,7 +25,7 @@ export function Projects() {
       >
         <Image
           src="/projects/aurum.png"
-          alt="AURUM — automated XAU/USD trading terminal"
+          alt="AURUM automated XAU/USD trading terminal"
           width={1400}
           height={900}
           priority

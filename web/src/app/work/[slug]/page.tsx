@@ -8,7 +8,7 @@ import {
 } from "@/lib/dictionary";
 import { projects } from "@/lib/projects";
 
-/** every case study is known at build time — anything else is a 404 */
+/** every case study is known at build time; anything else is a 404 */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -28,7 +28,7 @@ export async function generateMetadata({
   const project = projects.find((p) => p.id === slug);
 
   return {
-    title: `${cs.title} — Case study | Film`,
+    title: `${cs.title} case study | Film`,
     description: project?.description ?? cs.subtitle,
   };
 }
