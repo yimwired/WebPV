@@ -9,6 +9,7 @@ export type Locale = "en" | "th";
 const en = {
   nav: {
     work: "Work",
+    services: "Services",
     about: "About",
     labs: "Labs",
     contact: "Contact",
@@ -66,6 +67,79 @@ const en = {
     sub: "Like half the ideas in my backlog, it might get built someday. Meanwhile, everything that does exist lives on the home page.",
     home: "Back to home",
     labs: "Visit The Lab",
+  },
+  services: {
+    label: "Services",
+    title: "What I can build for you",
+    sub: "Same approach as everything above: designed, built and shipped by one person who has to live with the result.",
+    offerings: [
+      {
+        title: "Websites & landing pages",
+        blurb:
+          "A fast, responsive site that looks made for you instead of pulled off a template. Pick a direction from The Lab or send a reference you like. It goes live when it's done.",
+        points: [
+          "Next.js, deployed and running",
+          "Phone first, Thai and English",
+          "Your repo, your domain",
+        ],
+        timeline: "Usually about a week",
+      },
+      {
+        title: "Automation & bots",
+        blurb:
+          "The repetitive half of your week handed to a machine: Telegram bots, scheduled jobs, scraping, publishing to several platforms from one place.",
+        points: [
+          "Driven from Telegram or a web panel",
+          "Runs on a schedule or on demand",
+          "Alerts you when something breaks",
+        ],
+        timeline: "One to two weeks, depending on scope",
+      },
+      {
+        title: "Dashboards & internal tools",
+        blurb:
+          "One screen that shows the state of the business and lets you act on it: catalogs, orders, content status, exports.",
+        points: [
+          "Built around how you actually work",
+          "Search, filters and CSV export",
+          "Room to grow as you do",
+        ],
+        timeline: "One to three weeks",
+      },
+      {
+        title: "AI where it earns its place",
+        blurb:
+          "Claude or Gemini wired into a real workflow: product copy, summaries, image prompts, classification. Used where it saves hours, not sprinkled on for show.",
+        points: [
+          "Runs inside the tools you already use",
+          "Your data stays yours",
+          "Running costs explained up front",
+        ],
+        timeline: "Usually added onto one of the above",
+      },
+    ],
+    processTitle: "How it works",
+    process: [
+      {
+        h: "Tell me what you need",
+        p: "A message with the rough idea is enough. No brief, no forms to fill in.",
+      },
+      {
+        h: "Scope and quote",
+        p: "I come back with what I would build, how long it takes and a fixed price. That part costs nothing.",
+      },
+      {
+        h: "Build in the open",
+        p: "You see working versions as they land instead of waiting for one big reveal at the end.",
+      },
+      {
+        h: "Ship and hand over",
+        p: "It goes live, the code is yours, and revisions are included as agreed.",
+      },
+    ],
+    ctaTitle: "Have something in mind?",
+    ctaSub: "Tell me roughly what you need and I'll send back scope, timeline and a price.",
+    ctaButton: "Ask for a quote",
   },
   // Chrome shared by every case-study page.
   caseStudy: {
@@ -228,6 +302,7 @@ const en = {
 const th: typeof en = {
   nav: {
     work: "ผลงาน",
+    services: "รับงาน",
     about: "รู้จักผม",
     labs: "Labs",
     contact: "ติดต่อ",
@@ -285,6 +360,79 @@ const th: typeof en = {
     sub: "เหมือนไอเดียอีกครึ่งใน backlog แหละ สักวันอาจได้เกิด แต่ตอนนี้ของจริงทั้งหมดรออยู่ที่หน้าแรก",
     home: "กลับหน้าแรก",
     labs: "แวะดู The Lab",
+  },
+  services: {
+    label: "รับงาน",
+    title: "รับทำอะไรบ้าง",
+    sub: "วิธีทำงานเหมือนงานทุกชิ้นข้างบน ออกแบบเอง สร้างเอง ส่งจนขึ้นใช้จริง โดยคนที่ต้องอยู่กับผลงานนั้นเอง",
+    offerings: [
+      {
+        title: "เว็บไซต์และแลนดิ้งเพจ",
+        blurb:
+          "เว็บที่โหลดไว ใช้ได้ทุกจอ หน้าตาเหมือนทำมาเพื่อคุณ ไม่ใช่เทมเพลตสำเร็จรูป เลือกสไตล์จาก The Lab หรือส่งตัวอย่างที่ชอบมาก็ได้ ทำเสร็จแล้วขึ้นออนไลน์ให้เลย",
+        points: [
+          "Next.js ขึ้นเซิร์ฟเวอร์พร้อมใช้",
+          "ออกแบบจากมือถือก่อน รองรับทั้งไทยและอังกฤษ",
+          "โค้ดกับโดเมนเป็นของคุณ",
+        ],
+        timeline: "ปกติราวหนึ่งสัปดาห์",
+      },
+      {
+        title: "ระบบอัตโนมัติและบอท",
+        blurb:
+          "ยกงานซ้ำๆ ที่ต้องทำทุกวันไปให้เครื่องทำแทน ทั้งบอท Telegram งานตั้งเวลา ดึงข้อมูล ไปจนถึงกระจายโพสต์หลายแพลตฟอร์มจากที่เดียว",
+        points: [
+          "สั่งงานผ่าน Telegram หรือหน้าเว็บ",
+          "รันตามเวลาหรือกดเองเมื่อไหร่ก็ได้",
+          "แจ้งเตือนทันทีเมื่อระบบสะดุด",
+        ],
+        timeline: "ราวหนึ่งถึงสองสัปดาห์ ขึ้นกับขอบเขตงาน",
+      },
+      {
+        title: "Dashboard และเครื่องมือใช้ในทีม",
+        blurb:
+          "หน้าจอเดียวที่เห็นสถานะทั้งร้าน แล้วกดจัดการต่อได้เลย ทั้งแคตตาล็อกสินค้า ออเดอร์ สถานะคอนเทนต์ และการ export",
+        points: [
+          "ออกแบบตามวิธีทำงานจริงของคุณ",
+          "ค้นหา กรอง export เป็น CSV",
+          "ต่อเติมได้เรื่อยๆ เมื่อธุรกิจโตขึ้น",
+        ],
+        timeline: "ราวหนึ่งถึงสามสัปดาห์",
+      },
+      {
+        title: "AI เฉพาะจุดที่คุ้มจริง",
+        blurb:
+          "ต่อ Claude หรือ Gemini เข้ากับงานจริง เขียนคำโฆษณา สรุปข้อมูล สร้าง prompt รูป จัดหมวดหมู่ ใส่เฉพาะจุดที่ประหยัดเวลาได้จริง ไม่ได้ใส่ไว้ให้ดูเท่",
+        points: [
+          "ทำงานอยู่ในเครื่องมือที่คุณใช้อยู่แล้ว",
+          "ข้อมูลยังเป็นของคุณ",
+          "บอกค่าใช้จ่ายรายเดือนให้ชัดตั้งแต่แรก",
+        ],
+        timeline: "ส่วนใหญ่เสริมเข้าไปในงานข้างบน",
+      },
+    ],
+    processTitle: "ทำงานกันยังไง",
+    process: [
+      {
+        h: "เล่าให้ฟังก่อน",
+        p: "ส่งไอเดียคร่าวๆ มาก็พอ ไม่ต้องมีเอกสารหรือแบบฟอร์มอะไร",
+      },
+      {
+        h: "สรุปงานและเสนอราคา",
+        p: "ผมตอบกลับว่าจะทำอะไรให้บ้าง ใช้เวลาเท่าไหร่ ราคาเท่าไหร่ ขั้นนี้ไม่มีค่าใช้จ่าย",
+      },
+      {
+        h: "ทำให้เห็นระหว่างทาง",
+        p: "ได้เห็นของที่ใช้ได้จริงเป็นระยะ ไม่ต้องรอลุ้นทีเดียวตอนจบ",
+      },
+      {
+        h: "ส่งมอบและขึ้นจริง",
+        p: "ขึ้นออนไลน์ให้เรียบร้อย โค้ดเป็นของคุณ แล้วแก้ให้ตามรอบที่ตกลงกันไว้",
+      },
+    ],
+    ctaTitle: "มีงานในใจแล้วใช่ไหม",
+    ctaSub: "เล่าคร่าวๆ มาได้เลย เดี๋ยวสรุปขอบเขตงาน เวลา และราคากลับไปให้",
+    ctaButton: "ขอใบเสนอราคา",
   },
   caseStudy: {
     back: "กลับหน้าแรก",
