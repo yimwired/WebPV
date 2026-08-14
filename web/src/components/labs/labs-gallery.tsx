@@ -66,6 +66,43 @@ export function LabsGallery() {
                 >
                   <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
                     {/* abstract mini-composition per style */}
+                    {lab.slug === "sable" && (
+                      <>
+                        {/* the slate, tilted, with a folio edge under it */}
+                        <div className="absolute top-9 left-1/2 h-32 w-24 -translate-x-1/2 rotate-[-4deg] rounded-md bg-[#3b3833] p-1.5 shadow-[0_10px_24px_-10px_rgba(23,21,15,0.5)]">
+                          <div className="h-full w-full rounded-sm bg-[#d9d6cd] p-1.5">
+                            {[14, 11, 13, 8].map((w, s) => (
+                              <div
+                                key={s}
+                                className="mb-1 h-px bg-[#2f2c26]/45"
+                                style={{ width: `${w * 5}%` }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div className="absolute top-[10.2rem] left-1/2 h-2 w-28 -translate-x-1/2 rounded-b-md bg-[#2c2a26]/80" />
+                        <div className="absolute top-6 left-6 h-1.5 w-1.5 rounded-full bg-[#a8432b]" />
+                      </>
+                    )}
+                    {lab.slug === "meridian" && (
+                      <>
+                        {/* keycap field with one lit key */}
+                        <div className="absolute top-1/2 left-1/2 grid -translate-x-1/2 -translate-y-1/2 rotate-[-8deg] grid-cols-4 gap-1.5">
+                          {[...Array(12)].map((_, s) => (
+                            <div
+                              key={s}
+                              className="h-7 w-7 rounded-[3px] bg-gradient-to-b from-[#4a4741] to-[#2b2925] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]"
+                              style={
+                                s === 9
+                                  ? { background: "#f7a445", opacity: 0.85 }
+                                  : undefined
+                              }
+                            />
+                          ))}
+                        </div>
+                        <div className="absolute top-1/2 right-7 h-10 w-10 -translate-y-1/2 rounded-full border-2 border-[#6b6760] bg-gradient-to-b from-[#57534c] to-[#33302b]" />
+                      </>
+                    )}
                     {lab.slug === "dimension" && (
                       <>
                         {/* chrome ring impression */}
