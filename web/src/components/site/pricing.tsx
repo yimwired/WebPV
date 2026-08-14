@@ -90,6 +90,7 @@ export function Pricing() {
             {p.ctaSecondary}
           </Link>
         </div>
+        <p className="text-muted-foreground mt-5 text-sm">{p.proof}</p>
       </Reveal>
     </section>
   );
@@ -166,7 +167,23 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
         ))}
       </ul>
 
-      <div className="border-line mt-auto flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+      <div className="mt-auto pt-8">
+        <Link
+          href="/#contact"
+          className={cn(
+            // 44px tall so it stays a comfortable target on a phone
+            "flex h-11 items-center justify-center rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90",
+            tier.featured
+              ? "bg-foreground text-background"
+              : "border-line-strong text-foreground/90 hover:text-foreground border transition-colors",
+            wide && "sm:inline-flex sm:w-auto",
+          )}
+        >
+          {copy.cta}
+        </Link>
+      </div>
+
+      <div className="border-line mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
         <p className="text-muted-foreground text-sm">{copy.timeline}</p>
         {tier.demoHref && (
           <Link

@@ -165,8 +165,10 @@ const en = {
           "Thai and English copy",
           "Contact form straight to your inbox",
           "Live on your own domain",
+          "Two rounds of revisions",
         ],
         timeline: "About 5 days",
+        cta: "Start with Starter",
       },
       standard: {
         name: "Standard",
@@ -178,9 +180,10 @@ const en = {
           "A Lab style adapted to your brand",
           "SEO, share previews and sitemap",
           "Edit your own text without me",
-          "Two rounds of revisions",
+          "Three rounds of revisions",
         ],
         timeline: "About 2 weeks",
+        cta: "Start with Standard",
       },
       signature: {
         name: "Signature",
@@ -195,6 +198,7 @@ const en = {
           "Three rounds of revisions",
         ],
         timeline: "3 to 5 weeks",
+        cta: "Talk about a Signature build",
       },
       custom: {
         name: "Automation, dashboards, AI",
@@ -207,6 +211,7 @@ const en = {
           "Handed over with the code and how to run it",
         ],
         timeline: "Quoted with the scope",
+        cta: "Send me the scope",
       },
     },
     includedTitle: "In every package",
@@ -215,7 +220,7 @@ const en = {
       "Designed for a phone first",
       "The repository is yours at handover",
       "Deployment set up and running",
-      "Two weeks of free fixes after launch",
+      "30 days of free fixes after launch",
     ],
     faqTitle: "Before you ask",
     faq: [
@@ -225,11 +230,19 @@ const en = {
       },
       {
         q: "How does payment work?",
-        a: "Half to start, half on the day it goes live. Bank transfer or PromptPay.",
+        a: "Starter and Standard: half to start, half on the day it goes live. Signature runs longer, so it splits 40 / 30 / 30, with the middle payment when you see the working build. Bank transfer or PromptPay.",
+      },
+      {
+        q: "How is tax handled?",
+        a: "The price is what you pay. I am not VAT registered, so no VAT is added on top. Companies are welcome to withhold the usual 3% at source, and I will ask for the withholding certificate.",
       },
       {
         q: "What if I need changes later?",
-        a: "Fixes to what we agreed are free for two weeks after launch. After that, small edits are hourly and anything new gets quoted first.",
+        a: "Fixes to what we agreed are free for 30 days after launch. After that, small edits are 1,200 baht an hour with a one hour minimum, and anything new gets quoted before I touch it.",
+      },
+      {
+        q: "What if the project gets cancelled?",
+        a: "The deposit is not refundable once I start, but you keep everything built up to that point, code included.",
       },
       {
         q: "Can you start from a design I already have?",
@@ -240,6 +253,7 @@ const en = {
     ctaSub: "Send the rough idea. I'll tell you which package it lands in, or that it doesn't need one.",
     ctaButton: "Ask for a quote",
     ctaSecondary: "See the styles",
+    proof: "Five systems running in production, nine styles you can click through.",
   },
   // Chrome shared by every case-study page.
   caseStudy: {
@@ -561,8 +575,10 @@ const th: typeof en = {
           "ข้อความทั้งไทยและอังกฤษ",
           "ฟอร์มติดต่อส่งเข้าอีเมลคุณตรงๆ",
           "ขึ้นออนไลน์บนโดเมนของคุณเอง",
+          "แก้งานได้สองรอบ",
         ],
         timeline: "ราว 5 วัน",
+        cta: "เริ่มที่ Starter",
       },
       standard: {
         name: "Standard",
@@ -574,9 +590,10 @@ const th: typeof en = {
           "สไตล์จาก The Lab ปรับให้เข้ากับแบรนด์",
           "SEO รูปตอนแชร์ และ sitemap",
           "แก้ข้อความเองได้ ไม่ต้องเรียกผม",
-          "แก้งานได้สองรอบ",
+          "แก้งานได้สามรอบ",
         ],
         timeline: "ราว 2 สัปดาห์",
+        cta: "เริ่มที่ Standard",
       },
       signature: {
         name: "Signature",
@@ -591,6 +608,7 @@ const th: typeof en = {
           "แก้งานได้สามรอบ",
         ],
         timeline: "3 ถึง 5 สัปดาห์",
+        cta: "คุยงาน Signature",
       },
       custom: {
         name: "งานอัตโนมัติ Dashboard และ AI",
@@ -603,6 +621,7 @@ const th: typeof en = {
           "ส่งมอบพร้อมโค้ดและวิธีรัน",
         ],
         timeline: "เสนอราคาพร้อมขอบเขตงาน",
+        cta: "ส่งขอบเขตงานมาคุย",
       },
     },
     includedTitle: "ได้เหมือนกันทุกแพ็กเกจ",
@@ -611,7 +630,7 @@ const th: typeof en = {
       "ออกแบบจากจอมือถือก่อน",
       "โค้ดทั้งหมดส่งมอบเป็นของคุณ",
       "ติดตั้งขึ้นเซิร์ฟเวอร์ให้พร้อมใช้",
-      "แก้บั๊กฟรีสองสัปดาห์หลังขึ้นจริง",
+      "แก้บั๊กฟรี 30 วันหลังขึ้นจริง",
     ],
     faqTitle: "คำถามที่มักถามก่อน",
     faq: [
@@ -621,11 +640,19 @@ const th: typeof en = {
       },
       {
         q: "จ่ายเงินยังไง",
-        a: "ครึ่งแรกตอนเริ่มงาน ครึ่งหลังวันที่เว็บขึ้นจริง โอนธนาคารหรือพร้อมเพย์",
+        a: "Starter กับ Standard จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง ส่วน Signature ใช้เวลานานกว่า เลยแบ่งเป็น 40 / 30 / 30 ก้อนกลางจ่ายตอนได้เห็นของที่ใช้งานได้แล้ว โอนธนาคารหรือพร้อมเพย์",
+      },
+      {
+        q: "เรื่องภาษีคิดยังไง",
+        a: "ราคาที่เห็นคือราคาที่จ่าย ผมยังไม่ได้จด VAT เลยไม่มีภาษีมูลค่าเพิ่มบวกเพิ่ม ถ้าคุณเป็นนิติบุคคลก็หักภาษี ณ ที่จ่าย 3% ได้ตามปกติ ขอใบ 50 ทวิด้วย",
       },
       {
         q: "ส่งงานแล้วอยากแก้เพิ่มทีหลัง",
-        a: "แก้ในสิ่งที่ตกลงกันไว้ ฟรีสองสัปดาห์หลังขึ้นจริง หลังจากนั้นงานเล็กคิดรายชั่วโมง ของที่เพิ่มใหม่เสนอราคาให้ดูก่อนทุกครั้ง",
+        a: "แก้ในสิ่งที่ตกลงกันไว้ ฟรี 30 วันหลังขึ้นจริง หลังจากนั้นงานเล็กคิดชั่วโมงละ 1,200 บาท ขั้นต่ำหนึ่งชั่วโมง ส่วนของที่เพิ่มใหม่เสนอราคาให้ดูก่อนลงมือทุกครั้ง",
+      },
+      {
+        q: "ถ้ายกเลิกกลางทาง",
+        a: "มัดจำไม่คืนเมื่อเริ่มงานไปแล้ว แต่งานที่ทำไปถึงตรงนั้นเป็นของคุณ รวมโค้ดด้วย",
       },
       {
         q: "มีแบบอยู่แล้ว เริ่มจากตรงนั้นได้ไหม",
@@ -636,6 +663,7 @@ const th: typeof en = {
     ctaSub: "เล่าไอเดียคร่าวๆ มา เดี๋ยวบอกให้ว่าเข้าแพ็กเกจไหน หรือจริงๆ แล้วไม่ต้องใช้แพ็กเกจเลย",
     ctaButton: "ขอใบเสนอราคา",
     ctaSecondary: "ดูสไตล์ทั้งหมด",
+    proof: "5 ระบบที่รันอยู่จริงตอนนี้ กับ 9 สไตล์ที่กดเล่นได้เลย",
   },
   caseStudy: {
     back: "กลับหน้าแรก",
