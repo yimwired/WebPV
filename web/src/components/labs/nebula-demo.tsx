@@ -33,7 +33,7 @@ export function NebulaDemo() {
           </span>
           Nebula
         </span>
-        <div className="hidden gap-6 text-sm text-white/60 sm:flex">
+        <div className="hidden gap-6 text-sm text-white/75 sm:flex">
           <span className="cursor-default transition-colors hover:text-white">What we do</span>
           <span className="cursor-default transition-colors hover:text-white">Programs</span>
           <span className="cursor-default transition-colors hover:text-white">Updates</span>
@@ -61,7 +61,7 @@ export function NebulaDemo() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.25, ease }}
-            className="mt-6 max-w-md text-white/60 sm:text-lg"
+            className="mt-6 max-w-md text-white/75 sm:text-lg"
           >
             Bots, tools and content pipelines that think ahead, designed and
             shipped end to end by one person and a fleet of agents.
@@ -164,7 +164,7 @@ export function NebulaDemo() {
           transition={{ duration: 0.6, ease }}
           className="text-3xl font-semibold tracking-tight sm:text-5xl"
         >
-          Prompts that <span className="text-white/50">think ahead.</span>
+          Prompts that <span className="text-white/70">think ahead.</span>
         </motion.h2>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

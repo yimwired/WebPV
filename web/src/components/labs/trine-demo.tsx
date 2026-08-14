@@ -97,7 +97,7 @@ export function TrineDemo({ serifClass }: { serifClass: string }) {
       {/* ── masthead ── */}
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 pt-8 text-[11px] tracking-[0.34em] uppercase sm:px-8">
         <span className="font-medium">Trine</span>
-        <span className="text-[#141210]/45">Est. 2026 · Bangkok</span>
+        <span className="text-[#141210]/65">Est. 2026 · Bangkok</span>
       </header>
 
       {/* ── hero: the photograph, with the ring rebuilt in 3D ── */}
@@ -174,7 +174,7 @@ export function TrineDemo({ serifClass }: { serifClass: string }) {
               <TrineScene finishes={selected.finishes} spin={!reduced} />
             </div>
 
-            <figcaption className="mt-4 text-center text-[10px] tracking-[0.3em] text-[#141210]/40 uppercase">
+            <figcaption className="mt-4 text-center text-[10px] tracking-[0.3em] text-[#141210]/65 uppercase">
               Drag the ring to turn it
             </figcaption>
           </motion.figure>
@@ -190,7 +190,7 @@ export function TrineDemo({ serifClass }: { serifClass: string }) {
           <h2 className={`${serifClass} text-3xl font-light sm:text-4xl`}>
             Choose the metal
           </h2>
-          <span className="text-[10px] tracking-[0.3em] text-[#141210]/45 uppercase">
+          <span className="text-[10px] tracking-[0.3em] text-[#141210]/65 uppercase">
             Four combinations
           </span>
         </div>
@@ -221,10 +221,10 @@ export function TrineDemo({ serifClass }: { serifClass: string }) {
                   ))}
                 </span>
                 <span className="mt-4 block text-sm font-medium">{c.name}</span>
-                <span className="mt-1.5 block text-[13px] leading-relaxed text-[#141210]/60">
+                <span className="mt-1.5 block text-[13px] leading-relaxed text-[#141210]/75">
                   {c.note}
                 </span>
-                <span className="mt-4 block font-mono text-xs text-[#141210]/70">
+                <span className="mt-4 block font-mono text-xs text-[#141210]/80">
                   £{c.price.toLocaleString()}
                 </span>
               </button>
@@ -247,7 +247,7 @@ export function TrineDemo({ serifClass }: { serifClass: string }) {
                 key={s.k}
                 className="flex items-baseline justify-between gap-6 border-b border-[#141210]/15 py-4"
               >
-                <dt className="text-[10px] tracking-[0.3em] text-[#141210]/50 uppercase">
+                <dt className="text-[10px] tracking-[0.3em] text-[#141210]/65 uppercase">
                   {s.k}
                 </dt>
                 <dd className="text-right text-sm">{s.v}</dd>

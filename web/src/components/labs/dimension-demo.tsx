@@ -67,7 +67,7 @@ export function DimensionDemo() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.1 }}
-            className="text-[11px] tracking-[0.4em] text-slate-500 uppercase"
+            className="text-[11px] tracking-[0.4em] text-slate-400 uppercase"
           >
             ↓ scroll · drag to orbit
           </motion.p>
@@ -123,6 +123,31 @@ export function DimensionDemo() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* the scene is the product; make it orderable */}
+        <div className="mt-20 rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center sm:p-12">
+          <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Want a scene like this on your site?
+          </h3>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-300">
+            Real geometry, lit in the browser, about two weeks. The 3D is the
+            work; the rest of the page comes with it.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/services"
+              className="rounded-full bg-slate-100 px-7 py-3 text-sm font-semibold text-slate-900 transition-opacity hover:opacity-90"
+            >
+              What I build
+            </a>
+            <a
+              href="/#contact"
+              className="rounded-full border border-white/25 px-7 py-3 text-sm text-slate-200 transition-colors hover:border-white/50"
+            >
+              Ask for a quote
+            </a>
+          </div>
         </div>
       </section>
     </main>
