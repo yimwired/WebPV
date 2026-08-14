@@ -19,6 +19,24 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "sable",
+    name: "Sable",
+    vibe: "Product, ink on paper",
+    description:
+      "A fictional e-ink writing slate, drawn entirely in CSS with one light source. The text field on the page drives the panel at the hardware's real 41 ms latency, full-refresh flicker included.",
+    accent: "#a8432b",
+    preview: { from: "#f6f5f2", to: "#e4e1da" },
+  },
+  {
+    slug: "meridian",
+    name: "Meridian",
+    vibe: "Machined hardware",
+    description:
+      "A milled aluminium control deck: keycaps on translateZ, a knurled encoder, a scroll-pinned walkthrough and a configurator that recolours every deck on the page at once.",
+    accent: "#f7a445",
+    preview: { from: "#101012", to: "#2a2723" },
+  },
+  {
     slug: "dimension",
     name: "Dimension",
     vibe: "Real-time 3D",

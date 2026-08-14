@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sable — a slate for people who write first</title>
+<meta name="description" content="Sable is a 7.8-inch e-ink writing slate. No apps, no notifications, 31 days of battery.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+  /* Runs before first paint. Hiding reveal targets from a script at
+     the end of <body> means they render visible and then fade out —
+     a flash of content on every load. */
+  document.documentElement.classList.add("js");
+</script>
+
+<style>
+/* ============================================================
+   Sable — one page, no build step.
+
+   Palette is ink-on-paper with a single rust accent. The product
+   is a piece of grey plastic and a sheet of e-ink; the page should
+   feel like paper, not like a spaceship.
+
+   One light source for the whole document: top-left, roughly 148°.
+   Every shadow, every bevel, every specular highlight obeys it.
+   ============================================================ */
+
+:root {
+  /* Paper is barely warm. A full cream background reads as a
+     default rather than a decision, so this stops well short. */
+  --paper:      #f6f5f2;
+  --paper-deep: #eceae5;
+  --ink:        #17150f;
+  --ink-soft:   #4b4740;
+  /* Computed against both paper tones, not eyeballed: 5.29:1 on
+     --paper and 4.80:1 on --paper-deep. The lighter grey this
+     replaced looked right and measured 3.6:1. */
+  --ink-faint:  #6b655d;
+  --rust:       #a8432b;
+  --rust-deep:  #7d2f1d;
+
+  /* Dark rooms for the product sections. Neutral, not blue-black. */
+  --slate:      #14130f;
+  --chalk:      #f2f0ea;
+  --chalk-soft: #a9a49a;
+  --chalk-dim:  #857f75;   /* 4.68:1 on --slate; the shade below it measured 4.2 */
+
+  --rule:       #17150f14;
+  --rule-dark:  #f2f0ea1c;
+
+  --measure: 34rem;
+
+  /* Chassis finish — rewritten by the configurator. Graphite is
+     the default because it is what the first run is. */
+  --shell-hi:   #55524b;
+  --shell-mid:  #3b3833;
+  --shell-lo:   #2c2a26;
+  --shell-edge: #6d6960;
+  --key-face:   #43403a;
+  --key-edge:   #55514a;
+
+  /* Panel tone — the front light warms it and lifts it slightly. */
+  --panel:      #d9d6cd;
+  --panel-ink:  #2f2c26;
+
+  /* Long ease-out. Nothing here overshoots — the device doesn't
+     bounce when you set it down either. */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-sans: "Schibsted Grotesk", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono: "DM Mono", ui-monospace, "Cascadia Mono", "Consolas", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* The tilted slate legitimately paints past the text column.
+     `clip` contains it without creating a scroll container —
+     `hidden` here would break the sticky nav and the pinned slate. */
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;      /* 17px — 16 felt a shade small against this x-height */
+  line-height: 1.6;
+  font-feature-settings: "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+/* Selection in the accent, at an opacity that keeps ink readable
+   through it. Default blue would be the only unconsidered colour
+   on the page. */
+::selection { background: #a8432b26; color: var(--ink); }
+
+:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.dark-room :focus-visible { outline-color: #e08a6f; }
+
+img, svg { display: block; max-width: 100%; }
+
+h1, h2, h3 {
+  font-weight: 500;
+  line-height: 1.04;
+  /* Optical, not mathematical: the cap-height of this face sits
+     right of the box, so headings need pulling back to align with
+     the body text beneath them. */
+  margin-left: -0.022em;
+  text-wrap: balance;
+}
+
+a { color: inherit; }
+
+.wrap {
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 48rem) { .wrap { padding-inline: 2.5rem; } }
+
+/* Four sizes across the whole page — 11 / 14 / 17 / 21 — plus the
+   fluid heading clamps. Seven near-identical small sizes is how a
+   type ramp stops being a ramp. */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ── skip link ─────────────────────────────────────────────── */
+.skip {
+  position: absolute; left: 1rem; top: -4rem; z-index: 100;
+  background: var(--ink); color: var(--paper);
+  padding: 0.6rem 1rem; border-radius: 4px;
+  text-decoration: none; font-size: 0.875rem;
+  transition: top 160ms var(--ease-soft);
+}
+.skip:focus { top: 1rem; }
+
+/* ── nav ───────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 40;
+  background: #f6f5f2f2;
+  border-bottom: 1px solid transparent;
+  transition: border-color 300ms var(--ease-soft);
+}
+@supports (backdrop-filter: blur(1px)) {
+  .nav { background: #f6f5f2d9; backdrop-filter: blur(14px) saturate(1.4); }
+}
+.nav[data-stuck="true"] { border-bottom-color: var(--rule); }
+
+.nav-inner {
+  display: flex; align-items: center; gap: 2rem;
+  height: 3.5rem;
+}
+.wordmark {
+  font-size: 1.0625rem; font-weight: 600;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+  margin-right: auto;
+}
+.wordmark::after {
+  /* The dot is the only ornament in the nav and it earns its keep
+     by being the product's one physical button. */
+  content: "";
+  display: inline-block;
+  width: 4px; height: 4px;
+  margin-left: 3px; margin-bottom: 1px;
+  border-radius: 50%;
+  background: var(--rust);
+  vertical-align: middle;
+}
+.nav-links { display: none; gap: 1.75rem; }
+@media (min-width: 44rem) { .nav-links { display: flex; } }
+.nav-links a {
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 180ms var(--ease-soft);
+}
+.nav-links a:hover { color: var(--ink); }
+
+.buy {
+  display: inline-flex; align-items: center;
+  min-height: 2.25rem;
+  padding: 0 1rem;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-size: 0.875rem; font-weight: 500;
+  text-decoration: none;
+  transition: background-color 200ms var(--ease-soft), color 200ms var(--ease-soft);
+}
+.buy:hover { background: var(--ink); color: var(--paper); }
+
+/* ── hero ──────────────────────────────────────────────────── */
+/* Tuned against a 900px-tall viewport: the slate has to be visibly
+   entering the frame at the fold, or the hero is just a poster. */
+.hero { padding-top: 4rem; padding-bottom: 2rem; }
+@media (min-width: 48rem) { .hero { padding-top: 5.5rem; padding-bottom: 2.25rem; } }
+
+.hero h1 {
+  font-size: clamp(2.75rem, 8.2vw, 6rem);
+  letter-spacing: -0.045em;
+  margin: 0;
+}
+.hero h1 em {
+  font-family: var(--font-serif);
+  font-style: normal;          /* roman: an italic serif hero is its own cliché */
+  letter-spacing: -0.02em;
+}
+
+.hero-lede {
+  margin: 1.5rem 0 0;
+  max-width: 29rem;
+  font-size: 1.3125rem;
+  color: var(--ink-soft);
+}
+
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem;
+  margin-top: 1.75rem;
+  color: var(--ink-faint);
+}
+.hero-meta span { white-space: nowrap; }
+
+/* ══ the slate, drawn in CSS ═══════════════════════════════════
+   Three parts on one 3-D stage: the slate, its 18 mm sidewall
+   faked with a stacked box-shadow extrusion, and the keyboard
+   folio hinged below it. Everything is lit from 148°.
+   ═══════════════════════════════════════════════════════════ */
+.stage {
+  position: relative;
+  margin-top: 2.5rem;
+  padding: 3.25rem 1.5rem 4rem;
+  background: var(--paper-deep);
+  border-radius: 20px;
+  overflow: hidden;
+}
+@media (min-width: 48rem) { .stage { padding: 4.5rem 2.5rem 5.5rem; } }
+
+/* The window the photograph would have been taken next to. */
+.stage::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(148deg, #ffffff 0%, #ffffff00 46%);
+  pointer-events: none;
+}
+
+.rig {
+  position: relative;
+  width: min(30rem, 88vw);
+  margin-inline: auto;
+  perspective: 1400px;
+  perspective-origin: 50% 22%;
+}
+
+.assembly {
+  position: relative;
+  transform-style: preserve-3d;
+  transform:
+    rotateX(var(--tilt, 13deg))
+    rotateZ(var(--yaw, -3deg))
+    translateY(var(--float, 0px));
+  transition: transform 1100ms var(--ease);
+}
+
+/* ── the slate ── */
+.slate {
+  position: relative;
+  transform-style: preserve-3d;
+  width: 100%;
+  aspect-ratio: 3 / 4.06;
+  border-radius: 15px 15px 17px 17px;
+  background: linear-gradient(163deg, var(--shell-hi) 0%, var(--shell-mid) 38%, var(--shell-lo) 100%);
+  padding: 3.2% 3.2% 10.5%;
+  box-shadow:
+    /* top bevel catching the light, bottom lip in shadow */
+    0 1px 0 #ffffff33 inset,
+    0 -1px 0 #0000005e inset,
+    /* the 18 mm sidewall, stacked one pixel at a time */
+    0 2px 0 -1px var(--shell-lo),
+    0 4px 0 -2px var(--shell-lo),
+    0 6px 0 -3px #24221f,
+    0 8px 0 -4px #1e1c19,
+    /* contact shadow, then the soft one the room gives it */
+    0 10px 14px -8px #17150f4a,
+    0 30px 44px -22px #17150f45,
+    0 64px 80px -46px #17150f38;
+  transition: background 420ms var(--ease-soft);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px #0000003d,
+    0 2px 7px #00000047 inset;
+  overflow: hidden;
+  padding: 5.5% 5%;
+  transition: background 420ms var(--ease-soft);
+}
+
+/* E-ink is a suspension of pigment, not a backlight. The grain is
+   what sells it — a flat fill reads as a grey rectangle. */
+.screen::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+/* A full refresh on real e-ink inverts the whole panel for about a
+   fifth of a second before redrawing. Ugly, and the honest thing
+   to show. */
+.screen[data-refreshing="true"]::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 3;
+  background: #1b1915;
+  animation: eink-refresh 780ms steps(1) 1;
+}
+@keyframes eink-refresh {
+  0%, 34%   { opacity: 1 }
+  35%, 62%  { opacity: 0 }
+  63%, 88%  { opacity: 1 }
+  89%, 100% { opacity: 0 }
+}
+
+.screen-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: #57534b;
+  text-transform: uppercase;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #00000014;
+}
+
+.screen-body {
+  padding-top: 0.9rem;
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--panel-ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.screen-body .dim { color: #5c574f; }   /* 4.97:1 on the panel */
+
+/* This is a writing device with a real text field on it — the one
+   place a caret belongs. */
+.caret {
+  display: inline-block;
+  width: 1px; height: 0.78em;
+  margin-left: 1px;
+  background: var(--panel-ink);
+  vertical-align: -0.06em;
+  animation: caret 1.15s steps(1) infinite;
+}
+@keyframes caret { 0%, 55% { opacity: 1 } 56%, 100% { opacity: 0 } }
+
+.btn-physical {
+  position: absolute;
+  left: 50%; bottom: 3.1%;
+  translate: -50% 0;
+  width: 9%; height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--shell-edge), var(--key-face));
+  box-shadow: 0 1px 0 #ffffff26, 0 -1px 2px #0000004d inset;
+}
+
+/* ── the keyboard folio, hinged below ── */
+/* The folio lies flat on the desk in front of the slate. The
+   assembly is already tilted 13°, so the hinge has to swing a bit
+   past 90° to bring the keys back to level — rotating the other
+   way folds it behind the screen and crushes the caps into stripes. */
+.folio {
+  position: relative;
+  margin-top: -1.2%;
+  width: 100%;
+  transform-origin: 50% 0;
+  transform: rotateX(76deg);
+  transform-style: preserve-3d;
+  border-radius: 3px 3px 12px 12px;
+  /* The plate sits below the caps, so it has to be darker than they
+     are — lit the other way round, the gaps between keys glowed. */
+  background: linear-gradient(178deg, var(--shell-lo) 0%, var(--shell-mid) 84%);
+  padding: 3.4% 3% 9%;   /* deep enough to read as a keyboard, not a lid */
+  box-shadow:
+    0 1px 0 #ffffff1f inset,
+    0 -14px 26px -18px #17150f66;
+  transition: background 420ms var(--ease-soft), transform 1100ms var(--ease);
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 2.4%;
+}
+/* Keycaps are 1.1 mm proud of the plate. Flat fills read as printed
+   stickers, so each cap gets a lit top edge, a dark base, and a
+   contact shadow on the plate below it. */
+.key {
+  aspect-ratio: 1 / 0.94;
+  border-radius: 2.5px;
+  background: linear-gradient(176deg, var(--key-edge) 0%, var(--key-face) 62%, var(--shell-lo) 100%);
+  box-shadow:
+    0 0.5px 0 #ffffff2e inset,
+    0 -1.5px 1px #00000059 inset,
+    0 1.5px 0 -0.5px var(--shell-lo),
+    0 2.5px 2px -1px #00000047;
+  transition: background 420ms var(--ease-soft), box-shadow 90ms linear, transform 90ms linear;
+}
+.key.wide { grid-column: span 5; aspect-ratio: 5.4 / 0.92; }
+.key.half { grid-column: span 3; aspect-ratio: 3.2 / 0.92; }
+
+/* Struck keys sink into the plate; they do not glow. */
+.key[data-down="true"] {
+  transform: translateY(1.5px);
+  background: linear-gradient(176deg, var(--key-face), var(--key-edge));
+  box-shadow:
+    0 2px 3px #00000059 inset,
+    0 0 0 1px #00000026;
+}
+
+.stage-caption {
+  margin: 2.5rem auto 0;
+  max-width: 26rem;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-faint);
+  position: relative;
+}
+
+/* ══ pinned walkthrough ════════════════════════════════════════ */
+.dark-room {
+  background: var(--slate);
+  color: var(--chalk);
+  margin-top: 5.5rem;
+  padding: 5.5rem 0;
+}
+@media (min-width: 48rem) { .dark-room { padding: 8rem 0; } }
+
+.walk { position: relative; }
+
+.walk-grid { display: grid; gap: 3rem; }
+@media (min-width: 62rem) {
+  .walk-grid { grid-template-columns: 1fr 1.05fr; gap: 5rem; align-items: start; }
+}
+
+/* The slate holds still and the words move past it. Below 62rem
+   there is no room to pin anything, so it becomes a plain stack
+   with the slate shown once at the top. */
+.walk-pin { display: none; }
+@media (min-width: 62rem) {
+  .walk-pin {
+    display: block;
+    position: sticky;
+    top: 16vh;
+  }
+}
+
+/* The hero shows the whole kit, folio and all. Everywhere else the
+   slate appears alone and smaller — a second full assembly next to
+   body copy competes with it instead of supporting it. */
+.walk-pin .rig { width: min(19rem, 100%); }
+.try-grid .rig { width: min(16.5rem, 62vw); }
+.config-grid .rig { width: min(15.5rem, 58vw); }
+.walk-pin .slate { box-shadow:
+  0 1px 0 #ffffff29 inset,
+  0 -1px 0 #00000066 inset,
+  0 2px 0 -1px var(--shell-lo),
+  0 4px 0 -2px var(--shell-lo),
+  0 6px 0 -3px #201e1b,
+  0 8px 0 -4px #191714,
+  0 12px 18px -10px #00000073,
+  0 44px 64px -34px #000000a1;
+}
+
+.walk-mobile { margin-bottom: 3.5rem; }
+@media (min-width: 62rem) { .walk-mobile { display: none; } }
+
+.chapters { display: grid; gap: 6rem; }
+@media (min-width: 62rem) { .chapters { gap: 15rem; padding: 8vh 0 22vh; } }
+
+.chapter h2 {
+  font-size: clamp(1.85rem, 4.2vw, 3rem);
+  letter-spacing: -0.033em;
+  margin: 0;
+}
+.chapter p {
+  margin: 1.35rem 0 0;
+  max-width: var(--measure);
+  color: var(--chalk-soft);
+}
+.chapter .aside {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule-dark);
+  color: var(--chalk-dim);
+  font-size: 0.875rem;
+  max-width: 26rem;
+}
+
+/* ══ the writing test ══════════════════════════════════════════ */
+.try { padding: 6rem 0 1rem; }
+.try h2 {
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  letter-spacing: -0.03em;
+  margin: 0;
+  max-width: 20ch;
+}
+.try-lede { margin: 1.25rem 0 0; max-width: var(--measure); color: var(--ink-soft); }
+
+.try-grid { display: grid; gap: 2.5rem; margin-top: 3rem; }
+@media (min-width: 58rem) {
+  .try-grid { grid-template-columns: 1.15fr 1fr; gap: 4rem; align-items: center; }
+}
+
+.pad {
+  background: var(--paper-deep);
+  border-radius: 16px;
+  padding: 1.75rem;
+}
+@media (min-width: 48rem) { .pad { padding: 2.25rem; } }
+
+.pad label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+  margin-bottom: 0.75rem;
+}
+.pad textarea {
+  width: 100%;
+  min-height: 8.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #17150f24;
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+.pad textarea::placeholder { color: var(--ink-faint); }
+.pad textarea:focus-visible { border-color: var(--rust); }
+
+.readout {
+  display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem;
+  margin-top: 1.25rem;
+  color: var(--ink-faint);
+}
+.readout b { font-weight: 500; color: var(--ink); }
+
+.try-note {
+  margin: 1.5rem 0 0;
+  color: var(--ink-faint);
+  font-size: 0.875rem;
+  max-width: 30rem;
+}
+
+/* ══ configurator ══════════════════════════════════════════════ */
+.config { padding: 5.5rem 0 0; }
+.config h2 {
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  letter-spacing: -0.03em;
+  margin: 0 0 2.5rem;
+  max-width: 18ch;
+}
+
+.config-grid { display: grid; gap: 2.5rem; }
+@media (min-width: 58rem) {
+  .config-grid { grid-template-columns: 1fr 20rem; gap: 4rem; align-items: start; }
+}
+
+fieldset { border: 0; margin: 0 0 2.25rem; padding: 0; }
+legend {
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+  margin-bottom: 0.85rem;
+}
+
+.finishes { display: flex; gap: 0.75rem; }
+.finish {
+  position: relative;
+  display: flex; align-items: center; gap: 0.65rem;
+  min-height: 2.75rem;
+  padding: 0 1rem 0 0.6rem;
+  border: 1px solid #17150f24;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit; font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 200ms var(--ease-soft), background-color 200ms var(--ease-soft);
+}
+.finish:hover { background: #17150f08; }
+.finish[aria-pressed="true"] { border-color: var(--ink); background: #17150f0a; }
+.swatch {
+  width: 1.35rem; height: 1.35rem;
+  border-radius: 50%;
+  box-shadow: 0 1px 0 #ffffff40 inset, 0 0 0 1px #00000021;
+}
+
+.toggle {
+  display: flex; align-items: center; gap: 0.85rem;
+  min-height: 2.75rem;
+  border: 0; padding: 0;
+  background: transparent;
+  font: inherit; font-size: 1.0625rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+.track {
+  position: relative;
+  width: 2.75rem; height: 1.5rem;
+  border-radius: 999px;
+  background: #17150f1f;
+  transition: background-color 240ms var(--ease-soft);
+  flex: none;
+}
+.track::after {
+  content: "";
+  position: absolute; top: 3px; left: 3px;
+  width: 1.125rem; height: 1.125rem;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 1px 2px #17150f45;
+  transition: transform 240ms var(--ease);
+}
+.toggle[aria-pressed="true"] .track { background: var(--rust); }
+.toggle[aria-pressed="true"] .track::after { transform: translateX(1.25rem); }
+
+.consequence {
+  margin: 1rem 0 0;
+  color: var(--ink-faint);
+  font-size: 0.875rem;
+  max-width: 26rem;
+}
+.consequence b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ══ specs ═════════════════════════════════════════════════════ */
+.specs { padding: 5.5rem 0 2rem; }
+.specs h2 {
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  letter-spacing: -0.028em;
+  margin: 0 0 2.5rem;
+}
+
+table { border-collapse: collapse; width: 100%; min-width: 30rem; }
+th, td { text-align: left; padding: 0.95rem 1rem 0.95rem 0; border-bottom: 1px solid var(--rule); }
+th { font-weight: 500; font-size: 0.875rem; color: var(--ink-soft); width: 42%; }
+td { font-family: var(--font-mono); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+tr:last-child th, tr:last-child td { border-bottom: 0; }
+
+.spec-note {
+  margin: 1.5rem 0 0;
+  max-width: 38rem;
+  color: var(--ink-faint);
+  font-size: 0.875rem;
+}
+
+/* Below ~544px the two columns stop fitting. A sideways-scrolling
+   spec table is the lazy answer and it made the whole document
+   scroll horizontally; stacking each row is what the content wants
+   anyway. */
+@media (max-width: 34rem) {
+  table, tbody, tr, th, td { display: block; width: auto; }
+  table { min-width: 0; }
+  tr { padding: 0.85rem 0; border-bottom: 1px solid var(--rule); }
+  tr:last-child { border-bottom: 0; }
+  th, td { padding: 0; border-bottom: 0; }
+  th { color: var(--ink-faint); }
+  td { padding-top: 0.25rem; }
+}
+
+/* ══ the aside: deliberately not a card grid ═══════════════════ */
+.note {
+  margin: 5rem 0 0;
+  padding: 3.25rem 0 0;
+  border-top: 1px solid var(--rule);
+}
+.note-grid { display: grid; gap: 2.5rem; }
+@media (min-width: 52rem) {
+  .note-grid { grid-template-columns: 13rem 1fr; gap: 4rem; }
+}
+.note h2 {
+  font-size: 1.0625rem; font-weight: 500;
+  letter-spacing: 0; margin: 0;
+  color: var(--ink-faint);
+}
+.note-body { max-width: var(--measure); }
+.note-body p { margin: 0 0 1.15rem; }
+.note-body p:last-child { margin-bottom: 0; }
+.note-body strong { font-weight: 600; }
+
+.signature {
+  margin-top: 2rem;
+  font-family: var(--font-serif);
+  font-size: 1.3125rem;
+  color: var(--ink-soft);
+}
+
+/* ══ buy ═══════════════════════════════════════════════════════ */
+.close { padding: 6.5rem 0 5rem; }
+.close-inner { display: grid; gap: 2.25rem; align-items: end; }
+@media (min-width: 52rem) {
+  .close-inner { grid-template-columns: 1fr auto; gap: 3rem; }
+}
+.close h2 {
+  font-size: clamp(2rem, 5.5vw, 3.75rem);
+  letter-spacing: -0.035em;
+  margin: 0; max-width: 16ch;
+}
+.price {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+  margin: 1rem 0 0;
+}
+.buy-lg {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 3.25rem; padding: 0 2rem;
+  background: var(--ink); color: var(--paper);
+  border: 0; border-radius: 999px;
+  font: inherit; font-weight: 500; font-size: 1.0625rem;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 220ms var(--ease-soft), transform 220ms var(--ease);
+}
+.buy-lg:hover { background: var(--rust-deep); }
+.buy-lg:active { transform: translateY(1px); }
+
+/* ══ footer ════════════════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 2.5rem 0 3.5rem;
+  color: var(--ink-faint);
+  font-size: 0.875rem;
+}
+.foot-row { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: baseline; }
+.foot-row a { text-decoration: none; }
+.foot-row a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.colophon { margin: 1.75rem 0 0; max-width: 34rem; line-height: 1.55; }
+
+/* ── reveal ────────────────────────────────────────────────── */
+/* Content is visible unless JavaScript is present AND the observer
+   that will bring it back exists. */
+.js .reveal:not(.seen) { opacity: 0; transform: translateY(14px); }
+.js .reveal { transition: opacity 800ms var(--ease), transform 800ms var(--ease); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .js .reveal:not(.seen) { opacity: 1; transform: none; }
+  .caret { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="wordmark">Sable</a>
+    <div class="nav-links">
+      <a href="#why">Why</a>
+      <a href="#try">Try it</a>
+      <a href="#configure">Finish</a>
+      <a href="#specs">Specs</a>
+    </div>
+    <a href="#buy" class="buy">Reserve</a>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ══ hero ══════════════════════════════════════════════════ -->
+<section class="wrap hero" id="top">
+  <h1>Write first.<br><em>Read later.</em></h1>
+
+  <p class="hero-lede">
+    A 7.8-inch e-ink slate with a keyboard, a text file, and nothing else on it.
+    It cannot open a browser. That is the entire pitch.
+  </p>
+
+  <p class="hero-meta mono">
+    <span>31-day battery</span>
+    <span>No radio</span>
+    <span>Ships March</span>
+  </p>
+</section>
+
+<section class="wrap">
+  <div class="stage">
+    <div class="rig">
+      <div class="assembly" id="heroAssembly">
+        <div class="slate">
+          <div class="screen" id="heroScreen">
+            <div class="screen-head">
+              <span>chapter four</span>
+              <span id="heroWords">1,204 words</span>
+            </div>
+            <div class="screen-body" id="heroText"></div>
+          </div>
+          <span class="btn-physical" aria-hidden="true"></span>
+        </div>
+
+        <div class="folio" aria-hidden="true">
+          <div class="keys" id="heroKeys"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="stage-caption mono">Graphite, with the folio open. Also in bone, if you order before the first run closes.</p>
+  </div>
+</section>
+
+<!-- ══ pinned walkthrough ════════════════════════════════════ -->
+<section class="dark-room" id="why">
+  <div class="wrap walk">
+    <div class="walk-grid">
+
+      <div class="walk-pin" aria-hidden="true">
+        <div class="rig">
+          <div class="assembly" style="--tilt: 9deg; --yaw: -2deg;">
+            <div class="slate">
+              <div class="screen" id="walkScreen">
+                <div class="screen-head">
+                  <span id="walkHeadLeft">no radio</span>
+                  <span id="walkHeadRight">usb-c only</span>
+                </div>
+                <div class="screen-body" id="walkText"></div>
+              </div>
+              <span class="btn-physical"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chapters">
+        <div class="chapter reveal" data-chapter="0">
+          <h2>There is no radio in it.</h2>
+          <p>
+            No Wi-Fi chip, no Bluetooth, no cellular. Files leave over the USB-C port
+            when you decide they should. We looked hard at putting a radio in and
+            turning it off by default, and could not find a version of that which
+            stays off after eighteen months of firmware updates.
+          </p>
+          <p class="aside">
+            The antenna cutout is still in the chassis CAD. We left it there so the
+            second revision can be a different decision without new tooling.
+          </p>
+        </div>
+
+        <div class="chapter reveal" data-chapter="1">
+          <h2>The screen is slow on purpose.</h2>
+          <p>
+            The panel refreshes in 780&nbsp;ms and there is no way to make it faster,
+            so we spent the effort on the thing that actually matters while typing:
+            keystroke-to-ink latency, which lands at 41&nbsp;ms. Fast enough that the
+            letters keep up with you. Slow enough that scrolling feels like a chore,
+            which is the point.
+          </p>
+          <p class="aside">
+            Every 90 lines the panel does a full refresh and inverts for a fifth of a
+            second. We tried hiding it. Hiding it made the ghosting worse.
+          </p>
+        </div>
+
+        <div class="chapter reveal" data-chapter="2">
+          <h2>Plain text, on a card you can hold.</h2>
+          <p>
+            Everything you write lands on a removable SD card as dated
+            <span class="mono">.txt</span> files. No account, no sync, no export
+            button. If Sable the company disappears next year, the words are still
+            yours and still readable on anything made since 1993.
+          </p>
+          <p class="aside">
+            The card slot is under the folio hinge, not behind a door. Doors break.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ the writing test ══════════════════════════════════════ -->
+<section class="wrap try" id="try">
+  <h2>Type something. Watch it arrive late.</h2>
+  <p class="try-lede">
+    41&nbsp;ms is a number until you feel it. This field drives the panel above at the
+    real latency, and does a full refresh every 90 lines, exactly like the hardware.
+  </p>
+
+  <div class="try-grid">
+    <div class="pad">
+      <label for="padInput">Your text</label>
+      <textarea id="padInput" rows="5" spellcheck="false"
+        placeholder="The harbour road floods twice a year…"></textarea>
+      <p class="readout mono">
+        <span><b id="padWords">0</b> words</span>
+        <span><b id="padChars">0</b> characters</span>
+        <span><b id="padRefresh">0</b> full refreshes</span>
+      </p>
+    </div>
+
+    <div class="rig" aria-hidden="true">
+      <div class="assembly" style="--tilt: 11deg; --yaw: 2deg;">
+        <div class="slate">
+          <div class="screen" id="tryScreen">
+            <div class="screen-head">
+              <span>untitled — 2027-03-14</span>
+              <span id="tryWords">0 words</span>
+            </div>
+            <div class="screen-body" id="tryText"></div>
+          </div>
+          <span class="btn-physical"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="try-note">
+    The panel is a div. The latency is not — it is the same 41&nbsp;ms budget the
+    firmware works to, and it is the reason we stopped optimising the refresh rate.
+  </p>
+</section>
+
+<!-- ══ configurator ══════════════════════════════════════════ -->
+<section class="wrap config" id="configure">
+  <h2>Two finishes. One of them costs you nine days.</h2>
+
+  <div class="config-grid">
+    <div>
+      <fieldset>
+        <legend>Finish</legend>
+        <div class="finishes">
+          <button type="button" class="finish" data-finish="graphite" aria-pressed="true">
+            <span class="swatch" style="background: linear-gradient(160deg, #55524b, #2c2a26)"></span>
+            Graphite
+          </button>
+          <button type="button" class="finish" data-finish="bone" aria-pressed="false">
+            <span class="swatch" style="background: linear-gradient(160deg, #e6e0d2, #b9b1a0)"></span>
+            Bone
+          </button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Front light</legend>
+        <button type="button" class="toggle" id="lightToggle" aria-pressed="false">
+          <span class="track" aria-hidden="true"></span>
+          <span>Warm front light</span>
+        </button>
+        <p class="consequence">
+          Battery: <b id="batteryDays">31</b> days at four hours of typing a day.
+          <span id="batteryDelta"></span>
+        </p>
+      </fieldset>
+    </div>
+
+    <div class="rig" aria-hidden="true">
+      <div class="assembly" style="--tilt: 12deg; --yaw: -4deg;">
+        <div class="slate">
+          <div class="screen" id="configScreen">
+            <div class="screen-head">
+              <span id="configFinish">graphite</span>
+              <span id="configLight">light off</span>
+            </div>
+            <div class="screen-body">
+              <p>Everything on this page that shows the slate is the same markup,
+                 cloned. Change the finish and all four change with it.</p>
+            </div>
+          </div>
+          <span class="btn-physical"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ specs ═════════════════════════════════════════════════ -->
+<section class="wrap specs" id="specs">
+  <h2>The numbers, unrounded</h2>
+
+  <div>
+    <table>
+      <tbody>
+        <tr><th scope="row">Display</th><td>7.8&Prime; e-ink carta, 1872 &times; 1404, 300 ppi</td></tr>
+        <tr><th scope="row">Keystroke latency</th><td>41 ms</td></tr>
+        <tr><th scope="row">Full refresh</th><td>780 ms, every 90 lines</td></tr>
+        <tr><th scope="row">Battery</th><td><span id="specBattery">31 days</span> &middot; 4,100 mAh</td></tr>
+        <tr><th scope="row">Weight</th><td>412 g with the keyboard folio</td></tr>
+        <tr><th scope="row">Storage</th><td>SD card, up to 128 GB &middot; one included</td></tr>
+        <tr><th scope="row">Ports</th><td>USB-C, 2.0 speeds &mdash; it moves text files</td></tr>
+        <tr><th scope="row">Radios</th><td>None</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Outside the scroller: as a <caption> it inherited the table's
+       min-width and had to be scrolled sideways to be read. -->
+  <p class="spec-note">
+    Battery measured at 4 hours of typing per day with the front light off.
+    The light costs you about nine days.
+  </p>
+
+  <!-- ── a section that is not a grid, on purpose ── -->
+  <div class="note" id="note">
+    <div class="note-grid">
+      <h2>A note on the second prototype</h2>
+      <div class="note-body">
+        <p>
+          The first version had a touchscreen. It tested well and we killed it
+          anyway, because every person we handed it to spent the first ten
+          seconds swiping around looking for something to open.
+        </p>
+        <p>
+          The second version has a keyboard, one physical button, and a screen
+          that only ever shows the file you are in. Handed to the same people, the
+          first thing almost all of them did was <strong>start typing</strong>.
+          That was the whole finding, and it cost us seven months.
+        </p>
+        <p>
+          We are a team of four in Rotterdam. The first run is 900 units because
+          that is what we could pay for.
+        </p>
+        <p class="signature">— Marijke, Tobias, Ans &amp; Piet</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ buy ═══════════════════════════════════════════════════ -->
+<section class="wrap close" id="buy">
+  <div class="close-inner">
+    <div>
+      <h2>900 units. Then we see.</h2>
+      <p class="price">&euro;389 &middot; refundable &euro;40 holds one &middot; ships March 2027</p>
+    </div>
+    <a href="#buy" class="buy-lg">Reserve a Sable</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <span>Sable Werkplaats, Rotterdam</span>
+      <a href="#specs">Specs</a>
+      <a href="#note">Notes</a>
+      <a href="#top">Back to top</a>
+    </div>
+    <p class="colophon">
+      Set in Schibsted Grotesk and Newsreader. Every slate on this page is drawn in
+      CSS &mdash; the real one photographs better. This is a craft demo, not a
+      shipping product; nothing here is for sale.
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ── keycaps ──────────────────────────────────────────────
+     Built rather than authored: 40 hand-written divs would be
+     40 chances to typo a class name. */
+  function buildKeys(host) {
+    if (!host) return;
+    var rows = [11, 11, 11];
+    var html = "";
+    rows.forEach(function (count) {
+      for (var i = 0; i < count; i++) html += '<span class="key"></span>';
+    });
+    html += '<span class="key half"></span>';
+    html += '<span class="key wide"></span>';
+    html += '<span class="key half"></span>';
+    host.innerHTML = html;
+  }
+  buildKeys(document.getElementById("heroKeys"));
+
+  /* ── e-ink panel ──────────────────────────────────────────
+     One object drives every screen on the page: text arrives a
+     character at a time at the hardware's real latency, and the
+     panel inverts on a full refresh instead of pretending it
+     doesn't happen. */
+  var LATENCY_MS = 41;
+  var LINES_PER_REFRESH = 90;
+
+  function Panel(screenEl, textEl) {
+    this.screen = screenEl;
+    this.text = textEl;
+    this.queue = [];
+    this.shown = "";
+    this.timer = null;
+    this.refreshes = 0;
+    this.sinceRefresh = 0;
+  }
+
+  Panel.prototype.render = function (trailingCaret) {
+    var caret = trailingCaret ? '<span class="caret"></span>' : "";
+    this.text.innerHTML = escapeHtml(this.shown) + caret;
+  };
+
+  Panel.prototype.write = function (str, opts) {
+    var self = this;
+    opts = opts || {};
+    this.queue = str.split("");
+    this.shown = opts.keep ? this.shown : "";
+    window.clearInterval(this.timer);
+
+    if (reduced) {                       // no theatre for anyone who asked for none
+      this.shown = str;
+      this.render(true);
+      return;
+    }
+
+    this.timer = window.setInterval(function () {
+      if (!self.queue.length) {
+        window.clearInterval(self.timer);
+        return;
+      }
+      self.shown += self.queue.shift();
+      self.render(true);
+    }, LATENCY_MS);
+  };
+
+  Panel.prototype.set = function (str) {
+    window.clearInterval(this.timer);
+    this.shown = str;
+    this.render(false);
+  };
+
+  /* A real full refresh: the whole panel inverts, twice, for 780 ms. */
+  Panel.prototype.fullRefresh = function () {
+    if (reduced || this.screen.dataset.refreshing === "true") return;
+    var screen = this.screen;
+    screen.dataset.refreshing = "true";
+    this.refreshes += 1;
+    window.setTimeout(function () { screen.dataset.refreshing = "false"; }, 800);
+  };
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c];
+    });
+  }
+
+  /* ── hero panel ──────────────────────────────────────────── */
+  var heroPanel = new Panel(
+    document.getElementById("heroScreen"),
+    document.getElementById("heroText")
+  );
+  /* Long enough to fill the panel. A page of e-ink with three lines
+     on it and half a screen of nothing reads as a mockup. */
+  var HERO_TEXT =
+    "The harbour road floods twice a year and everyone plans around it, " +
+    "which is how you can tell a place has been lived in properly. The " +
+    "butcher moves his crates up onto the counter, the café turns its " +
+    "chairs upside down on the tables, and by Thursday it has drained " +
+    "away again and nobody mentions it.\n\n" +
+    "She had stopped asking when the council would fix it sometime around " +
+    "her fourth winter here. That was the year she also stopped saying " +
+    "she was only staying until the spring.\n\n" +
+    "What replaced the question was a kind of arithmetic. Two floods a " +
+    "year, forty years if she was lucky, eighty tides of brown water " +
+    "coming up over the kerb and going out again. It did not frighten " +
+    "her. It was the first thing in a decade she could count on.\n\n" +
+    "Piet from the chandlery says the pumps were rebuilt in ninety-one " +
+    "and that they work, which is true, and that the problem is the " +
+    "sluice gate, which is also true, and that somebody ought to do " +
+    "something about it, which is where the conversation has ended " +
+    "every single time for thirty years.\n\n" +
+    "She has started writing it down. Not the flood — the sentence about " +
+    "the sluice gate, and the exact way he shrugs before he gets to the";
+  heroPanel.set(HERO_TEXT);
+  heroPanel.render(true);
+
+  /* ── the slate settles as it enters, once ─────────────────── */
+  var heroAssembly = document.getElementById("heroAssembly");
+  if (heroAssembly && "IntersectionObserver" in window && !reduced) {
+    heroAssembly.style.setProperty("--float", "14px");
+    heroAssembly.style.setProperty("--tilt", "17deg");
+    var settle = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      heroAssembly.style.setProperty("--float", "0px");
+      heroAssembly.style.setProperty("--tilt", "13deg");
+      settle.disconnect();
+    }, { threshold: 0.25 });
+    settle.observe(heroAssembly);
+  }
+
+  /* ── reveals ──────────────────────────────────────────────── */
+  var targets = document.querySelectorAll(".reveal");
+  var showAll = function () {
+    targets.forEach(function (el) { el.classList.add("seen"); });
+  };
+
+  if (!("IntersectionObserver" in window) || reduced) {
+    showAll();
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("seen");
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.1 });
+    targets.forEach(function (el) { io.observe(el); });
+
+    /* Backstop: an observer that never fires, a restored scroll
+       position, a printed page — none of those should leave the
+       text hidden. */
+    window.setTimeout(showAll, 3000);
+  }
+
+  /* ── walkthrough: the pinned slate follows the chapters ───── */
+  var walkPanel = new Panel(
+    document.getElementById("walkScreen"),
+    document.getElementById("walkText")
+  );
+  var walkHeadLeft = document.getElementById("walkHeadLeft");
+  var walkHeadRight = document.getElementById("walkHeadRight");
+
+  var CHAPTERS = [
+    {
+      left: "no radio", right: "usb-c only",
+      body: "$ ls /dev/net\nls: /dev/net: No such directory\n\nNothing to configure. Nothing to forget to turn off."
+    },
+    {
+      left: "latency", right: "41 ms",
+      body: "keystroke  ->  ink\n\n41 ms      typing\n780 ms     full refresh\n\nOne of these you feel. The other you learn to ignore."
+    },
+    {
+      left: "sd card", right: "128 gb",
+      body: "/SABLE\n  2027-03-14.txt\n  2027-03-13.txt\n  2027-03-11.txt\n\nPlain text. Dated. Yours."
+    }
+  ];
+
+  var currentChapter = -1;
+  function showChapter(index) {
+    if (index === currentChapter || !CHAPTERS[index]) return;
+    currentChapter = index;
+    var ch = CHAPTERS[index];
+    walkHeadLeft.textContent = ch.left;
+    walkHeadRight.textContent = ch.right;
+    walkPanel.fullRefresh();
+    /* Let the inversion finish before the new text starts arriving —
+       the hardware cannot draw during a refresh either. */
+    window.setTimeout(function () { walkPanel.write(ch.body); }, reduced ? 0 : 300);
+  }
+
+  var chapterEls = document.querySelectorAll(".chapter");
+  if ("IntersectionObserver" in window && chapterEls.length) {
+    var chapterIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) showChapter(+entry.target.dataset.chapter);
+      });
+    }, { rootMargin: "-35% 0px -45% 0px", threshold: 0 });
+    chapterEls.forEach(function (el) { chapterIO.observe(el); });
+  }
+  walkPanel.set(CHAPTERS[0].body);
+  walkHeadLeft.textContent = CHAPTERS[0].left;
+  walkHeadRight.textContent = CHAPTERS[0].right;
+
+  /* ── the writing test ─────────────────────────────────────── */
+  var padInput = document.getElementById("padInput");
+  var tryPanel = new Panel(
+    document.getElementById("tryScreen"),
+    document.getElementById("tryText")
+  );
+  var padWords = document.getElementById("padWords");
+  var padChars = document.getElementById("padChars");
+  var padRefresh = document.getElementById("padRefresh");
+  var tryWords = document.getElementById("tryWords");
+
+  var PLACEHOLDER = "Nothing typed yet.\n\nThe panel holds the last thing it drew — e-ink keeps its image with the power off.";
+  tryPanel.set(PLACEHOLDER);
+
+  /* The panel lags the field by one keystroke budget, which is the
+     whole point of the section. Longer pastes catch up in one go
+     rather than crawling. */
+  var padTimer = null;
+  var lastLineCount = 0;
+
+  function updatePad() {
+    var value = padInput.value;
+    var words = value.trim() ? value.trim().split(/\s+/).length : 0;
+    padWords.textContent = words.toLocaleString("en-US");
+    padChars.textContent = value.length.toLocaleString("en-US");
+    tryWords.textContent = words.toLocaleString("en-US") + (words === 1 ? " word" : " words");
+
+    /* One full refresh per 90 lines, same as the firmware. */
+    var lines = value.split("\n").length;
+    if (Math.floor(lines / LINES_PER_REFRESH) > Math.floor(lastLineCount / LINES_PER_REFRESH)) {
+      tryPanel.fullRefresh();
+      padRefresh.textContent = tryPanel.refreshes;
+    }
+    lastLineCount = lines;
+
+    window.clearTimeout(padTimer);
+    padTimer = window.setTimeout(function () {
+      tryPanel.set(value || PLACEHOLDER);
+      tryPanel.render(Boolean(value));
+    }, LATENCY_MS);
+  }
+
+  if (padInput) padInput.addEventListener("input", updatePad);
+
+  /* ── keys twitch while the field is being typed into ──────── */
+  var heroKeys = document.getElementById("heroKeys");
+  if (padInput && heroKeys && !reduced) {
+    padInput.addEventListener("keydown", function () {
+      var keys = heroKeys.children;
+      var key = keys[Math.floor(Math.random() * keys.length)];
+      if (!key) return;
+      key.dataset.down = "true";
+      window.setTimeout(function () { key.dataset.down = "false"; }, 90);
+    });
+  }
+
+  /* ── configurator ─────────────────────────────────────────── */
+  var FINISHES = {
+    graphite: {
+      "--shell-hi": "#55524b", "--shell-mid": "#3b3833", "--shell-lo": "#2c2a26",
+      "--shell-edge": "#6d6960", "--key-face": "#43403a", "--key-edge": "#55514a"
+    },
+    bone: {
+      "--shell-hi": "#e6e0d2", "--shell-mid": "#cdc7b8", "--shell-lo": "#b3ac9c",
+      "--shell-edge": "#f2ede1", "--key-face": "#d6d0c1", "--key-edge": "#e4dece"
+    }
+  };
+
+  var root = document.documentElement;
+  var configFinish = document.getElementById("configFinish");
+
+  document.querySelectorAll(".finish").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var name = button.dataset.finish;
+      var tokens = FINISHES[name];
+      if (!tokens) return;
+
+      Object.keys(tokens).forEach(function (token) {
+        root.style.setProperty(token, tokens[token]);
+      });
+
+      document.querySelectorAll(".finish").forEach(function (other) {
+        other.setAttribute("aria-pressed", String(other === button));
+      });
+      if (configFinish) configFinish.textContent = name;
+    });
+  });
+
+  /* The front light is the only setting with a cost, so the cost is
+     shown next to it rather than in a footnote nobody reads. */
+  var LIT_PANEL = "#e9e4d6";
+  var LIT_INK = "#26231d";
+  var DARK_PANEL = "#d9d6cd";
+  var DARK_INK = "#2f2c26";
+
+  var lightToggle = document.getElementById("lightToggle");
+  var batteryDays = document.getElementById("batteryDays");
+  var batteryDelta = document.getElementById("batteryDelta");
+  var specBattery = document.getElementById("specBattery");
+  var configLight = document.getElementById("configLight");
+
+  if (lightToggle) {
+    lightToggle.addEventListener("click", function () {
+      var on = lightToggle.getAttribute("aria-pressed") !== "true";
+      lightToggle.setAttribute("aria-pressed", String(on));
+
+      root.style.setProperty("--panel", on ? LIT_PANEL : DARK_PANEL);
+      root.style.setProperty("--panel-ink", on ? LIT_INK : DARK_INK);
+
+      batteryDays.textContent = on ? "22" : "31";
+      batteryDelta.textContent = on ? "Nine days for a warmer page." : "";
+      specBattery.textContent = on ? "22 days" : "31 days";
+      if (configLight) configLight.textContent = on ? "light on" : "light off";
+    });
+  }
+
+  /* ── nav hairline, once you have left the top ─────────────── */
+  var nav = document.getElementById("nav");
+  var onScroll = function () {
+    nav.dataset.stuck = window.scrollY > 8 ? "true" : "false";
+  };
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+})();
+</script>
+
+</body>
+</html>
