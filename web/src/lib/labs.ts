@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "trine",
+    name: "Trine",
+    vibe: "Jewellery, still life",
+    description:
+      "A photographed hand with the ring removed and rebuilt in WebGL, sitting exactly where the real one was. Drag to turn it, and the metal picker recolours all three bands live.",
+    accent: "#b08d57",
+    preview: { from: "#f4f2ef", to: "#dcd8d2" },
+    bestFor: "Jewellery, watches, anything sold on one hero object",
+    buildTime: "Two weeks, the 3D object is the work",
+  },
+  {
     slug: "sable",
     name: "Sable",
     vibe: "Product, ink on paper",

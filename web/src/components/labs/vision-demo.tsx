@@ -208,13 +208,21 @@ export function VisionDemo() {
           transition={{ duration: 0.8, delay: 0.25, ease }}
           className="mt-10"
         >
-          <a
-            href="/#work"
-            className="rounded-full px-7 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.04]"
-            style={{ background: BLUE }}
-          >
-            See the work
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/services"
+              className="rounded-full px-7 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.04]"
+              style={{ background: BLUE }}
+            >
+              Build yours
+            </a>
+            <a
+              href="/#contact"
+              className="rounded-full border border-white/25 px-7 py-3 text-sm text-white/90 transition-colors hover:border-white/60"
+            >
+              Ask for a quote
+            </a>
+          </div>
         </motion.div>
 
         <p className="absolute bottom-10 text-xs text-white/30">

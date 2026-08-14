@@ -185,7 +185,35 @@ export function SpaceDemo() {
           ))}
         </div>
 
-        <p className="mt-12 text-center text-[10px] tracking-[0.4em] text-slate-600 uppercase">
+        {/* the transmission ends with a way to answer it */}
+        <div className="mt-16 border border-cyan-400/25 bg-cyan-950/20 p-8 text-center">
+          <p className="text-[10px] tracking-[0.4em] text-cyan-300/90 uppercase">
+            // incoming channel open
+          </p>
+          <h3 className="mt-4 font-sans text-2xl font-semibold tracking-tight text-slate-100">
+            Want a site that flies like this one?
+          </h3>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-300">
+            The starfield is a canvas, not a video. Every panel here is yours to
+            fill.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/services"
+              className="border border-cyan-400/60 bg-cyan-400/10 px-6 py-3 text-[11px] tracking-[0.3em] text-cyan-200 uppercase transition-colors hover:bg-cyan-400/20"
+            >
+              What I build
+            </a>
+            <a
+              href="/#contact"
+              className="border border-slate-600 px-6 py-3 text-[11px] tracking-[0.3em] text-slate-300 uppercase transition-colors hover:border-slate-400"
+            >
+              Ask for a quote
+            </a>
+          </div>
+        </div>
+
+        <p className="mt-12 text-center text-[10px] tracking-[0.4em] text-slate-500 uppercase">
           end of transmission
         </p>
       </section>

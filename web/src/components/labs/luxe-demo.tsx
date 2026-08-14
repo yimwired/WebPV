@@ -5,7 +5,7 @@ import { projects } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
-const GOLD = "#a8823c";
+const GOLD = "#8a6a2f";
 
 /**
  * "Maison": printed-matter luxury. Ivory paper, serif display type,
@@ -103,7 +103,7 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
               transition={{ duration: 0.6, delay: i * 0.05, ease }}
               className="group grid gap-2 border-b border-[#1c1917]/15 py-8 sm:grid-cols-[4rem_1fr_auto] sm:items-baseline sm:gap-8"
             >
-              <span className={cn(serifClass, "text-xl text-[#a8a29e] italic")}>
+              <span className={cn(serifClass, "text-xl text-[#6b6560] italic")}>
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div>
@@ -118,10 +118,10 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
                   </span>
                 </h3>
                 <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#57534e]">
-                  {p.tagline}, {p.category.toLowerCase()}.
+                  {p.tagline}.
                 </p>
               </div>
-              <span className="text-[10px] tracking-[0.3em] text-[#a8a29e] uppercase">
+              <span className="text-[10px] tracking-[0.3em] text-[#6b6560] uppercase">
                 No. {i + 1} / {projects.length}
               </span>
             </motion.article>
@@ -140,6 +140,32 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
         >
           “Par appointement seulement.”
         </motion.p>
+
+        {/* the appointment has to be bookable */}
+        <div className="mt-16 border-t border-[#1c1917]/20 pt-10 text-center">
+          <h3 className={cn(serifClass, "text-3xl font-normal sm:text-4xl")}>
+            A page like this, for your house.
+          </h3>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#57534e]">
+            Restaurants, ateliers, jewellers, anyone selling something that
+            deserves paper rather than pixels. Roughly a week.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="/services"
+              className="border border-[#1c1917] px-8 py-3 text-[11px] tracking-[0.3em] uppercase transition-colors hover:bg-[#1c1917] hover:text-[#f7f3ea]"
+            >
+              What I build
+            </a>
+            <a
+              href="/#contact"
+              className="text-[11px] tracking-[0.3em] uppercase underline underline-offset-8"
+              style={{ color: GOLD }}
+            >
+              Enquire
+            </a>
+          </div>
+        </div>
       </section>
     </main>
   );

@@ -23,8 +23,8 @@ export function MinimalDemo() {
           className="grid grid-cols-2 gap-4 border-b border-neutral-900 py-6 font-mono text-[11px] tracking-widest uppercase sm:grid-cols-4"
         >
           <span>Film</span>
-          <span className="text-neutral-400">Portfolio, index</span>
-          <span className="hidden text-neutral-400 sm:block">BKK / remote</span>
+          <span className="text-neutral-600">Portfolio, index</span>
+          <span className="hidden text-neutral-600 sm:block">BKK / remote</span>
           <span className="text-right" style={{ color: RED }}>
             2026
           </span>
@@ -55,7 +55,7 @@ export function MinimalDemo() {
               Designed, built and operated by one person. Everything below is
               real and running.
             </p>
-            <div className="font-mono text-[11px] tracking-widest text-neutral-400 uppercase sm:text-right">
+            <div className="font-mono text-[11px] tracking-widest text-neutral-600 uppercase sm:text-right">
               <p>{projects.length} projects, all active</p>
               <p className="mt-1">Next.js / Python / MT5 / Claude</p>
             </div>
@@ -69,7 +69,7 @@ export function MinimalDemo() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6 }}
-            className="grid grid-cols-[3rem_1fr_auto] gap-4 border-b border-neutral-900 pb-3 font-mono text-[11px] tracking-widest text-neutral-400 uppercase sm:grid-cols-[3rem_1fr_1fr_auto]"
+            className="grid grid-cols-[3rem_1fr_auto] gap-4 border-b border-neutral-900 pb-3 font-mono text-[11px] tracking-widest text-neutral-600 uppercase sm:grid-cols-[3rem_1fr_1fr_auto]"
           >
             <span>No.</span>
             <span>Project</span>
@@ -86,7 +86,7 @@ export function MinimalDemo() {
               transition={{ duration: 0.5, delay: i * 0.05, ease }}
               className="group grid grid-cols-[3rem_1fr_auto] items-baseline gap-4 border-b border-neutral-200 py-6 transition-colors hover:bg-neutral-50 sm:grid-cols-[3rem_1fr_1fr_auto]"
             >
-              <span className="font-mono text-[11px] text-neutral-400">
+              <span className="font-mono text-[11px] text-neutral-600">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <h2 className="text-xl font-bold tracking-tight transition-colors group-hover:text-[#e11d48] sm:text-2xl">
@@ -95,18 +95,50 @@ export function MinimalDemo() {
               <p className="hidden max-w-xs text-sm leading-relaxed text-neutral-500 sm:block">
                 {p.tagline}
               </p>
-              <span className="font-mono text-[11px] tracking-widest text-neutral-400 uppercase">
+              <span className="font-mono text-[11px] tracking-widest text-neutral-600 uppercase">
                 {p.category}
               </span>
             </motion.article>
           ))}
+
+          {/* the index ends with the one thing it is selling */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mt-16 grid gap-6 border-t-2 border-neutral-900 pt-8 sm:grid-cols-[1fr_auto] sm:items-end"
+          >
+            <div>
+              <h2 className="max-w-lg text-2xl font-bold tracking-tight sm:text-3xl">
+                This grid, with your work in it.
+              </h2>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-neutral-600">
+                Under a week. You send the content, I set it.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <a
+                href="/services"
+                className="bg-neutral-900 px-6 py-3 font-mono text-[11px] tracking-widest text-white uppercase transition-opacity hover:opacity-90"
+              >
+                What I build
+              </a>
+              <a
+                href="/#contact"
+                className="border border-neutral-900 px-6 py-3 font-mono text-[11px] tracking-widest uppercase transition-colors hover:bg-neutral-900 hover:text-white"
+              >
+                Quote
+              </a>
+            </div>
+          </motion.div>
 
           <motion.footer
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-16 flex items-center justify-between font-mono text-[11px] tracking-widest text-neutral-400 uppercase"
+            className="mt-16 flex items-center justify-between font-mono text-[11px] tracking-widest text-neutral-500 uppercase"
           >
             <span>© 2026 Film</span>
             <span className="h-3 w-3" style={{ background: RED }} />

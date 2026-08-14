@@ -56,6 +56,28 @@ export function LabsGallery() {
                 >
                   <div className="absolute inset-0">
                     {/* abstract mini-composition per style */}
+                    {lab.slug === "trine" && (
+                      <>
+                        {/* three interlaced bands on a lit backdrop */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[18deg]">
+                          {[
+                            { c: "#d8a48c", x: -13 },
+                            { c: "#dcdcdf", x: 0 },
+                            { c: "#d3a54e", x: 13 },
+                          ].map((band) => (
+                            <span
+                              key={band.c}
+                              className="absolute top-1/2 left-1/2 h-24 w-14 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border-[5px]"
+                              style={{
+                                borderColor: band.c,
+                                transform: `translate(calc(-50% + ${band.x}px), -50%)`,
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <div className="absolute right-6 bottom-6 h-px w-16 bg-[#141210]/25" />
+                      </>
+                    )}
                     {lab.slug === "sable" && (
                       <>
                         {/* the slate, tilted, with a folio edge under it */}
