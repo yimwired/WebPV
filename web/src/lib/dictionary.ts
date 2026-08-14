@@ -10,6 +10,7 @@ const en = {
   nav: {
     work: "Work",
     services: "Services",
+    pricing: "Pricing",
     about: "About",
     labs: "Labs",
     contact: "Contact",
@@ -145,6 +146,118 @@ const en = {
     ctaTitle: "Have something in mind?",
     ctaSub: "Tell me roughly what you need and I'll send back scope, timeline and a price.",
     ctaButton: "Ask for a quote",
+  },
+  // Numbers live in `pricing.ts`; only the wording is here, keyed by tier id.
+  pricing: {
+    title: "Prices agreed before anything starts",
+    sub: "Three packages cover most of what people ask me for. Anything larger is quoted per project. Whatever number you agree to is the number on the invoice.",
+    recommended: "Recommended",
+    perProject: "Per project",
+    seeDemo: "See it live",
+    introNote:
+      "Launch pricing: the first three projects are 30% off, quoted work included, in exchange for showing the result here as an example.",
+    introBadge: "Launch price",
+    regularPrice: "Regular price",
+    tiers: {
+      starter: {
+        name: "Starter",
+        forWho: "One page, one message",
+        blurb:
+          "A single scrolling page for a product, an event or an introduction. Everything a first visitor needs, without making them click anywhere else.",
+        points: [
+          "One page, up to five sections",
+          "Thai and English copy",
+          "Contact form straight to your inbox",
+          "Live on your own domain",
+          "Two rounds of revisions",
+        ],
+        timeline: "About 5 days",
+        cta: "Start with Starter",
+      },
+      standard: {
+        name: "Standard",
+        forWho: "A small site that has to sell",
+        blurb:
+          "Several pages built on a direction you pick from The Lab, written so Google can find it and light enough to open on a phone with no wifi.",
+        points: [
+          "Up to eight pages",
+          "A Lab style adapted to your brand",
+          "SEO, share previews and sitemap",
+          "Edit your own text without me",
+          "Three rounds of revisions",
+        ],
+        timeline: "About 2 weeks",
+        cta: "Start with Standard",
+      },
+      signature: {
+        name: "Signature",
+        forWho: "The site is the product",
+        blurb:
+          "Motion, 3D or an interactive piece written from scratch for you, at the level of the Trine and Sable studies in The Lab.",
+        points: [
+          "Everything in Standard",
+          "Custom motion, WebGL or a configurator",
+          "A design system you can extend later",
+          "Speed and accessibility measured, not assumed",
+          "Three rounds of revisions",
+        ],
+        timeline: "3 to 5 weeks",
+        cta: "Talk about a Signature build",
+      },
+      custom: {
+        name: "Automation, dashboards, AI",
+        forWho: "Not a website",
+        blurb:
+          "Trading systems, Telegram bots, internal dashboards, content pipelines. Scope decides the price here, so it gets quoted properly instead of guessed.",
+        points: [
+          "Free scoping call, then a fixed price",
+          "Built in stages you can stop between",
+          "Handed over with the code and how to run it",
+        ],
+        timeline: "Quoted with the scope",
+        cta: "Send me the scope",
+      },
+    },
+    includedTitle: "In every package",
+    included: [
+      "Built by me end to end, no agency layer",
+      "Designed for a phone first",
+      "The repository is yours at handover",
+      "Deployment set up and running",
+      "30 days of free fixes after launch",
+    ],
+    faqTitle: "Before you ask",
+    faq: [
+      {
+        q: "What is not included?",
+        a: "Domain and hosting stay in your name: a domain runs about 500 baht a year, and a site this size hosts free on Vercel. Photography, licensed fonts and long-form copywriting are quoted separately if you want them.",
+      },
+      {
+        q: "How does payment work?",
+        a: "Starter and Standard: half to start, half on the day it goes live. Signature runs longer, so it splits 40 / 30 / 30, with the middle payment when you see the working build. Bank transfer or PromptPay.",
+      },
+      {
+        q: "How is tax handled?",
+        a: "The price is what you pay. I am not VAT registered, so no VAT is added on top. Companies are welcome to withhold the usual 3% at source, and I will ask for the withholding certificate.",
+      },
+      {
+        q: "What if I need changes later?",
+        a: "Fixes to what we agreed are free for 30 days after launch. After that, small edits are 1,200 baht an hour with a one hour minimum, and anything new gets quoted before I touch it.",
+      },
+      {
+        q: "What if the project gets cancelled?",
+        a: "The deposit is not refundable once I start, but you keep everything built up to that point, code included.",
+      },
+      {
+        q: "Can you start from a design I already have?",
+        a: "Yes. A Figma file, or even screenshots of a site you like, is enough. It usually makes the build faster.",
+      },
+    ],
+    ctaTitle: "Not sure which one fits?",
+    ctaSub: "Send the rough idea. I'll tell you which package it lands in, or that it doesn't need one.",
+    ctaButton: "Ask for a quote",
+    ctaSecondary: "See the styles",
+    proof: "Five systems running in production, nine styles you can click through.",
   },
   // Chrome shared by every case-study page.
   caseStudy: {
@@ -308,6 +421,7 @@ const th: typeof en = {
   nav: {
     work: "ผลงาน",
     services: "รับงาน",
+    pricing: "ราคา",
     about: "รู้จักผม",
     labs: "Labs",
     contact: "ติดต่อ",
@@ -447,6 +561,117 @@ const th: typeof en = {
     ctaTitle: "มีงานในใจแล้วใช่ไหม",
     ctaSub: "เล่าคร่าวๆ มาได้เลย เดี๋ยวสรุปขอบเขตงาน เวลา และราคากลับไปให้",
     ctaButton: "ขอใบเสนอราคา",
+  },
+  pricing: {
+    title: "ราคาคุยกันจบ​ตั้งแต่​ก่อนเริ่มงาน",
+    sub: "สามแพ็กเกจนี้ครอบคลุมงานที่มีคนถามหาบ่อยที่สุด ถ้าใหญ่กว่านั้นคิดตามงานจริง ตกลงราคาไหนไว้ ก็จ่ายเท่านั้น ไม่มีบวกเพิ่มทีหลัง",
+    recommended: "แนะนำ",
+    perProject: "คิดตามงาน",
+    seeDemo: "ดูของจริง",
+    introNote:
+      "ราคาเปิดตัว: สามโปรเจกต์แรกลด 30% ทุกแพ็กเกจ งานที่คิดตามงานก็ลดด้วย แลกกับการได้เอาผลงานมาลงเป็นตัวอย่างในเว็บนี้",
+    introBadge: "ราคาเปิดตัว",
+    regularPrice: "ราคาปกติ",
+    tiers: {
+      starter: {
+        name: "Starter",
+        forWho: "หน้าเดียว จบในหน้าเดียว",
+        blurb:
+          "หน้าเว็บเลื่อนยาวหน้าเดียว สำหรับสินค้าตัวเดียว งานอีเวนต์ หรือแนะนำตัว มีครบทุกอย่างที่คนเข้ามาครั้งแรกอยากรู้ โดยไม่ต้องกดไปหน้าอื่น",
+        points: [
+          "หน้าเดียว ไม่เกินห้าส่วน",
+          "ข้อความทั้งไทยและอังกฤษ",
+          "ฟอร์มติดต่อส่งเข้าอีเมลคุณตรงๆ",
+          "ขึ้นออนไลน์บนโดเมนของคุณเอง",
+          "แก้งานได้สองรอบ",
+        ],
+        timeline: "ราว 5 วัน",
+        cta: "เริ่มที่ Starter",
+      },
+      standard: {
+        name: "Standard",
+        forWho: "เว็บเล็กที่ต้องขายของได้",
+        blurb:
+          "หลายหน้า เลือกสไตล์จาก The Lab มาปรับให้เป็นของคุณ เขียนให้ Google หาเจอ และเบาพอจะเปิดติดบนมือถือที่ไม่ได้ต่อไวไฟ",
+        points: [
+          "ไม่เกินแปดหน้า",
+          "สไตล์จาก The Lab ปรับให้เข้ากับแบรนด์",
+          "SEO รูปตอนแชร์ และ sitemap",
+          "แก้ข้อความเองได้ ไม่ต้องเรียกผม",
+          "แก้งานได้สามรอบ",
+        ],
+        timeline: "ราว 2 สัปดาห์",
+        cta: "เริ่มที่ Standard",
+      },
+      signature: {
+        name: "Signature",
+        forWho: "ตัวเว็บคือตัวสินค้า",
+        blurb:
+          "งาน motion, 3D หรือของเล่นในหน้าเว็บที่เขียนขึ้นใหม่ให้เฉพาะคุณ ระดับเดียวกับ Trine และ Sable ที่อยู่ใน The Lab",
+        points: [
+          "ได้ทุกอย่างใน Standard",
+          "Motion, WebGL หรือ configurator ที่เขียนขึ้นใหม่",
+          "ระบบดีไซน์ที่ต่อยอดเองได้ทีหลัง",
+          "วัดความเร็วและการเข้าถึงด้วยเครื่องมือจริง ไม่ใช่เดา",
+          "แก้งานได้สามรอบ",
+        ],
+        timeline: "3 ถึง 5 สัปดาห์",
+        cta: "คุยงาน Signature",
+      },
+      custom: {
+        name: "งานอัตโนมัติ Dashboard และ AI",
+        forWho: "ไม่ใช่เว็บไซต์",
+        blurb:
+          "ระบบเทรด บอท Telegram dashboard ในทีม สายพานคอนเทนต์ งานกลุ่มนี้ขอบเขตเป็นตัวกำหนดราคา เลยต้องคุยก่อนแล้วเสนอจริง ไม่ใช่ทายเอา",
+        points: [
+          "คุยขอบเขตงานฟรี แล้วเสนอราคาคงที่",
+          "แบ่งทำเป็นช่วง หยุดระหว่างช่วงได้",
+          "ส่งมอบพร้อมโค้ดและวิธีรัน",
+        ],
+        timeline: "เสนอราคาพร้อมขอบเขตงาน",
+        cta: "ส่งขอบเขตงานมาคุย",
+      },
+    },
+    includedTitle: "ได้เหมือนกันทุกแพ็กเกจ",
+    included: [
+      "ผมทำเองตั้งแต่ต้นจนจบ ไม่มีชั้นเอเจนซีคั่น",
+      "ออกแบบจากจอมือถือก่อน",
+      "โค้ดทั้งหมดส่งมอบเป็นของคุณ",
+      "ติดตั้งขึ้นเซิร์ฟเวอร์ให้พร้อมใช้",
+      "แก้บั๊กฟรี 30 วันหลังขึ้นจริง",
+    ],
+    faqTitle: "คำถามที่มักถามก่อน",
+    faq: [
+      {
+        q: "อะไรที่ไม่รวมในราคา",
+        a: "โดเมนกับโฮสต์อยู่ในชื่อคุณ โดเมนราวปีละ 500 บาท เว็บขนาดนี้โฮสต์บน Vercel ได้ฟรี ส่วนภาพถ่าย ฟอนต์ที่มีลิขสิทธิ์ และงานเขียนยาวๆ คิดแยกถ้าอยากได้",
+      },
+      {
+        q: "จ่ายเงินยังไง",
+        a: "Starter กับ Standard จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง ส่วน Signature ใช้เวลานานกว่า เลยแบ่งเป็น 40 / 30 / 30 ก้อนกลางจ่ายตอนได้เห็นของที่ใช้งานได้แล้ว โอนธนาคารหรือพร้อมเพย์",
+      },
+      {
+        q: "เรื่องภาษีคิดยังไง",
+        a: "ราคาที่เห็นคือราคาที่จ่าย ผมยังไม่ได้จด VAT เลยไม่มีภาษีมูลค่าเพิ่มบวกเพิ่ม ถ้าคุณเป็นนิติบุคคลก็หักภาษี ณ ที่จ่าย 3% ได้ตามปกติ ขอใบ 50 ทวิด้วย",
+      },
+      {
+        q: "ส่งงานแล้วอยากแก้เพิ่มทีหลัง",
+        a: "แก้ในสิ่งที่ตกลงกันไว้ ฟรี 30 วันหลังขึ้นจริง หลังจากนั้นงานเล็กคิดชั่วโมงละ 1,200 บาท ขั้นต่ำหนึ่งชั่วโมง ส่วนของที่เพิ่มใหม่เสนอราคาให้ดูก่อนลงมือทุกครั้ง",
+      },
+      {
+        q: "ถ้ายกเลิกกลางทาง",
+        a: "มัดจำไม่คืนเมื่อเริ่มงานไปแล้ว แต่งานที่ทำไปถึงตรงนั้นเป็นของคุณ รวมโค้ดด้วย",
+      },
+      {
+        q: "มีแบบอยู่แล้ว เริ่มจากตรงนั้นได้ไหม",
+        a: "ได้ ไฟล์ Figma หรือแค่รูปหน้าเว็บที่ชอบก็พอ ส่วนใหญ่ช่วยให้งานเร็วขึ้นด้วยซ้ำ",
+      },
+    ],
+    ctaTitle: "ไม่แน่ใจว่าอันไหนใช่",
+    ctaSub: "เล่าไอเดียคร่าวๆ มา เดี๋ยวบอกให้ว่าเข้าแพ็กเกจไหน หรือจริงๆ แล้วไม่ต้องใช้แพ็กเกจเลย",
+    ctaButton: "ขอใบเสนอราคา",
+    ctaSecondary: "ดูสไตล์ทั้งหมด",
+    proof: "5 ระบบที่รันอยู่จริงตอนนี้ กับ 9 สไตล์ที่กดเล่นได้เลย",
   },
   caseStudy: {
     back: "กลับหน้าแรก",
