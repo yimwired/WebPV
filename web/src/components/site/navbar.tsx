@@ -21,6 +21,7 @@ export function Navbar() {
   const links = [
     { href: section("#work"), label: t.nav.work },
     { href: "/services", label: t.nav.services },
+    { href: "/pricing", label: t.nav.pricing },
     { href: section("#about"), label: t.nav.about },
     { href: "/labs", label: t.nav.labs },
     { href: section("#contact"), label: t.nav.contact },
@@ -97,7 +98,7 @@ export function Navbar() {
           Film
         </a>
 
-        <nav className="hidden items-center gap-1 sm:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {links.map((l) => renderLink(l, linkClass))}
         </nav>
 
@@ -105,7 +106,7 @@ export function Navbar() {
           <LanguageSwitch />
           <a
             href={section("#contact")}
-            className="bg-foreground text-background hidden rounded-md px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90 sm:inline-block"
+            className="bg-foreground text-background hidden rounded-md px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90 md:inline-block"
           >
             {t.nav.cta}
           </a>
@@ -115,7 +116,7 @@ export function Navbar() {
             aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
-            className="border-line-strong text-foreground/80 hover:text-foreground grid h-9 w-9 place-items-center rounded-md border transition-colors sm:hidden"
+            className="border-line-strong text-foreground/80 hover:text-foreground grid h-9 w-9 place-items-center rounded-md border transition-colors md:hidden"
           >
             {menuOpen ? (
               <X className="h-4.5 w-4.5" />
@@ -141,7 +142,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              className="bg-background/95 fixed inset-0 -z-10 sm:hidden"
+              className="bg-background/95 fixed inset-0 -z-10 md:hidden"
             />
             <motion.nav
               key="sheet"
@@ -150,7 +151,7 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="bg-surface border-line mx-4 mt-2 flex flex-col gap-1 rounded-lg border p-3 sm:hidden"
+              className="bg-surface border-line mx-4 mt-2 flex flex-col gap-1 rounded-lg border p-3 md:hidden"
             >
               {links.map((l) =>
                 renderLink(
