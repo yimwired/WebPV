@@ -3,9 +3,11 @@
 import { motion, type Variants } from "framer-motion";
 import { type ReactNode } from "react";
 
+// A short lift, no blur. The blur-in reveal reads as decoration; this one
+// just keeps the eye moving down the page.
 const variants: Variants = {
-  hidden: { opacity: 0, y: 24, filter: "blur(8px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0 },
 };
 
 export function Reveal({
@@ -23,7 +25,7 @@ export function Reveal({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+      transition={{ duration: 0.5, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
       variants={variants}
     >
       {children}

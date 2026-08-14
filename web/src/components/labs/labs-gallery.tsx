@@ -9,62 +9,52 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
 export function LabsGallery() {
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-neutral-950 text-white">
-      {/* backdrop */}
-      <div className="bg-grid pointer-events-none absolute inset-0 opacity-60" />
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-130 w-[52rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-600/20 via-violet-600/20 to-cyan-500/20 blur-3xl" />
-
-      <div className="relative mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+    <main className="bg-background min-h-dvh text-white">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease }}
+          transition={{ duration: 0.5, ease }}
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-neutral-400 transition-colors hover:text-white"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to site
           </Link>
 
-          <p className="mt-10 text-sm font-medium tracking-widest text-neutral-500 uppercase">
-            Design experiments
-          </p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-            One portfolio,{" "}
-            <span className="bg-gradient-to-r from-indigo-300 via-cyan-200 to-violet-300 bg-clip-text text-transparent">
-              many faces
-            </span>
-            .
+          <h1 className="mt-10 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            Eight directions your site could take
           </h1>
-          <p className="mt-5 max-w-xl text-neutral-400 sm:text-lg">
-            The same work, rebuilt in radically different visual languages,
-            because a website is a design decision, not a template. Pick a
-            universe and step in.
+          <p className="mt-5 max-w-2xl leading-relaxed text-muted-foreground">
+            Every one is a working page built from scratch, not a theme with the
+            colours swapped. Open the ones that fit your business, then tell me
+            which you want and I build your content in that direction. Each card
+            says what it suits and roughly how long it takes.
           </p>
         </motion.div>
 
-        <div className="mt-14 grid gap-5 sm:mt-20 sm:grid-cols-2">
+        <div className="mt-14 grid gap-5 sm:mt-16 sm:grid-cols-2">
           {labs.map((lab, i) => (
             <motion.div
               key={lab.slug}
-              initial={{ opacity: 0, y: 32 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 + i * 0.08, ease }}
+              transition={{ duration: 0.5, delay: 0.1 + i * 0.05, ease }}
             >
               <Link
                 href={`/labs/${lab.slug}`}
-                className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors duration-300 hover:border-white/25"
+                className="border-line hover:border-line-strong group flex h-full flex-col overflow-hidden rounded-lg border transition-colors"
               >
                 {/* preview */}
                 <div
-                  className="relative h-44 overflow-hidden sm:h-52"
+                  className="border-line relative h-44 overflow-hidden border-b sm:h-52"
                   style={{
                     background: `linear-gradient(135deg, ${lab.preview.from}, ${lab.preview.to})`,
                   }}
                 >
-                  <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+                  <div className="absolute inset-0">
                     {/* abstract mini-composition per style */}
                     {lab.slug === "sable" && (
                       <>
@@ -156,7 +146,10 @@ export function LabsGallery() {
                       <>
                         <div className="absolute inset-x-8 top-8 grid grid-cols-4 gap-2">
                           {[...Array(8)].map((_, s) => (
-                            <div key={s} className="h-8 border border-neutral-400/40" />
+                            <div
+                              key={s}
+                              className="h-8 border border-neutral-400/40"
+                            />
                           ))}
                         </div>
                         <div className="absolute bottom-8 left-8 h-4 w-4 bg-[#e11d48]" />
@@ -165,61 +158,69 @@ export function LabsGallery() {
                   </div>
                 </div>
 
-                {/* meta */}
-                <div className="flex items-start justify-between gap-4 p-5 sm:p-6">
-                  <div>
-                    <div className="flex items-center gap-2.5">
+                {/* what it is, who it suits, what it costs in time */}
+                <div className="flex flex-1 flex-col p-5 sm:p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
                       <h2 className="text-lg font-semibold tracking-tight">
                         {lab.name}
                       </h2>
-                      <span
-                        className="rounded-full px-2.5 py-0.5 text-[11px] font-medium"
-                        style={{
-                          color: lab.accent,
-                          background: `color-mix(in oklab, ${lab.accent} 14%, transparent)`,
-                        }}
-                      >
-                        {lab.vibe}
-                      </span>
+                      <p className="spec mt-1">{lab.vibe}</p>
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-                      {lab.description}
-                    </p>
+                    <ArrowUpRight className="mt-1 h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                   </div>
-                  <ArrowUpRight className="mt-1 h-5 w-5 shrink-0 text-neutral-500 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {lab.description}
+                  </p>
+
+                  <dl className="border-line mt-auto space-y-2 border-t pt-4 text-sm">
+                    <div className="flex gap-4">
+                      <dt className="w-24 shrink-0 text-muted-foreground">
+                        Best for
+                      </dt>
+                      <dd className="text-foreground/90">{lab.bestFor}</dd>
+                    </div>
+                    <div className="flex gap-4">
+                      <dt className="w-24 shrink-0 text-muted-foreground">
+                        Build time
+                      </dt>
+                      <dd className="text-foreground/90">{lab.buildTime}</dd>
+                    </div>
+                  </dl>
                 </div>
               </Link>
             </motion.div>
           ))}
         </div>
 
-        <div className="mt-16 rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 text-center backdrop-blur-md sm:p-12">
-          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            Like one of these?
+        <div className="border-line mt-16 border-t pt-10">
+          <h2 className="text-2xl font-semibold tracking-tight text-white">
+            Know which one you want?
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-neutral-400">
-            Pick a direction and I&apos;ll build your site in it. Same code,
-            same care, your content.
+          <p className="mt-3 max-w-lg text-muted-foreground">
+            Send me the name of the direction and what your business does. You
+            get back scope, a timeline and a fixed price before anything starts.
           </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
               href="/services"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-white px-7 text-sm font-medium text-neutral-950 transition-transform hover:scale-[1.03] active:scale-95"
+              className="inline-flex h-11 items-center justify-center rounded-md bg-white px-6 text-sm font-medium text-neutral-950 transition-opacity hover:opacity-90"
             >
-              See what I build
+              What I build
             </Link>
             <Link
               href="/#contact"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              className="border-line-strong inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm text-white/80 transition-colors hover:border-white/40 hover:text-white"
             >
-              Get in touch
+              Ask for a quote
             </Link>
           </div>
+          <p className="mt-10 text-sm text-muted-foreground">
+            Every page here is hand-built in Next.js, Tailwind and Framer
+            Motion. No themes, no page builders.
+          </p>
         </div>
-
-        <p className="mt-14 text-center text-sm text-neutral-600">
-          Built with Next.js · Tailwind · Framer Motion. No templates.
-        </p>
       </div>
     </main>
   );

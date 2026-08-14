@@ -1,46 +1,48 @@
 "use client";
 
-import Image from "next/image";
 import { projects } from "@/lib/projects";
 import { ProjectCard } from "./project-card";
-import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import { Reveal } from "./reveal";
 import { useLocale } from "@/lib/i18n";
 
 export function Projects() {
   const { t } = useLocale();
+
+  // the featured project leads the grid at full width
+  const ordered = [...projects].sort(
+    (a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)),
+  );
+
   return (
-    <section id="work" className="scroll-mt-24">
-      {/* Cinematic scroll reveal: tilts up and flattens as you scroll into Work */}
-      <ContainerScroll
-        titleComponent={
-          <div className="pb-2">
-            <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-              {t.work.label}
-            </p>
-            <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
+    <section
+      id="work"
+      className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-10 pb-20 sm:px-8 sm:pt-14 sm:pb-28"
+    >
+      <Reveal>
+        <div className="border-line flex flex-wrap items-end justify-between gap-4 border-b pb-6">
+          <div>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               {t.work.title}
             </h2>
+            <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-relaxed sm:text-base">
+              {t.work.sub}
+            </p>
           </div>
-        }
-      >
-        <Image
-          src="/projects/aurum.png"
-          alt="AURUM automated XAU/USD trading terminal"
-          width={1400}
-          height={900}
-          priority
-          draggable={false}
-          className="mx-auto h-full w-full rounded-2xl object-cover object-top"
-        />
-      </ContainerScroll>
-
-      {/* Full project grid */}
-      <div className="mx-auto -mt-24 max-w-6xl px-5 pb-24 sm:px-8 sm:pb-32 md:-mt-48">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {projects.map((p) => (
-            <ProjectCard key={p.id} project={p} />
-          ))}
+          <span className="spec pb-1">
+            {projects.length} {t.work.label}
+          </span>
         </div>
+      </Reveal>
+
+      <div className="mt-8 grid gap-5 sm:grid-cols-2">
+        {ordered.map((p, i) => (
+          <ProjectCard
+            key={p.id}
+            project={p}
+            featured={p.featured}
+            delay={Math.min(i, 3) * 0.05}
+          />
+        ))}
       </div>
     </section>
   );

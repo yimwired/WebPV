@@ -37,21 +37,18 @@ export function Footer() {
       id="contact"
       className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24 sm:px-8 sm:py-32"
     >
-      <Reveal className="rounded-[2rem] border border-white/10 bg-card/40 p-8 backdrop-blur-md sm:p-14">
-        <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-          {t.footer.label}
-        </p>
-        <h2 className="mt-3 max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+      <Reveal className="border-line border-t pt-12">
+        <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
           {t.footer.title}
         </h2>
-        <p className="mt-4 max-w-md text-muted-foreground">{t.footer.sub}</p>
+        <p className="text-muted-foreground mt-4 max-w-md">{t.footer.sub}</p>
 
         <ContactForm />
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <a
             href={`mailto:${EMAIL}`}
-            className="group inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 text-sm font-medium text-foreground/90 transition-colors hover:bg-white/10 hover:text-foreground"
+            className="border-line-strong text-foreground/90 hover:border-foreground/40 hover:text-foreground group inline-flex h-11 items-center justify-center gap-2 rounded-md border px-5 text-sm font-medium transition-colors"
           >
             <Mail className="h-4 w-4" />
             {EMAIL}
@@ -60,7 +57,7 @@ export function Footer() {
             <button
               type="button"
               onClick={copyEmail}
-              className="inline-flex h-12 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-5 text-sm text-foreground/80 transition-colors hover:bg-white/10 hover:text-foreground"
+              className="border-line-strong text-foreground/80 hover:border-foreground/40 hover:text-foreground inline-flex h-11 items-center gap-1.5 rounded-md border px-5 text-sm transition-colors"
             >
               {copied ? (
                 <Check className="h-3.5 w-3.5" />
@@ -75,7 +72,7 @@ export function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex h-12 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-5 text-sm text-foreground/80 transition-colors hover:bg-white/10 hover:text-foreground"
+                className="border-line-strong text-foreground/80 hover:border-foreground/40 hover:text-foreground group inline-flex h-11 items-center gap-1.5 rounded-md border px-5 text-sm transition-colors"
               >
                 {s.label}
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -85,7 +82,7 @@ export function Footer() {
         </div>
       </Reveal>
 
-      <div className="mt-10 flex flex-col items-center justify-between gap-3 text-sm text-muted-foreground sm:flex-row">
+      <div className="border-line text-muted-foreground mt-16 flex flex-col items-center justify-between gap-3 border-t pt-6 text-sm sm:flex-row">
         <span>
           © {new Date().getFullYear()} Film. {t.footer.rights}
         </span>
