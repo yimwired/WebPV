@@ -13,11 +13,17 @@ export interface Project {
   /** 1-2 sentences for the card body */
   description: string;
   category: string;
+  /** short keywords; used by the lab demos, not by the site's own cards */
   tags: string[];
   status: ProjectStatus;
   /** where the "open" button goes; set to a real URL when deployed */
   href: string;
-  /** accent colour used for the card glow/badge (any CSS colour) */
+  /** given the full width at the top of the work grid */
+  featured?: boolean;
+  /**
+   * Accent colour kept per project for the labs demos, which each colour
+   * their own layout. The site itself uses one accent, `--brand`.
+   */
   accent: string;
   /**
    * Optional preview image for the card. Drop a file in `public/projects/`
@@ -67,6 +73,7 @@ export const projects: Project[] = [
     tags: ["XAU/USD", "MT5", "12 engines", "Python"],
     status: "active",
     href: "/work/aurum",
+    featured: true,
     accent: "#f59e0b", // amber/gold
     image: "/projects/aurum.png",
     th: {

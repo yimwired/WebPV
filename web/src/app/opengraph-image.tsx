@@ -1,9 +1,16 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Film | Builder of bots, tools & content";
+export const alt = "Nuttapon Yimnoi (Film), builder of trading systems and AI agents";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const BRAND = "#f7a445";
+const LINE = "rgba(250,250,250,0.14)";
+
+/**
+ * Share card. Flat background and one accent, matching the site: a link
+ * preview that promises a gradient the page does not have is a small lie.
+ */
 export default function Image() {
   return new ImageResponse(
     (
@@ -13,11 +20,9 @@ export default function Image() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: "80px",
-          backgroundColor: "#09090b",
-          backgroundImage:
-            "radial-gradient(720px 420px at 18% 0%, rgba(99,102,241,0.28), transparent 65%), radial-gradient(720px 420px at 88% 100%, rgba(34,211,238,0.20), transparent 65%)",
+          justifyContent: "space-between",
+          padding: "72px 80px",
+          backgroundColor: "#0a0a0a",
           color: "#fafafa",
           fontFamily: "sans-serif",
         }}
@@ -25,76 +30,53 @@ export default function Image() {
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: "16px",
+            justifyContent: "space-between",
+            fontSize: "24px",
+            color: "rgba(250,250,250,0.55)",
           }}
         >
+          <div>Nuttapon Yimnoi (Film)</div>
+          <div>Bangkok</div>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "56px",
-              height: "56px",
-              borderRadius: "14px",
-              backgroundColor: "#fafafa",
-              color: "#09090b",
-              fontSize: "30px",
-              fontWeight: 700,
+              fontSize: "76px",
+              fontWeight: 600,
+              letterSpacing: "-2px",
+              lineHeight: 1.08,
             }}
           >
-            F
-          </div>
-          <div style={{ fontSize: "30px", color: "rgba(250,250,250,0.75)" }}>
-            Film
+            I build trading systems, AI agents and the tools around them.
           </div>
         </div>
 
         <div
           style={{
-            marginTop: "48px",
-            fontSize: "84px",
-            fontWeight: 700,
-            letterSpacing: "-3px",
-            lineHeight: 1.05,
-          }}
-        >
-          I build things that ship.
-        </div>
-
-        <div
-          style={{
-            marginTop: "28px",
-            fontSize: "32px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            borderTop: `1px solid ${LINE}`,
+            paddingTop: "28px",
+            fontSize: "26px",
             color: "rgba(250,250,250,0.6)",
           }}
         >
-          Trading systems · AI assistants · Dashboards · Content
-        </div>
-
-        <div
-          style={{
-            marginTop: "56px",
-            display: "flex",
-            alignItems: "center",
-            gap: "14px",
-          }}
-        >
-          <div
-            style={{
-              width: "120px",
-              height: "4px",
-              borderRadius: "2px",
-              backgroundImage:
-                "linear-gradient(90deg, #818cf8, #67e8f9, #c4b5fd)",
-            }}
-          />
-          <div style={{ fontSize: "26px", color: "rgba(250,250,250,0.5)" }}>
-            webpv.vercel.app
+          <div style={{ display: "flex", gap: "36px" }}>
+            <div>5 systems in production</div>
+            <div>12 strategy engines</div>
+            <div>11 AI agents</div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div
+              style={{ width: "10px", height: "10px", backgroundColor: BRAND }}
+            />
+            <div>webpv.vercel.app</div>
           </div>
         </div>
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }

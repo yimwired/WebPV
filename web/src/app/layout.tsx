@@ -15,22 +15,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Film | Builder of bots, tools & content",
+  title: "Film | Trading systems, AI agents and the tools around them",
   description:
-    "Personal site of Film. Trading systems, AI assistants, dashboards and content, built end to end.",
+    "Nuttapon Yimnoi (Film), Bangkok. Five systems in production: a gold trading terminal, an 11-agent AI fleet, dashboards and publishing automation, all built solo.",
   // update if Vercel assigns a different domain (or a custom domain later)
   metadataBase: new URL("https://webpv.vercel.app"),
   openGraph: {
-    title: "Film | Builder of bots, tools & content",
+    title: "Film | Trading systems, AI agents and the tools around them",
     description:
-      "Trading systems, AI assistants, dashboards and content, built end to end.",
+      "Five systems in production, all designed and built solo.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Film | Builder of bots, tools & content",
+    title: "Film | Trading systems, AI agents and the tools around them",
     description:
-      "Trading systems, AI assistants, dashboards and content, built end to end.",
+      "Five systems in production, all designed and built solo.",
   },
 };
 

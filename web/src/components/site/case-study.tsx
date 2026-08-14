@@ -15,21 +15,11 @@ export function CaseStudy({ slug }: { slug: CaseStudySlug }) {
   const chrome = t.caseStudy;
   const cs = t.caseStudies[slug];
 
-  // accent + hero image come from the project card, so both stay in sync
+  // the hero image comes from the project card, so the two stay in sync
   const project = projects.find((p) => p.id === slug);
-  const accent = project?.accent ?? "#818cf8";
 
   return (
     <main className="relative mx-auto max-w-4xl px-5 pb-24 pt-24 sm:px-8 sm:pb-32">
-      {/* ambient glow in the project's accent colour */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background: `radial-gradient(800px 400px at 50% 0%, ${accent}1a, transparent 70%)`,
-        }}
-      />
-
       <div className="flex items-center justify-between">
         <Link
           href="/"
@@ -42,31 +32,21 @@ export function CaseStudy({ slug }: { slug: CaseStudySlug }) {
       </div>
 
       <motion.header
-        initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
         className="mt-14"
       >
-        <p
-          className="text-sm font-medium uppercase tracking-widest"
-          style={{ color: accent }}
-        >
-          {chrome.label}
-        </p>
-        <h1 className="mt-3 text-5xl font-semibold tracking-tight sm:text-7xl">
+        <p className="spec">{chrome.label}</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-6xl">
           {cs.title}
         </h1>
         <p className="mt-4 text-xl text-muted-foreground">{cs.subtitle}</p>
 
-        <dl className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <dl className="border-line mt-10 grid grid-cols-2 border-t sm:grid-cols-4">
           {cs.meta.map((m) => (
-            <div
-              key={m.k}
-              className="rounded-2xl border border-white/10 bg-card/40 p-4 backdrop-blur-md"
-            >
-              <dt className="text-xs uppercase tracking-widest text-muted-foreground">
-                {m.k}
-              </dt>
+            <div key={m.k} className="border-line border-b py-4 sm:border-b-0">
+              <dt className="spec">{m.k}</dt>
               <dd className="mt-1.5 text-sm font-medium">{m.v}</dd>
             </div>
           ))}
@@ -74,7 +54,7 @@ export function CaseStudy({ slug }: { slug: CaseStudySlug }) {
       </motion.header>
 
       {project?.image && (
-        <Reveal className="mt-12 overflow-hidden rounded-3xl border border-white/10">
+        <Reveal className="border-line mt-12 overflow-hidden rounded-lg border">
           <Image
             src={project.image}
             alt={cs.imageAlt}
@@ -91,7 +71,7 @@ export function CaseStudy({ slug }: { slug: CaseStudySlug }) {
           <Reveal key={s.h} delay={i * 0.05}>
             <section className="grid grid-cols-1 gap-4 sm:grid-cols-[220px_1fr] sm:gap-10">
               <h2 className="text-lg font-semibold tracking-tight sm:text-right">
-                <span className="mr-2 text-sm" style={{ color: accent }}>
+                <span className="text-brand mr-2 font-mono text-sm">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {s.h}
@@ -104,16 +84,14 @@ export function CaseStudy({ slug }: { slug: CaseStudySlug }) {
         ))}
       </div>
 
-      <Reveal className="mt-20 rounded-[2rem] border border-white/10 bg-card/40 p-8 text-center backdrop-blur-md sm:p-12">
+      <Reveal className="border-line mt-20 border-t pt-12">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {chrome.ctaTitle}
         </h2>
-        <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-          {chrome.ctaSub}
-        </p>
+        <p className="text-muted-foreground mt-3 max-w-md">{chrome.ctaSub}</p>
         <a
           href="mailto:yimwired@gmail.com"
-          className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-7 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95"
+          className="bg-foreground text-background mt-8 inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90"
         >
           <Mail className="h-4 w-4" />
           {chrome.ctaButton}

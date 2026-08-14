@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Aurora } from "@/components/site/aurora";
 import { Navbar } from "@/components/site/navbar";
 import { Services } from "@/components/site/services";
 import { Footer } from "@/components/site/footer";
@@ -13,9 +12,8 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
-      <Aurora />
       <Navbar />
-      <main className="relative">
+      <main>
         <Services />
         <Footer />
       </main>

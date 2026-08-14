@@ -12,7 +12,7 @@ const FORM_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || "xdenayky";
 type Status = "idle" | "sending" | "sent" | "error";
 
 const fieldClass =
-  "w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-white/25 focus:outline-none focus:ring-2 focus:ring-white/15";
+  "w-full rounded-md border border-line bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40";
 
 /**
  * Posts straight to Formspree, so the site stays static and keyless.
@@ -58,7 +58,7 @@ export function ContactForm() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="grid gap-1.5">
-          <span className="text-xs uppercase tracking-widest text-muted-foreground">
+          <span className="spec">
             {t.form.name}
           </span>
           <input
@@ -71,7 +71,7 @@ export function ContactForm() {
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="text-xs uppercase tracking-widest text-muted-foreground">
+          <span className="spec">
             {t.form.email}
           </span>
           <input
@@ -86,7 +86,7 @@ export function ContactForm() {
       </div>
 
       <label className="grid gap-1.5">
-        <span className="text-xs uppercase tracking-widest text-muted-foreground">
+        <span className="spec">
           {t.form.message}
         </span>
         <textarea
@@ -102,7 +102,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-7 text-sm font-medium text-background transition-transform hover:scale-[1.03] active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
+          className="bg-foreground text-background inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {status === "sending" ? (
             <Loader2 className="h-4 w-4 animate-spin" />

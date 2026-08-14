@@ -19,14 +19,14 @@ export function LanguageSwitch() {
       aria-checked={isThai}
       aria-label={isThai ? "Switch language to English" : "เปลี่ยนภาษาเป็นไทย"}
       onClick={() => setLocale(isThai ? "en" : "th")}
-      className="relative grid h-8 w-[74px] grid-cols-2 items-center rounded-full border border-white/15 bg-white/5 text-[11px] font-semibold tracking-wide backdrop-blur-md transition-colors hover:border-white/25"
+      className="border-line-strong hover:border-foreground/40 relative grid h-8 w-[74px] grid-cols-2 items-center rounded-md border text-[11px] font-semibold tracking-wide transition-colors"
     >
       <motion.span
         aria-hidden
         initial={false}
         animate={{ x: isThai ? 36 : 3 }}
         transition={{ type: "spring", stiffness: 500, damping: 32 }}
-        className="absolute h-6 w-[33px] rounded-full bg-foreground shadow-sm"
+        className="bg-foreground absolute h-6 w-[33px] rounded-sm"
       />
       <span
         className={cn(
