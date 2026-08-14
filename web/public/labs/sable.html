@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sable — a slate for people who write first</title>
+<title>Sable: a slate for people who write first</title>
 <meta name="description" content="Sable is a 7.8-inch e-ink writing slate. No apps, no notifications, 31 days of battery.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,14 +12,14 @@
 
 <script>
   /* Runs before first paint. Hiding reveal targets from a script at
-     the end of <body> means they render visible and then fade out —
+     the end of <body> means they render visible and then fade out:
      a flash of content on every load. */
   document.documentElement.classList.add("js");
 </script>
 
 <style>
 /* ============================================================
-   Sable — one page, no build step.
+   Sable: one page, no build step.
 
    Palette is ink-on-paper with a single rust accent. The product
    is a piece of grey plastic and a sheet of e-ink; the page should
@@ -54,7 +54,7 @@
 
   --measure: 34rem;
 
-  /* Chassis finish — rewritten by the configurator. Graphite is
+  /* Chassis finish, rewritten by the configurator. Graphite is
      the default because it is what the first run is. */
   --shell-hi:   #55524b;
   --shell-mid:  #3b3833;
@@ -63,11 +63,11 @@
   --key-face:   #43403a;
   --key-edge:   #55514a;
 
-  /* Panel tone — the front light warms it and lifts it slightly. */
+  /* Panel tone: the front light warms it and lifts it slightly. */
   --panel:      #d9d6cd;
   --panel-ink:  #2f2c26;
 
-  /* Long ease-out. Nothing here overshoots — the device doesn't
+  /* Long ease-out. Nothing here overshoots; the device doesn't
      bounce when you set it down either. */
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
@@ -83,7 +83,7 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   /* The tilted slate legitimately paints past the text column.
-     `clip` contains it without creating a scroll container —
+     `clip` contains it without creating a scroll container.
      `hidden` here would break the sticky nav and the pinned slate. */
   overflow-x: clip;
 }
@@ -93,7 +93,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1.0625rem;      /* 17px — 16 felt a shade small against this x-height */
+  font-size: 1.0625rem;      /* 17px: 16 felt a shade small against this x-height */
   line-height: 1.6;
   font-feature-settings: "kern" 1;
   -webkit-font-smoothing: antialiased;
@@ -135,7 +135,7 @@ a { color: inherit; }
 }
 @media (min-width: 48rem) { .wrap { padding-inline: 2.5rem; } }
 
-/* Four sizes across the whole page — 11 / 14 / 17 / 21 — plus the
+/* Four sizes across the whole page (11 / 14 / 17 / 21), plus the
    fluid heading clamps. Seven near-identical small sizes is how a
    type ramp stops being a ramp. */
 .mono {
@@ -328,7 +328,7 @@ a { color: inherit; }
 }
 
 /* E-ink is a suspension of pigment, not a backlight. The grain is
-   what sells it — a flat fill reads as a grey rectangle. */
+   what sells it; a flat fill reads as a grey rectangle. */
 .screen::after {
   content: "";
   position: absolute; inset: 0;
@@ -377,7 +377,7 @@ a { color: inherit; }
 }
 .screen-body .dim { color: #5c574f; }   /* 4.97:1 on the panel */
 
-/* This is a writing device with a real text field on it — the one
+/* This is a writing device with a real text field on it, the one
    place a caret belongs. */
 .caret {
   display: inline-block;
@@ -402,7 +402,7 @@ a { color: inherit; }
 /* ── the keyboard folio, hinged below ── */
 /* The folio lies flat on the desk in front of the slate. The
    assembly is already tilted 13°, so the hinge has to swing a bit
-   past 90° to bring the keys back to level — rotating the other
+   past 90° to bring the keys back to level. Rotating the other
    way folds it behind the screen and crushes the caps into stripes. */
 .folio {
   position: relative;
@@ -413,7 +413,7 @@ a { color: inherit; }
   transform-style: preserve-3d;
   border-radius: 3px 3px 12px 12px;
   /* The plate sits below the caps, so it has to be darker than they
-     are — lit the other way round, the gaps between keys glowed. */
+     are. Lit the other way round, the gaps between keys glowed. */
   background: linear-gradient(178deg, var(--shell-lo) 0%, var(--shell-mid) 84%);
   padding: 3.4% 3% 9%;   /* deep enough to read as a keyboard, not a lid */
   box-shadow:
@@ -491,7 +491,7 @@ a { color: inherit; }
 }
 
 /* The hero shows the whole kit, folio and all. Everywhere else the
-   slate appears alone and smaller — a second full assembly next to
+   slate appears alone and smaller: a second full assembly next to
    body copy competes with it instead of supporting it. */
 .walk-pin .rig { width: min(19rem, 100%); }
 .try-grid .rig { width: min(16.5rem, 62vw); }
@@ -934,7 +934,7 @@ footer {
     <div class="pad">
       <label for="padInput">Your text</label>
       <textarea id="padInput" rows="5" spellcheck="false"
-        placeholder="The harbour road floods twice a year…"></textarea>
+        placeholder="The harbour road floods twice a year."></textarea>
       <p class="readout mono">
         <span><b id="padWords">0</b> words</span>
         <span><b id="padChars">0</b> characters</span>
@@ -947,7 +947,7 @@ footer {
         <div class="slate">
           <div class="screen" id="tryScreen">
             <div class="screen-head">
-              <span>untitled — 2027-03-14</span>
+              <span>untitled · 2027-03-14</span>
               <span id="tryWords">0 words</span>
             </div>
             <div class="screen-body" id="tryText"></div>
@@ -959,7 +959,7 @@ footer {
   </div>
 
   <p class="try-note">
-    The panel is a div. The latency is not — it is the same 41&nbsp;ms budget the
+    The panel is a div. The latency is not: it is the same 41&nbsp;ms budget the
     firmware works to, and it is the reason we stopped optimising the refresh rate.
   </p>
 </section>
@@ -1063,7 +1063,7 @@ footer {
           We are a team of four in Rotterdam. The first run is 900 units because
           that is what we could pay for.
         </p>
-        <p class="signature">— Marijke, Tobias, Ans &amp; Piet</p>
+        <p class="signature">Marijke, Tobias, Ans &amp; Piet</p>
       </div>
     </div>
   </div>
@@ -1213,7 +1213,7 @@ footer {
     "sluice gate, which is also true, and that somebody ought to do " +
     "something about it, which is where the conversation has ended " +
     "every single time for thirty years.\n\n" +
-    "She has started writing it down. Not the flood — the sentence about " +
+    "She has started writing it down. Not the flood, the sentence about " +
     "the sluice gate, and the exact way he shrugs before he gets to the";
   heroPanel.set(HERO_TEXT);
   heroPanel.render(true);
@@ -1251,7 +1251,7 @@ footer {
     targets.forEach(function (el) { io.observe(el); });
 
     /* Backstop: an observer that never fires, a restored scroll
-       position, a printed page — none of those should leave the
+       position, a printed page: none of those should leave the
        text hidden. */
     window.setTimeout(showAll, 3000);
   }
@@ -1287,7 +1287,7 @@ footer {
     walkHeadLeft.textContent = ch.left;
     walkHeadRight.textContent = ch.right;
     walkPanel.fullRefresh();
-    /* Let the inversion finish before the new text starts arriving —
+    /* Let the inversion finish before the new text starts arriving;
        the hardware cannot draw during a refresh either. */
     window.setTimeout(function () { walkPanel.write(ch.body); }, reduced ? 0 : 300);
   }
@@ -1316,7 +1316,7 @@ footer {
   var padRefresh = document.getElementById("padRefresh");
   var tryWords = document.getElementById("tryWords");
 
-  var PLACEHOLDER = "Nothing typed yet.\n\nThe panel holds the last thing it drew — e-ink keeps its image with the power off.";
+  var PLACEHOLDER = "Nothing typed yet.\n\nThe panel holds the last thing it drew. E-ink keeps its image with the power off.";
   tryPanel.set(PLACEHOLDER);
 
   /* The panel lags the field by one keystroke budget, which is the

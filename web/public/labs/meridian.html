@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#08080a">
-<title>Meridian One — A control deck for people who build things</title>
+<title>Meridian One: a control deck for people who build things</title>
 <meta name="description" content="Meridian One is a 12-key control deck machined from a single billet of aluminium. A weighted encoder, hall-effect switches and a scriptable display, on the desk beside your keyboard.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,14 +18,14 @@
    ========================================================================== */
 
 :root {
-  /* Surface ramp — near-black with a trace of blue so aluminium reads warm */
+  /* Surface ramp: near-black with a trace of blue so aluminium reads warm */
   --bg:            #08080a;
   --bg-raised:     #0e0e11;
   --bg-sunken:     #050506;
   --surface:       rgba(255, 255, 255, 0.038);
   --surface-hover: rgba(255, 255, 255, 0.065);
 
-  /* Text ramp — every value below verified >= 4.5:1 against --bg */
+  /* Text ramp: every value below verified >= 4.5:1 against --bg */
   --text:          #f2f2f4;   /* 18.3:1 */
   --text-muted:    #9d9da6;   /*  7.4:1 */
   --text-dim:      #7b7b85;   /*  4.7:1 */
@@ -35,7 +35,7 @@
   --line-strong:   rgba(255, 255, 255, 0.16);
   --line-control:  rgba(255, 255, 255, 0.38);
 
-  /* One accent. Warm, because the deck is backlit — not a violet gradient. */
+  /* One accent. Warm, because the deck is backlit, not a violet gradient. */
   --accent:        #f7a445;
   --accent-soft:   #ffc98a;
   --accent-ink:    #170d02;
@@ -375,7 +375,7 @@ section[id] { scroll-margin-top: 76px; }
   overflow: hidden;
 }
 
-/* Pointer-tracked wash. Ambient only — nothing depends on seeing it. */
+/* Pointer-tracked wash. Ambient only; nothing depends on seeing it. */
 .hero-wash {
   position: absolute;
   inset: -20% -10% auto;
@@ -457,12 +457,12 @@ section[id] { scroll-margin-top: 76px; }
 }
 
 /* ==========================================================================
-   8. The product — built from CSS, no bitmaps
+   8. The product, built from CSS, no bitmaps
    ========================================================================== */
 
 /* The chassis is rotated out of the page, so its painted height is roughly
    half its layout height. The stage carries an explicit aspect ratio and the
-   deck is absolutely centred inside it — otherwise the untransformed box
+   deck is absolutely centred inside it. Otherwise the untransformed box
    leaves a screenful of dead space under every product shot. */
 .deck-stage {
   --deck-w: min(80vw, 620px);
@@ -493,7 +493,7 @@ section[id] { scroll-margin-top: 76px; }
   width: 100%;
   aspect-ratio: 620 / 400;
   transform-style: preserve-3d;
-  /* 0.855 makes the painted bounds land inside the reserved stage box —
+  /* 0.855 makes the painted bounds land inside the reserved stage box:
      perspective scales the near edge up, so the untransformed size overshoots. */
   transform:
     translateY(calc(-50% + var(--drift, 0px)))
@@ -710,7 +710,7 @@ section[id] { scroll-margin-top: 76px; }
   transform: translateZ(11px) rotate(var(--dial-angle, 0deg));
   transition: transform 900ms var(--ease-out);
   background:
-    /* Knurling. Kept coarse — a fine conic period moirés into a starburst. */
+    /* Knurling. Kept coarse; a fine conic period moirés into a starburst. */
     repeating-conic-gradient(from 0deg,
       rgba(255,255,255,0.13) 0deg 2.4deg,
       rgba(0,0,0,0.34) 2.4deg 4.8deg),
@@ -722,7 +722,7 @@ section[id] { scroll-margin-top: 76px; }
     0 6px 0 var(--metal-edge), 0 8px 0 var(--metal-edge),
     0 12px 18px rgba(0,0,0,0.7);
 }
-.dial::before {                /* machined cap — flat, not a chrome bead */
+.dial::before {                /* machined cap: flat, not a chrome bead */
   content: "";
   position: absolute;
   inset: 26%;
@@ -971,7 +971,7 @@ section[id] { scroll-margin-top: 76px; }
 .card-title { font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.024em; }
 .card-body p { font-size: 0.9375rem; color: var(--text-muted); line-height: 1.55; }
 
-/* Art A — billet with visible tool paths */
+/* Art A: billet with visible tool paths */
 .art-mill {
   position: absolute;
   inset: 14%;
@@ -1002,7 +1002,7 @@ section[id] { scroll-margin-top: 76px; }
     inset 0 -1px 0 rgba(255,255,255,0.18);
 }
 
-/* Art B — anodised sample coupons, fanned like a finish deck */
+/* Art B: anodised sample coupons, fanned like a finish deck */
 .art-swatches { display: flex; gap: 14px; }
 .art-swatches i {
   display: block;
@@ -1020,7 +1020,7 @@ section[id] { scroll-margin-top: 76px; }
 .art-swatches i:nth-child(2) { background: linear-gradient(150deg, #e6e7ea, #6e7178); }
 .art-swatches i:nth-child(3) { background: linear-gradient(150deg, #4c5c7e, #11151f); }
 
-/* Art C — exploded stack. Each layer steps sideways so the skew reads as
+/* Art C: exploded stack. Each layer steps sideways so the skew reads as
    an assembly pulled apart, not four flat bars. */
 .art-stack { display: grid; gap: 13px; width: 54%; }
 .art-stack i {
@@ -1286,7 +1286,7 @@ section[id] { scroll-margin-top: 76px; }
 
       <p class="lede reveal" data-delay="2">
         Twelve hall-effect keys, one weighted encoder and a display you can
-        script — milled from a single billet of aluminium and sat on the desk
+        script, milled from a single billet of aluminium and sat on the desk
         beside your keyboard.
       </p>
 
@@ -1400,7 +1400,7 @@ section[id] { scroll-margin-top: 76px; }
           <h3 class="subhead">The display answers the question you keep alt-tabbing to ask.</h3>
           <p class="lede">
             A 128×32 monochrome panel with a documented socket. Pipe anything
-            into it in nine lines of Python — build status, failing test count,
+            into it in nine lines of Python: build status, failing test count,
             the branch name you had already forgotten.
           </p>
           <div class="chapter-facts">
@@ -1423,7 +1423,7 @@ section[id] { scroll-margin-top: 76px; }
             day, 3.6&nbsp;mm for the one that force-pushes to main.
           </p>
           <div class="chapter-facts">
-            <span class="chip">0.2–3.6 mm</span>
+            <span class="chip">0.2 to 3.6 mm</span>
             <span class="chip">1,000 Hz poll</span>
             <span class="chip">Hot-swap</span>
           </div>
@@ -1494,7 +1494,7 @@ section[id] { scroll-margin-top: 76px; }
           <p>
             Each chassis starts as a 1.9&nbsp;kg block of 6061-T6 and leaves the
             mill at 842&nbsp;g. The tool marks on the underside are left in on
-            purpose — bead-blasting them away would cost a day and hide the work.
+            purpose. Bead-blasting them away would cost a day and hide the work.
           </p>
         </div>
       </article>
@@ -1592,7 +1592,7 @@ section[id] { scroll-margin-top: 76px; }
           </label>
           <input class="text-input" id="engraving" name="engraving" type="text"
                  maxlength="14" autocomplete="off" spellcheck="false"
-                 placeholder="Shown at wake…">
+                 placeholder="Shown at wake">
           <p class="fine">Written to the display on every boot. Change it any time from the CLI.</p>
         </div>
 
@@ -1621,7 +1621,7 @@ section[id] { scroll-margin-top: 76px; }
       <blockquote>“Software forgot that hands are input devices too.”</blockquote>
       <figcaption>
         <p style="font-size: 0.9375rem; font-weight: 500;">Rowan Ashby</p>
-        <p class="fine">Founder — Meridian Instruments, Bristol</p>
+        <p class="fine">Founder, Meridian Instruments, Bristol</p>
       </figcaption>
       <a class="link-arrow" href="#configure">
         Read how it was built
@@ -1951,7 +1951,7 @@ section[id] { scroll-margin-top: 76px; }
       event.preventDefault();
       var finish = form.elements.finish.value;
       statusEl.textContent =
-        "Reserved — " + names[finish] + ", " + money.format(prices[finish]) +
+        "Reserved: " + names[finish] + ", " + money.format(prices[finish]) +
         ". A confirmation would land in your inbox, if this were real.";
     });
   }
