@@ -154,6 +154,10 @@ const en = {
     recommended: "Recommended",
     perProject: "Per project",
     seeDemo: "See it live",
+    introNote:
+      "Launch pricing: the first three projects are 30% off, quoted work included, in exchange for showing the result here as an example.",
+    introBadge: "Launch price",
+    regularPrice: "Regular price",
     tiers: {
       starter: {
         name: "Starter",
@@ -176,7 +180,7 @@ const en = {
         blurb:
           "Several pages built on a direction you pick from The Lab, written so Google can find it and light enough to open on a phone with no wifi.",
         points: [
-          "Up to five pages",
+          "Up to eight pages",
           "A Lab style adapted to your brand",
           "SEO, share previews and sitemap",
           "Edit your own text without me",
@@ -564,6 +568,10 @@ const th: typeof en = {
     recommended: "แนะนำ",
     perProject: "คิดตามงาน",
     seeDemo: "ดูของจริง",
+    introNote:
+      "ราคาเปิดตัว: สามโปรเจกต์แรกลด 30% ทุกแพ็กเกจ งานที่คิดตามงานก็ลดด้วย แลกกับการได้เอาผลงานมาลงเป็นตัวอย่างในเว็บนี้",
+    introBadge: "ราคาเปิดตัว",
+    regularPrice: "ราคาปกติ",
     tiers: {
       starter: {
         name: "Starter",
@@ -586,7 +594,7 @@ const th: typeof en = {
         blurb:
           "หลายหน้า เลือกสไตล์จาก The Lab มาปรับให้เป็นของคุณ เขียนให้ Google หาเจอ และเบาพอจะเปิดติดบนมือถือที่ไม่ได้ต่อไวไฟ",
         points: [
-          "ไม่เกินห้าหน้า",
+          "ไม่เกินแปดหน้า",
           "สไตล์จาก The Lab ปรับให้เข้ากับแบรนด์",
           "SEO รูปตอนแชร์ และ sitemap",
           "แก้ข้อความเองได้ ไม่ต้องเรียกผม",

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
-import { pricingTiers, type PricingTier } from "@/lib/pricing";
+import { introOffer, pricingTiers, type PricingTier } from "@/lib/pricing";
 import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./reveal";
@@ -25,6 +25,11 @@ export function Pricing() {
           {locale === "th" ? thaiWrap(p.title) : p.title}
         </h1>
         <p className="mt-5 max-w-xl text-lg text-muted-foreground">{p.sub}</p>
+        {introOffer.active && (
+          <p className="border-line-strong bg-surface text-foreground/80 mt-6 max-w-2xl rounded-md border px-4 py-3 text-sm leading-relaxed">
+            {p.introNote}
+          </p>
+        )}
       </Reveal>
 
       <div className="mt-14 grid gap-5 lg:grid-cols-3">
@@ -100,6 +105,7 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
   const { t } = useLocale();
   const p = t.pricing;
   const copy = p.tiers[tier.id];
+  const onIntro = introOffer.active && Boolean(tier.introPrice);
 
   return (
     <article
@@ -120,20 +126,29 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
         )}
       </div>
 
-      <p className="mt-6 text-3xl font-semibold tracking-tight tabular-nums">
-        {tier.price ? (
-          <>
-            <span className="text-muted-foreground mr-0.5 text-xl font-normal">
-              ฿
+      <div className="mt-6">
+        <p className="text-3xl font-semibold tracking-tight tabular-nums">
+          {tier.price ? (
+            <>
+              <span className="text-muted-foreground mr-0.5 text-xl font-normal">
+                ฿
+              </span>
+              {onIntro ? tier.introPrice : tier.price}
+              {onIntro && (
+                <s className="text-muted-foreground ml-2.5 text-lg font-normal">
+                  <span className="sr-only">{p.regularPrice} </span>฿
+                  {tier.price}
+                </s>
+              )}
+            </>
+          ) : (
+            <span className="text-muted-foreground text-xl font-normal">
+              {p.perProject}
             </span>
-            {tier.price}
-          </>
-        ) : (
-          <span className="text-muted-foreground text-xl font-normal">
-            {p.perProject}
-          </span>
-        )}
-      </p>
+          )}
+        </p>
+        {onIntro && <p className="spec text-brand mt-2">{p.introBadge}</p>}
+      </div>
 
       <p
         className={cn(
