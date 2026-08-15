@@ -11,6 +11,9 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { PACKS } from "./contour-scene";
+import { contourCopy } from "@/lib/contour-copy";
+import { useLocale } from "@/lib/i18n";
+import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
 
 const ContourScene = dynamic(() => import("./contour-scene"), {
@@ -20,68 +23,13 @@ const ContourScene = dynamic(() => import("./contour-scene"), {
 
 /**
  * Published figures for Coca-Cola Original Taste: 10.6 g of sugar and 42 kcal
- * per 100 ml, carried through to each pack size sold in Thailand.
+ * per 100 ml, carried through to each pack size. Numbers live apart from the
+ * copy because they read the same in either language.
  */
-interface Facts {
-  kcal: number;
-  sugar: number;
-  line: string;
-  serves: string;
-}
-
-const FACTS: Record<string, Facts> = {
-  can: {
-    kcal: 137,
-    sugar: 34,
-    serves: "One person, cold, gone in ten minutes",
-    line: "The format that has to survive a cooler, a vending slot and a bare hand. Aluminium takes the chill fastest and gives the shelf its wall of red.",
-  },
-  bottle: {
-    kcal: 214,
-    sugar: 54,
-    serves: "One person, resealable",
-    line: "The contour carried into PET. The waist is the reason you can name the brand from a silhouette across the street, so the label sits below it and leaves the shape alone.",
-  },
-  magnum: {
-    kcal: 525,
-    sugar: 132,
-    serves: "Four glasses at a table",
-    line: "The sharing size keeps the same 28 mm neck as the 510, so one cap tools both lines. The body grows, the finish does not.",
-  },
-};
-
-/** The claims that fly in over the pack while it is turned around. */
-const CALLOUTS: Record<string, { title: string; body: string }[]> = {
-  can: [
-    {
-      title: "Two minutes to cold",
-      body: "Aluminium moves heat about a thousand times faster than PET, which is why the can is the format vending machines were built around.",
-    },
-    {
-      title: "Printed, not stuck on",
-      body: "The artwork is cured straight onto the barrel, so there is no label edge to lift when the can sweats in a cooler.",
-    },
-  ],
-  bottle: [
-    {
-      title: "The waist does the work",
-      body: "Take the colour away and the silhouette still reads. That is the whole argument for keeping the label clear of the contour.",
-    },
-    {
-      title: "Opens twice",
-      body: "The screw finish is what separates this from the can: the same drink, sold to someone who is not going to finish it standing up.",
-    },
-  ],
-  magnum: [
-    {
-      title: "One cap, two bottles",
-      body: "The neck stays at 28 mm whatever the body does, so the sharing size runs down the same capping line as the 510.",
-    },
-    {
-      title: "Priced by the table",
-      body: "At 132 g of sugar this is never a single serve. The pack has to look like something you put in the middle, not something you hold.",
-    },
-  ],
+const NUMBERS: Record<string, { kcal: number; sugar: number }> = {
+  can: { kcal: 137, sugar: 34 },
+  bottle: { kcal: 214, sugar: 54 },
+  magnum: { kcal: 525, sugar: 132 },
 };
 
 /** Tracks a media query, starting false so the server and first paint agree. */
@@ -122,6 +70,11 @@ export function ContourDemo({
   const [active, setActive] = useState(0);
   const reduced = useReducedMotion();
   const compact = useMediaQuery("(max-width: 639px)");
+  const { locale, setLocale } = useLocale();
+
+  const copy = contourCopy[locale];
+  // Thai has no spaces, so display sizes need explicit break opportunities
+  const display = (text: string) => (locale === "th" ? thaiWrap(text) : text);
 
   const container = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -150,8 +103,8 @@ export function ContourDemo({
   }, [step]);
 
   const pack = PACKS[active];
-  const facts = FACTS[pack.id];
-  const callouts = CALLOUTS[pack.id];
+  const packCopy = copy.packs[pack.id];
+  const numbers = NUMBERS[pack.id];
 
   const familyOpacity = useActOpacity(scrollYProgress, 0, 0.02, 0.17, 0.27);
   const focusOpacity = useActOpacity(scrollYProgress, 0.28, 0.38, 0.48, 0.57);
@@ -174,7 +127,7 @@ export function ContourDemo({
   return (
     <div ref={container} className="relative h-[460vh] bg-[#150002]">
       <div className="sticky top-0 h-dvh overflow-hidden text-white">
-        <motion.div
+        <div
           aria-hidden
           className="absolute inset-0"
           style={{
@@ -210,13 +163,31 @@ export function ContourDemo({
           />
         </div>
 
-        <header className="pointer-events-none relative z-20 flex items-center justify-between px-6 pt-7 sm:px-10">
-          <span className={cn(scriptClass, "text-2xl leading-none sm:text-3xl")}>
+        <header className="relative z-30 flex items-center justify-between px-6 pt-7 sm:px-10">
+          <span
+            className={cn(
+              scriptClass,
+              "pointer-events-none text-2xl leading-none sm:text-3xl"
+            )}
+          >
             Coca-Cola
           </span>
-          <span className="rounded-full border border-white/25 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/70 mix-blend-difference">
-            Concept study
-          </span>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setLocale(locale === "en" ? "th" : "en")}
+              aria-label={
+                locale === "en" ? "อ่านเป็นภาษาไทย" : "Read this in English"
+              }
+              className="rounded-full border border-white/25 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/70 transition-colors hover:border-white/60 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {locale === "en" ? "ไทย" : "EN"}
+            </button>
+            <span className="pointer-events-none rounded-full border border-white/25 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/70 mix-blend-difference">
+              Concept study
+            </span>
+          </div>
         </header>
 
         {/* ── act one: the family on its plinth ── */}
@@ -225,14 +196,13 @@ export function ContourDemo({
           className="pointer-events-none absolute inset-x-0 top-[15vh] z-20 px-6 text-center sm:top-[18vh] sm:px-10"
         >
           <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-black/45">
-            Original Taste
+            {copy.eyebrow}
           </p>
           <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold leading-[1.02] tracking-tight text-black/85 sm:text-5xl">
-            One drink, three ways to hold it
+            {display(copy.headline)}
           </h1>
           <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-black/55">
-            The same 10.6 grams of sugar per 100 ml, tooled three ways for three
-            different moments. Scroll to take each one apart.
+            {copy.intro}
           </p>
         </motion.div>
 
@@ -247,20 +217,20 @@ export function ContourDemo({
               {String(PACKS.length).padStart(2, "0")}
             </p>
             <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
-              {pack.name}
+              {display(packCopy.name)}
             </h2>
             <p className="mt-1 text-lg text-white/70 sm:text-xl">
               {pack.volume}
             </p>
             <p className="mt-5 text-sm leading-relaxed text-white/65">
-              {facts.line}
+              {packCopy.line}
             </p>
 
             <dl className="mt-6 flex gap-6">
               {[
-                { label: "Energy", value: `${facts.kcal} kcal` },
-                { label: "Sugar", value: `${facts.sugar} g` },
-                { label: "Height", value: `${pack.heightMm} mm` },
+                { label: copy.stats.energy, value: `${numbers.kcal} kcal` },
+                { label: copy.stats.sugar, value: `${numbers.sugar} g` },
+                { label: copy.stats.height, value: `${pack.heightMm} mm` },
               ].map((stat) => (
                 <div key={stat.label}>
                   <dt className="text-[10px] uppercase tracking-[0.16em] text-white/45">
@@ -272,7 +242,7 @@ export function ContourDemo({
                 </div>
               ))}
             </dl>
-            <p className="mt-3 text-[11px] text-white/40">{facts.serves}</p>
+            <p className="mt-3 text-[11px] text-white/40">{packCopy.serves}</p>
           </div>
         </motion.div>
 
@@ -281,7 +251,7 @@ export function ContourDemo({
           style={{ opacity: detailOpacity }}
           className="pointer-events-none absolute inset-0 z-20"
         >
-          {callouts.map((callout, i) => (
+          {packCopy.callouts.map((callout, i) => (
             <div
               key={callout.title}
               className={cn(
@@ -310,11 +280,10 @@ export function ContourDemo({
           className="pointer-events-none absolute inset-x-0 top-[14vh] z-20 px-6 text-center sm:px-10"
         >
           <h2 className="text-3xl font-semibold tracking-tight text-black/85 sm:text-5xl">
-            The range, to scale
+            {display(copy.lineup.title)}
           </h2>
           <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-black/55">
-            Every other view reframes each pack to fill the screen. This is the
-            only one where they are measured against each other.
+            {copy.lineup.body}
           </p>
           <p className="mt-5 text-[11px] uppercase tracking-[0.22em] text-black/45 tabular-nums">
             {PACKS.map((p) => `${p.volume} · ${p.heightMm} mm`).join("   /   ")}
@@ -331,7 +300,7 @@ export function ContourDemo({
               key={p.id}
               type="button"
               onClick={() => setActive(i)}
-              aria-label={`${p.name}, ${p.volume}`}
+              aria-label={`${copy.packs[p.id].name}, ${p.volume}`}
               aria-current={i === active}
               className={cn(
                 "grid h-9 w-9 place-items-center rounded-full border text-[9px] font-medium tabular-nums transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
@@ -349,15 +318,13 @@ export function ContourDemo({
           style={{ opacity: familyOpacity }}
           className="pointer-events-none absolute inset-x-0 bottom-24 z-20 text-center text-[10px] uppercase tracking-[0.3em] text-black/40"
         >
-          Scroll
+          {copy.scroll}
         </motion.p>
 
         {/* Not optional. The page borrows a real brand to make a point about
             craft, and it has to say so where nobody can miss it. */}
         <p className="absolute inset-x-0 bottom-[4.5rem] z-20 px-6 text-center text-[9px] leading-relaxed text-white/30 mix-blend-difference sm:px-10 sm:text-[10px]">
-          Unofficial concept, made as a portfolio study. Not affiliated with, or
-          endorsed by, The Coca-Cola Company. Coca-Cola is their trademark.
-          Every model and label here was generated in the browser for this demo.
+          {copy.disclaimer}
         </p>
       </div>
     </div>

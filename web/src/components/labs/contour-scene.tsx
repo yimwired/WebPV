@@ -142,15 +142,41 @@ const BOTTLE_PROFILE = [
 
 /**
  * The sharing bottle is the same tooling family scaled out, except for the
- * neck: that stays at 28 mm so the cap matches. Splitting the profile at the
- * shoulder is what lets the body grow while the finish stays put.
+ * neck: that stays at 28 mm so the cap matches. The body is the 510's, blown
+ * wider and taller, and only the shoulder is drawn by hand: scaling that too
+ * left a cone, because the wider body has much further to come in and needs
+ * the extra height to do it over.
  */
-const MAGNUM_PROFILE = BOTTLE_PROFILE.map(([r, y], i) => {
-  const belowShoulder = i < 13;
-  return belowShoulder
-    ? ([r * 1.38, y * 1.52] as const)
-    : ([r, y - 216 + 315] as const);
-});
+const MAGNUM_BODY = BOTTLE_PROFILE.slice(0, 13).map(
+  ([r, y]) => [r * 1.38, y * 1.52] as const
+);
+
+const MAGNUM_SHOULDER = [
+  [39.6, 248],
+  [37.4, 258],
+  [34, 267],
+  [29.6, 275],
+  [24.4, 282],
+  [19.4, 288],
+  [15.6, 293],
+] as const;
+
+/** identical to the 510's finish, which is the whole point of it */
+const MAGNUM_NECK = [
+  [13.4, 300],
+  [13.4, 304],
+  [15, 306],
+  [13.4, 308],
+  [13.4, 313],
+  [12.2, 315],
+  [0, 315],
+] as const;
+
+const MAGNUM_PROFILE = [
+  ...MAGNUM_BODY,
+  ...MAGNUM_SHOULDER,
+  ...MAGNUM_NECK,
+] as const;
 
 const CAP_PROFILE = [
   [0, 0],

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
@@ -25,7 +26,7 @@ export function LabsGallery() {
           </Link>
 
           <h1 className="mt-10 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-            Eight directions your site could take
+            Ten directions your site could take
           </h1>
           <p className="mt-5 max-w-2xl leading-relaxed text-muted-foreground">
             Every one is a working page built from scratch, not a theme with the
@@ -47,137 +48,22 @@ export function LabsGallery() {
                 href={`/labs/${lab.slug}`}
                 className="border-line hover:border-line-strong group flex h-full flex-col overflow-hidden rounded-lg border transition-colors"
               >
-                {/* preview */}
+                {/* preview: a real frame of the demo, shot by shoot-lab-cards.mjs.
+                    The gradient stays underneath as the colour while the image
+                    decodes, so the card never flashes empty. */}
                 <div
-                  className="border-line relative h-44 overflow-hidden border-b sm:h-52"
+                  className="border-line relative aspect-[16/10] overflow-hidden border-b"
                   style={{
                     background: `linear-gradient(135deg, ${lab.preview.from}, ${lab.preview.to})`,
                   }}
                 >
-                  <div className="absolute inset-0">
-                    {/* abstract mini-composition per style */}
-                    {lab.slug === "trine" && (
-                      <>
-                        {/* three interlaced bands on a lit backdrop */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[18deg]">
-                          {[
-                            { c: "#d8a48c", x: -13 },
-                            { c: "#dcdcdf", x: 0 },
-                            { c: "#d3a54e", x: 13 },
-                          ].map((band) => (
-                            <span
-                              key={band.c}
-                              className="absolute top-1/2 left-1/2 h-24 w-14 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border-[5px]"
-                              style={{
-                                borderColor: band.c,
-                                transform: `translate(calc(-50% + ${band.x}px), -50%)`,
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <div className="absolute right-6 bottom-6 h-px w-16 bg-[#141210]/25" />
-                      </>
-                    )}
-                    {lab.slug === "sable" && (
-                      <>
-                        {/* the slate, tilted, with a folio edge under it */}
-                        <div className="absolute top-9 left-1/2 h-32 w-24 -translate-x-1/2 rotate-[-4deg] rounded-md bg-[#3b3833] p-1.5 shadow-[0_10px_24px_-10px_rgba(23,21,15,0.5)]">
-                          <div className="h-full w-full rounded-sm bg-[#d9d6cd] p-1.5">
-                            {[14, 11, 13, 8].map((w, s) => (
-                              <div
-                                key={s}
-                                className="mb-1 h-px bg-[#2f2c26]/45"
-                                style={{ width: `${w * 5}%` }}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="absolute top-[10.2rem] left-1/2 h-2 w-28 -translate-x-1/2 rounded-b-md bg-[#2c2a26]/80" />
-                        <div className="absolute top-6 left-6 h-1.5 w-1.5 rounded-full bg-[#a8432b]" />
-                      </>
-                    )}
-                    {lab.slug === "meridian" && (
-                      <>
-                        {/* keycap field with one lit key */}
-                        <div className="absolute top-1/2 left-1/2 grid -translate-x-1/2 -translate-y-1/2 rotate-[-8deg] grid-cols-4 gap-1.5">
-                          {[...Array(12)].map((_, s) => (
-                            <div
-                              key={s}
-                              className="h-7 w-7 rounded-[3px] bg-gradient-to-b from-[#4a4741] to-[#2b2925] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]"
-                              style={
-                                s === 9
-                                  ? { background: "#f7a445", opacity: 0.85 }
-                                  : undefined
-                              }
-                            />
-                          ))}
-                        </div>
-                        <div className="absolute top-1/2 right-7 h-10 w-10 -translate-y-1/2 rounded-full border-2 border-[#6b6760] bg-gradient-to-b from-[#57534c] to-[#33302b]" />
-                      </>
-                    )}
-                    {lab.slug === "dimension" && (
-                      <>
-                        {/* chrome ring impression */}
-                        <div className="absolute top-1/2 left-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border-[10px] border-slate-200/90 [border-style:double] shadow-[0_0_50px_rgba(240,171,252,0.45)]" />
-                        <div className="absolute top-1/2 left-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/40" />
-                        <div className="absolute top-6 right-6 text-[9px] tracking-[0.3em] text-slate-300/80 uppercase">
-                          WebGL
-                        </div>
-                      </>
-                    )}
-                    {lab.slug === "vision" && (
-                      <>
-                        {/* glowing visor */}
-                        <div className="absolute top-1/2 left-1/2 h-20 w-52 -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(41,151,255,0.75)_0%,rgba(94,92,230,0.4)_50%,transparent_78%)] blur-md" />
-                        <div className="absolute top-1/2 left-1/2 h-16 w-44 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-white/25" />
-                      </>
-                    )}
-                    {lab.slug === "nebula" && (
-                      <>
-                        <div className="absolute top-8 left-8 h-3 w-40 rounded-full bg-white/70" />
-                        <div className="absolute top-14 left-8 h-3 w-28 rounded-full bg-white/35" />
-                        <div className="absolute -right-8 -bottom-10 h-40 w-40 rounded-full bg-gradient-to-tr from-white/60 to-white/5 blur-[2px]" />
-                      </>
-                    )}
-                    {lab.slug === "space" && (
-                      <>
-                        {[...Array(24)].map((_, s) => (
-                          <span
-                            key={s}
-                            className="absolute h-px w-px rounded-full bg-white"
-                            style={{
-                              top: `${(s * 37) % 100}%`,
-                              left: `${(s * 53) % 100}%`,
-                              opacity: 0.3 + ((s * 7) % 10) / 14,
-                            }}
-                          />
-                        ))}
-                        <div className="absolute -bottom-14 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full bg-cyan-300/80 blur-[1px] shadow-[0_0_60px_20px_rgba(34,211,238,0.35)]" />
-                      </>
-                    )}
-                    {lab.slug === "luxe" && (
-                      <>
-                        <div className="absolute top-10 left-8 font-serif text-4xl tracking-wide text-neutral-800 italic">
-                          Maison
-                        </div>
-                        <div className="absolute top-24 right-8 left-8 h-px bg-neutral-800/30" />
-                        <div className="absolute top-28 left-8 h-2 w-24 rounded-full bg-[#c8a24a]/70" />
-                      </>
-                    )}
-                    {lab.slug === "minimal" && (
-                      <>
-                        <div className="absolute inset-x-8 top-8 grid grid-cols-4 gap-2">
-                          {[...Array(8)].map((_, s) => (
-                            <div
-                              key={s}
-                              className="h-8 border border-neutral-400/40"
-                            />
-                          ))}
-                        </div>
-                        <div className="absolute bottom-8 left-8 h-4 w-4 bg-[#e11d48]" />
-                      </>
-                    )}
-                  </div>
+                  <Image
+                    src={`/labs/cards/${lab.slug}.jpg`}
+                    alt={`${lab.name}: ${lab.vibe}`}
+                    fill
+                    sizes="(min-width: 640px) 45vw, 92vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
                 </div>
 
                 {/* what it is, who it suits, what it costs in time */}
