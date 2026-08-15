@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer } from "@react-three/drei";
 import {
   CanvasTexture,
   Group,
@@ -36,38 +36,21 @@ export interface Pack {
   volume: string;
   /** overall height in mm, used for the true-scale silhouettes in the UI */
   heightMm: number;
-  /** camera pull-back that frames this pack without cropping the cap */
-  distance: number;
-  /** sugar in grams for the whole pack, at the published 10.6 g / 100 ml */
-  sugarG: number;
 }
 
 export const PACKS: Pack[] = [
-  {
-    id: "can",
-    name: "Standard can",
-    volume: "325 ml",
-    heightMm: 122,
-    distance: 4.6,
-    sugarG: 34,
-  },
-  {
-    id: "bottle",
-    name: "Contour bottle",
-    volume: "510 ml",
-    heightMm: 216,
-    distance: 6.9,
-    sugarG: 54,
-  },
-  {
-    id: "magnum",
-    name: "Sharing bottle",
-    volume: "1.25 L",
-    heightMm: 315,
-    distance: 9.6,
-    sugarG: 132,
-  },
+  { id: "can", name: "Standard can", volume: "325 ml", heightMm: 122 },
+  { id: "bottle", name: "Contour bottle", volume: "510 ml", heightMm: 216 },
+  { id: "magnum", name: "Sharing bottle", volume: "1.25 L", heightMm: 315 },
 ];
+
+/** Where each act starts and ends as a share of the page scroll. */
+export const ACTS = {
+  family: [0, 0.3],
+  focus: [0.3, 0.56],
+  detail: [0.56, 0.8],
+  lineup: [0.8, 1],
+} as const;
 
 // ── geometry ─────────────────────────────────────────────────
 
@@ -209,6 +192,80 @@ function ribbon(ctx: CanvasRenderingContext2D, w: number, y: number, h: number) 
   ctx.fill();
 }
 
+/** Nutrition per 100 ml, as published for Original Taste. */
+const PANEL_ROWS: [string, string][] = [
+  ["Energy", "42 kcal"],
+  ["Sugars", "10.6 g"],
+  ["Sodium", "10 mg"],
+];
+
+/**
+ * The back of the sleeve: the small print a real pack is legally obliged to
+ * carry. It exists so that turning the pack around reveals something.
+ */
+function paintBack(
+  ctx: CanvasRenderingContext2D,
+  panel: number,
+  height: number,
+  scriptFamily: string
+) {
+  const mid = panel / 2;
+
+  ctx.fillStyle = "rgba(255,255,255,0.9)";
+  fitText(
+    ctx,
+    "Coca-Cola",
+    panel * 0.26,
+    (size) => `${size}px ${scriptFamily}, cursive`
+  );
+  ctx.fillText("Coca-Cola", mid, height * 0.14);
+
+  ctx.letterSpacing = `${Math.round(height * 0.014)}px`;
+  fitText(
+    ctx,
+    "NUTRITION PER 100 ML",
+    panel * 0.34,
+    (size) => `600 ${size}px system-ui, sans-serif`
+  );
+  ctx.fillText("NUTRITION PER 100 ML", mid, height * 0.27);
+  ctx.letterSpacing = "0px";
+
+  const rowSize = Math.round(height * 0.042);
+  const left = mid - panel * 0.21;
+  const right = mid + panel * 0.21;
+  ctx.font = `500 ${rowSize}px system-ui, sans-serif`;
+
+  PANEL_ROWS.forEach(([label, value], i) => {
+    const y = height * (0.37 + i * 0.075);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.28)";
+    ctx.lineWidth = Math.max(1, height * 0.002);
+    ctx.beginPath();
+    ctx.moveTo(left, y + rowSize * 0.85);
+    ctx.lineTo(right, y + rowSize * 0.85);
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255,255,255,0.72)";
+    ctx.textAlign = "left";
+    ctx.fillText(label, left, y);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "right";
+    ctx.fillText(value, right, y);
+  });
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(255,255,255,0.62)";
+  fitText(
+    ctx,
+    "CARBONATED WATER, SUGAR, COLOUR 150D,",
+    panel * 0.42,
+    (size) => `400 ${size}px system-ui, sans-serif`
+  );
+  ctx.fillText("CARBONATED WATER, SUGAR, COLOUR 150D,", mid, height * 0.63);
+  ctx.fillText("ACID 338, FLAVOURING, CAFFEINE.", mid, height * 0.685);
+}
+
 /**
  * Paint the wrap label. Nothing is traced from the real artwork: this is the
  * red field, a script wordmark set in a free face, and the white wave, drawn
@@ -229,10 +286,9 @@ function paintLabel(
   ctx.fillStyle = BRAND_RED;
   ctx.fillRect(0, 0, width, height);
 
-  // A wrap texture repeats at the seam, so the panel is drawn twice, half a
-  // turn apart, and the pack reads from whichever side you spin it to. Only
-  // about two thirds of a panel faces the camera at once, so nothing may run
-  // wider than that or neighbouring copies collide in view.
+  // A wrap texture repeats at the seam, so the sleeve is two panels: the face
+  // that sells and the back that informs. Turning the pack has to be worth
+  // doing, and two identical panels would make a half turn look like no turn.
   const panel = width / 2;
   const safe = panel * 0.48;
 
@@ -242,26 +298,31 @@ function paintLabel(
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
+    // the wave runs across both panels and meets itself at the seam
     ctx.fillStyle = "#ffffff";
     ribbon(ctx, panel, height * 0.78, height * 0.1);
 
-    fitText(
-      ctx,
-      "Coca-Cola",
-      safe,
-      (size) => `${size}px ${scriptFamily}, cursive`
-    );
-    ctx.fillText("Coca-Cola", panel / 2, height * 0.4);
+    if (left === 0) {
+      fitText(
+        ctx,
+        "Coca-Cola",
+        safe,
+        (size) => `${size}px ${scriptFamily}, cursive`
+      );
+      ctx.fillText("Coca-Cola", panel / 2, height * 0.4);
 
-    ctx.fillStyle = "rgba(255,255,255,0.94)";
-    ctx.letterSpacing = `${Math.round(height * 0.02)}px`;
-    fitText(
-      ctx,
-      "ORIGINAL TASTE",
-      safe * 0.62,
-      (size) => `600 ${size}px system-ui, sans-serif`
-    );
-    ctx.fillText("ORIGINAL TASTE", panel / 2, height * 0.585);
+      ctx.fillStyle = "rgba(255,255,255,0.94)";
+      ctx.letterSpacing = `${Math.round(height * 0.02)}px`;
+      fitText(
+        ctx,
+        "ORIGINAL TASTE",
+        safe * 0.62,
+        (size) => `600 ${size}px system-ui, sans-serif`
+      );
+      ctx.fillText("ORIGINAL TASTE", panel / 2, height * 0.585);
+    } else {
+      paintBack(ctx, panel, height, scriptFamily);
+    }
 
     ctx.fillStyle = "rgba(255,255,255,0.72)";
     ctx.letterSpacing = "0px";
@@ -446,165 +507,347 @@ function Bottle({
 
 // ── staging ──────────────────────────────────────────────────
 
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+
+function smoothstep(edge0: number, edge1: number, x: number) {
+  const t = clamp01((x - edge0) / (edge1 - edge0));
+  return t * t * (3 - 2 * t);
+}
+
+/** Rises over [inA, inB] and falls over [outA, outB]. One act's share of the page. */
+function band(p: number, inA: number, inB: number, outA: number, outB: number) {
+  return smoothstep(inA, inB, p) * (1 - smoothstep(outA, outB, p));
+}
+
+interface Pose {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: number;
+}
+
+const HERO_HEIGHT = 1.48;
+const FOCUS_HEIGHT = 2.9;
+/** One factor for every pack, so the last act is the only true-scale view. */
+const LINEUP_SCALE = 0.72;
+
+/** Where a pack rests in the family arc, by its distance from the chosen one. */
+const ARC: Pose[] = [
+  { position: [0, 0, 0.7], rotation: [0.05, 0, 0], scale: 1 },
+  { position: [2.05, 0.06, -0.5], rotation: [0.06, -0.5, -0.22], scale: 0.88 },
+  { position: [-2.05, 0.06, -0.5], rotation: [0.06, 0.5, 0.22], scale: 0.88 },
+];
+
+/** The receding diagonal of the closing shot, in pack order. */
+const LINEUP: Pose[] = [
+  { position: [-1.5, -0.5, 0.9], rotation: [0.1, 0.35, -0.28], scale: 1 },
+  { position: [0.05, -0.2, 0], rotation: [0.1, 0.15, -0.28], scale: 1 },
+  { position: [1.62, 0.16, -0.9], rotation: [0.1, -0.05, -0.28], scale: 1 },
+];
+
 /**
- * All three packs stay mounted and the inactive ones collapse to nothing.
- * Swapping by scale rather than by mounting keeps the change instant, since
- * a lathe rebuilt mid-transition is a visible hitch on a phone.
+ * The four poses a pack can be in, given which pack is currently chosen.
+ * Everything the scroll does to the scene is described here and then blended,
+ * so an act is a set of numbers rather than a branch in the frame loop.
  */
-function Stage({
+function poses(index: number, active: number, compact: boolean): Pose[] {
+  const height = PACKS[index].heightMm * MM;
+  const chosen = index === active;
+  const spread = compact ? 0.62 : 1;
+
+  const arc = ARC[(index - active + PACKS.length) % PACKS.length];
+  const line = LINEUP[index];
+
+  // offstage: the packs not being talked about leave rather than shrink in place
+  const away: Pose = {
+    position: [index < active ? -5 : 5, 0, -2],
+    rotation: [0, 0, 0],
+    scale: 0,
+  };
+
+  const focus: Pose = {
+    position: [compact ? 0 : 0.5, compact ? -0.15 : -0.05, 0],
+    rotation: [0.05, 0.15, -0.13],
+    scale: (FOCUS_HEIGHT * (compact ? 0.6 : 1)) / height,
+  };
+
+  const detail: Pose = {
+    position: [compact ? 0 : 0.3, compact ? -0.2 : -0.1, 0.3],
+    rotation: [0.04, Math.PI + 0.2, -0.1],
+    scale: (FOCUS_HEIGHT * (compact ? 0.55 : 0.92)) / height,
+  };
+
+  return [
+    {
+      position: [arc.position[0] * spread, arc.position[1], arc.position[2]],
+      rotation: arc.rotation,
+      scale: (HERO_HEIGHT / height) * arc.scale,
+    },
+    chosen ? focus : away,
+    chosen ? detail : away,
+    {
+      position: [line.position[0] * spread, line.position[1], line.position[2]],
+      rotation: line.rotation,
+      scale: LINEUP_SCALE,
+    },
+  ];
+}
+
+/** Camera distance for each act, in the same order as `poses`. */
+const CAMERA = [6.4, 4.6, 4.3, 6.8];
+
+/**
+ * How far the camera rides above the set, per act. The two family shots carry
+ * a centred headline, so they push the packs down out from under it; the two
+ * close acts keep their copy at the edges and need no offset.
+ */
+const CAMERA_Y = [0.44, 0, 0, 0.3];
+
+function PackModel({
+  index,
+  label,
+  weights,
   active,
-  spin,
   compact,
-  labels,
+  float,
 }: {
+  index: number;
+  label: CanvasTexture | null;
+  weights: RefObject<number[]>;
   active: number;
-  spin: boolean;
   compact: boolean;
-  labels: Record<string, CanvasTexture> | null;
+  float: boolean;
 }) {
-  const groups = useRef<(Group | null)[]>([]);
-  const stage = useRef<Group>(null);
+  const group = useRef<Group>(null);
+  const pack = PACKS[index];
 
   useFrame((state, delta) => {
+    const group_ = group.current;
+    if (!group_) return;
+
     const dt = Math.min(delta, 0.05);
-    const t = state.clock.elapsedTime;
+    const w = weights.current;
+    const list = poses(index, active, compact);
 
-    PACKS.forEach((pack, i) => {
-      const group = groups.current[i];
-      if (!group) return;
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    let rx = 0;
+    let ry = 0;
+    let rz = 0;
+    let scale = 0;
 
-      const isActive = i === active;
-      group.scale.setScalar(MathUtils.damp(group.scale.x, isActive ? 1 : 0, 9, dt));
-      group.visible = group.scale.x > 0.012;
-
-      if (!spin) {
-        group.rotation.y = 0;
-        return;
-      }
-
-      if (isActive) {
-        // A pack on stage has to keep its face to camera, so instead of
-        // turning it rocks either side of front. Damping toward that is also
-        // what swings an incoming pack round into place.
-        group.rotation.y = MathUtils.damp(
-          group.rotation.y,
-          Math.sin(t * 0.4) * 0.3,
-          2.4,
-          dt
-        );
-      } else {
-        // the outgoing pack keeps turning as it leaves, wrapped so it is
-        // never more than half a turn from front when it is called back
-        let spun = group.rotation.y + delta * 1.6;
-        if (spun > Math.PI) spun -= Math.PI * 2;
-        group.rotation.y = spun;
-      }
-    });
-
-    // ease the camera back for the taller packs instead of shrinking them,
-    // which is what keeps the size difference legible between formats
-    const distance = PACKS[active].distance * (compact ? 1.75 : 1);
-    state.camera.position.z = MathUtils.damp(
-      state.camera.position.z,
-      distance,
-      4,
-      dt
-    );
-    state.camera.updateProjectionMatrix();
-
-    // On a phone the copy has the top of the screen to itself, so the pack
-    // drops into the gap below it. Offsetting by a share of what the camera
-    // can see keeps that gap the same on every pack, however far back it is.
-    if (stage.current) {
-      const visible =
-        2 * state.camera.position.z * Math.tan((FOV / 2) * MathUtils.DEG2RAD);
-      stage.current.position.y = MathUtils.damp(
-        stage.current.position.y,
-        compact ? -visible * 0.12 : 0,
-        4,
-        dt
-      );
+    for (let i = 0; i < list.length; i++) {
+      const pose = list[i];
+      x += pose.position[0] * w[i];
+      y += pose.position[1] * w[i];
+      z += pose.position[2] * w[i];
+      rx += pose.rotation[0] * w[i];
+      ry += pose.rotation[1] * w[i];
+      rz += pose.rotation[2] * w[i];
+      scale += pose.scale * w[i];
     }
+
+    // a slow bob, offset per pack so the group never pulses in unison
+    const bob = float ? Math.sin(state.clock.elapsedTime * 0.5 + index * 2) * 0.045 : 0;
+
+    group_.position.x = MathUtils.damp(group_.position.x, x, 5, dt);
+    group_.position.y = MathUtils.damp(group_.position.y, y + bob, 5, dt);
+    group_.position.z = MathUtils.damp(group_.position.z, z, 5, dt);
+    group_.rotation.x = MathUtils.damp(group_.rotation.x, rx, 5, dt);
+    group_.rotation.y = MathUtils.damp(group_.rotation.y, ry, 5, dt);
+    group_.rotation.z = MathUtils.damp(group_.rotation.z, rz, 5, dt);
+    group_.scale.setScalar(MathUtils.damp(group_.scale.x, scale, 6, dt));
+    group_.visible = group_.scale.x > 0.012;
   });
 
   return (
-    <group ref={stage}>
-      {PACKS.map((pack, i) => (
-        <group
-          key={pack.id}
-          ref={(el) => {
-            groups.current[i] = el;
-          }}
-          scale={i === 0 ? 1 : 0}
-        >
-          {pack.id === "can" ? (
-            <Can label={labels?.can ?? null} />
-          ) : (
-            <Bottle
-              label={labels?.[pack.id] ?? null}
-              pack={pack.id as "bottle" | "magnum"}
-            />
-          )}
-        </group>
-      ))}
-
-      <ContactShadows
-        position={[0, -1.75, 0]}
-        opacity={0.5}
-        scale={9}
-        blur={2.6}
-        far={3}
-        resolution={512}
-        color="#450205"
-      />
+    <group ref={group} scale={0.001}>
+      {pack.id === "can" ? (
+        <Can label={label} />
+      ) : (
+        <Bottle label={label} pack={pack.id as "bottle" | "magnum"} />
+      )}
     </group>
   );
 }
 
-/** Slow drift on the key light, so a still page never looks frozen. */
-function Key() {
-  const light = useRef<Mesh>(null);
-  useFrame(({ clock }) => {
-    if (light.current) {
-      light.current.position.x = Math.sin(clock.elapsedTime * 0.18) * 2.4;
+/** A soft disc of light, used as the pedestal the family arc rests on. */
+function useGlowTexture() {
+  return useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    const gradient = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      0,
+      size / 2,
+      size / 2,
+      size / 2
+    );
+    gradient.addColorStop(0, "rgba(255,255,255,0.95)");
+    gradient.addColorStop(0.45, "rgba(255,190,190,0.35)");
+    gradient.addColorStop(1, "rgba(255,120,120,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGBColorSpace;
+    return texture;
+  }, []);
+}
+
+function Pedestal({ weights }: { weights: RefObject<number[]> }) {
+  const glow = useGlowTexture();
+  const above = useRef<Mesh>(null);
+  const below = useRef<Mesh>(null);
+
+  useFrame((_, delta) => {
+    const dt = Math.min(delta, 0.05);
+    // only the family arc is staged on a plinth; the rest of the page floats
+    const target = weights.current[0];
+    for (const ref of [above, below]) {
+      const material = ref.current?.material as
+        | { opacity: number }
+        | undefined;
+      if (material) {
+        material.opacity = MathUtils.damp(material.opacity, target, 6, dt);
+      }
     }
   });
+
+  if (!glow) return null;
+
   return (
-    <Lightformer
-      ref={light}
-      intensity={5}
-      position={[0, 4, 3]}
-      scale={[9, 7, 1]}
-    />
+    <group position={[0, 0, 0.7]}>
+      <mesh ref={below} position={[0, -0.95, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[1.15, 48]} />
+        <meshBasicMaterial
+          map={glow}
+          transparent
+          opacity={0}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh ref={above} position={[0, 1.15, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.85, 48]} />
+        <meshBasicMaterial
+          map={glow}
+          transparent
+          opacity={0}
+          depthWrite={false}
+        />
+      </mesh>
+    </group>
   );
 }
 
-export default function ContourScene({
-  active,
-  spin,
+/**
+ * Turns one scroll value into the weights every other part of the scene reads.
+ * Acts overlap on purpose: a pack is midway between two poses for the whole
+ * crossfade, which is what makes the page feel filmed rather than stepped.
+ */
+function Director({
+  progress,
+  weights,
   compact,
+}: {
+  progress: RefObject<number>;
+  weights: RefObject<number[]>;
+  compact: boolean;
+}) {
+  useFrame((state, delta) => {
+    const p = progress.current;
+
+    const raw = [
+      band(p, -1, 0, 0.2, 0.36),
+      band(p, 0.24, 0.4, 0.5, 0.62),
+      band(p, 0.54, 0.66, 0.74, 0.84),
+      band(p, 0.78, 0.9, 2, 3),
+    ];
+    const total = raw.reduce((sum, v) => sum + v, 0) || 1;
+    for (let i = 0; i < raw.length; i++) weights.current[i] = raw[i] / total;
+
+    let distance = 0;
+    let lift = 0;
+    for (let i = 0; i < CAMERA.length; i++) {
+      distance += CAMERA[i] * weights.current[i];
+      lift += CAMERA_Y[i] * weights.current[i];
+    }
+    if (compact) distance *= 1.5;
+
+    const dt = Math.min(delta, 0.05);
+    state.camera.position.z = MathUtils.damp(
+      state.camera.position.z,
+      distance,
+      5,
+      dt
+    );
+
+    // on a phone the copy owns the top of the screen, so the set drops further
+    const visible = 2 * distance * Math.tan((FOV / 2) * MathUtils.DEG2RAD);
+    state.camera.position.y = MathUtils.damp(
+      state.camera.position.y,
+      lift + (compact ? visible * 0.16 : 0),
+      5,
+      dt
+    );
+    state.camera.lookAt(0, state.camera.position.y, 0);
+  });
+
+  return null;
+}
+
+export default function ContourScene({
+  progress,
+  active,
+  compact,
+  float,
   scriptFamily,
 }: {
+  /** page scroll, 0 to 1, written every frame without re-rendering React */
+  progress: RefObject<number>;
   active: number;
-  spin: boolean;
-  /** phone layout: the pack sits smaller and lower, under the copy */
+  /** phone layout: the set sits smaller and lower, under the copy */
   compact: boolean;
+  /** idle bob, off when the visitor asked for reduced motion */
+  float: boolean;
   scriptFamily: string;
 }) {
   const labels = useLabels(scriptFamily);
+  const weights = useRef<number[]>([1, 0, 0, 0]);
 
   return (
     <Canvas
-      camera={{ position: [0, 0, PACKS[0].distance], fov: FOV }}
+      camera={{ position: [0, 0, CAMERA[0]], fov: FOV }}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true }}
       className="touch-none"
     >
-      <Stage active={active} spin={spin} compact={compact} labels={labels} />
+      <Director progress={progress} weights={weights} compact={compact} />
+
+      {PACKS.map((pack, i) => (
+        <PackModel
+          key={pack.id}
+          index={i}
+          label={labels?.[pack.id] ?? null}
+          weights={weights}
+          active={active}
+          compact={compact}
+          float={float}
+        />
+      ))}
+
+      <Pedestal weights={weights} />
 
       <ambientLight intensity={0.5} />
       <Environment resolution={256}>
-        <Key />
+        <Lightformer intensity={5} position={[0, 4, 3]} scale={[9, 7, 1]} />
         {/* dark cards either side: red aluminium needs something to reflect
             or the barrel of the can flattens out */}
         <Lightformer

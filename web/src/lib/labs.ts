@@ -27,7 +27,7 @@ export const labs: Lab[] = [
     name: "Contour",
     vibe: "Packaging, real-time 3D",
     description:
-      "One drink in three pack sizes, each lathed in WebGL from published dimensions and wearing a label painted in the browser. Click to cycle the format and the camera reframes it. An unofficial brand study.",
+      "One drink in three pack sizes, lathed in WebGL from published dimensions and wearing labels painted in the browser. Scroll and it plays out in four acts: the family, one pack filling the frame, the turn to the back panel, then the range to scale. An unofficial brand study.",
     accent: "#f40009",
     preview: { from: "#c11119", to: "#2c0104" },
     bestFor: "Drinks, cosmetics, anything sold as a range of sizes",
