@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "contour",
+    name: "Contour",
+    vibe: "Packaging, real-time 3D",
+    description:
+      "One drink in three pack sizes, lathed in WebGL from published dimensions and wearing labels painted in the browser. Scroll and it plays out in four acts: the family, one pack filling the frame, the turn to the back panel, then the range to scale. An unofficial brand study.",
+    accent: "#f40009",
+    preview: { from: "#c11119", to: "#2c0104" },
+    bestFor: "Drinks, cosmetics, anything sold as a range of sizes",
+    buildTime: "Two weeks, the packaging models are the work",
+  },
+  {
     slug: "trine",
     name: "Trine",
     vibe: "Jewellery, still life",
