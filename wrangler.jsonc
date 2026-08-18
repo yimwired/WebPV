@@ -5,6 +5,14 @@
   "name": "webpv",
   "compatibility_date": "2026-08-18",
 
+  // Keep the workers.dev address; it is what the site is served from until a
+  // custom domain goes in front of it.
+  "workers_dev": true,
+
+  // Off by default here: with it on, every branch pushed gets a public URL,
+  // and unfinished work on a portfolio is not something to hand out links to.
+  "preview_urls": false,
+
   "assets": {
     "directory": "./web/out",
 
