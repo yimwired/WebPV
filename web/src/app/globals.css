@@ -11,6 +11,7 @@
   --color-brand: var(--brand);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
+  --color-line-control: var(--line-control);
   --color-surface: var(--surface);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
@@ -85,6 +86,11 @@
   --brand: oklch(0.78 0.13 66);
   --line: oklch(0.145 0 0 / 12%);
   --line-strong: oklch(0.145 0 0 / 22%);
+  /* Only for a boundary that IDENTIFIES a control (input, select, textarea).
+     WCAG 1.4.11 wants 3:1 there, and --line-strong is 1.7:1 -- fine as a
+     decorative rule, invisible as the edge of a text field. 3.22:1 over
+     --surface. Do not use it for decorative hairlines. */
+  --line-control: oklch(0.145 0 0 / 46%);
   --surface: oklch(0.975 0 0);
 
   --sidebar: oklch(0.985 0 0);
@@ -120,6 +126,8 @@
   --brand: oklch(0.78 0.13 66);
   --line: oklch(1 0 0 / 9%);
   --line-strong: oklch(1 0 0 / 18%);
+  /* See the note in :root. 3.21:1 over --surface, 3.41:1 over --background. */
+  --line-control: oklch(1 0 0 / 35%);
   /* Opaque, one step above the page. Panels are lifted by tone, not by
      blurring whatever happens to be behind them. */
   --surface: oklch(0.185 0 0);
@@ -131,7 +139,9 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  /* shadcn ships a blue-violet here (oklch(0.488 0.243 264.376)). Removed: the
+     site has one accent and it is amber. Nothing consumes it -- no sidebar
+     component exists -- so this falls back to the neutral :root value. */
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);

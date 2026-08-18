@@ -111,11 +111,19 @@ export function LabsGallery() {
             get back scope, a timeline and a fixed price before anything starts.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
+            {/* scope -> price -> ask, in that order: the copy above promises a
+                fixed price and /pricing is where the numbers actually are. */}
             <Link
               href="/services"
               className="inline-flex h-11 items-center justify-center rounded-md bg-white px-6 text-sm font-medium text-neutral-950 transition-opacity hover:opacity-90"
             >
               What I build
+            </Link>
+            <Link
+              href="/pricing"
+              className="border-line-strong inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm text-white/80 transition-colors hover:border-white/40 hover:text-white"
+            >
+              What it costs
             </Link>
             <Link
               href="/#contact"

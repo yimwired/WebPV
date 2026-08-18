@@ -27,7 +27,7 @@ export interface Project {
   accent: string;
   /**
    * Optional preview image for the card. Drop a file in `public/projects/`
-   * and set e.g. "/projects/aurum.png". If omitted, a styled placeholder shows.
+   * and set e.g. "/projects/aurum.webp". If omitted, a styled placeholder shows.
    */
   image?: string;
   /** Thai copy for the card. Base fields above stay English. */
@@ -56,7 +56,7 @@ export const projects: Project[] = [
     status: "active",
     href: "/work/you-are-the-virus",
     accent: "#34d399", // emerald
-    image: "/projects/you-are-the-virus.png",
+    image: "/projects/you-are-the-virus.webp",
     th: {
       tagline: "แพร่เชื้อ กลายพันธุ์ เอาตัวรอด",
       description:
@@ -75,7 +75,7 @@ export const projects: Project[] = [
     href: "/work/aurum",
     featured: true,
     accent: "#f59e0b", // amber/gold
-    image: "/projects/aurum.png",
+    image: "/projects/aurum.webp",
     th: {
       tagline: "เทอร์มินัลเทรดทองอัตโนมัติ XAU/USD",
       description:
@@ -93,7 +93,7 @@ export const projects: Project[] = [
     status: "active",
     href: "/work/product-dashboard",
     accent: "#60a5fa", // blue
-    image: "/projects/product-dashboard.png",
+    image: "/projects/product-dashboard.webp",
     th: {
       tagline: "ระบบหลังบ้านสินค้าและคอนเทนต์สำหรับ Shopee",
       description:
@@ -111,7 +111,7 @@ export const projects: Project[] = [
     status: "active",
     href: "/work/affiliate",
     accent: "#a78bfa", // violet
-    image: "/projects/affiliate.png",
+    image: "/projects/affiliate.webp",
     th: {
       tagline: "โพสต์เดียว ไปครบทุกแพลตฟอร์ม",
       description:
@@ -129,7 +129,7 @@ export const projects: Project[] = [
     status: "active",
     href: "/work/jarvis-moon",
     accent: "#22d3ee", // cyan
-    image: "/projects/jarvis-moon.png",
+    image: "/projects/jarvis-moon.webp",
     th: {
       tagline: "กองยาน AI 11 agents ใต้ผู้บัญชาการเดียว",
       description:

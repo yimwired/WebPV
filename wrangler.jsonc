@@ -1,0 +1,20 @@
+{
+  // Static-only Worker: no `main` script, so Cloudflare just serves the files
+  // Next wrote to web/out. Deployed with `npx wrangler deploy` from the repo
+  // root, which is why the asset path starts at ./web.
+  "name": "webpv",
+  "compatibility_date": "2026-08-18",
+
+  "assets": {
+    "directory": "./web/out",
+
+    // The export writes services.html, pricing.html, work/aurum.html and so on.
+    // This default resolves /services to services.html and keeps folder index
+    // files on a trailing slash, which is what the generated links expect.
+    "html_handling": "auto-trailing-slash",
+
+    // Without this a bad URL returns a bare Cloudflare 404 instead of the
+    // site's own 404.html, and the styled not-found page never renders.
+    "not_found_handling": "404-page"
+  }
+}

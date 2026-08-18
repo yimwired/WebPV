@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Check } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { Reveal } from "./reveal";
@@ -75,12 +76,22 @@ export function Services() {
           {s.ctaTitle}
         </h2>
         <p className="text-muted-foreground mt-3 max-w-md">{s.ctaSub}</p>
-        <a
-          href="#contact"
-          className="bg-foreground text-background mt-8 inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90"
-        >
-          {s.ctaButton}
-        </a>
+        {/* This page states scope and timeline but no numbers, so the reader
+            who is ready to see prices had only the navbar to get there. */}
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <a
+            href="#contact"
+            className="bg-foreground text-background inline-flex h-11 items-center justify-center rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90"
+          >
+            {s.ctaButton}
+          </a>
+          <Link
+            href="/pricing"
+            className="border-line-strong text-foreground/90 hover:border-foreground/40 hover:text-foreground inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm font-medium transition-colors"
+          >
+            {s.ctaPricing}
+          </Link>
+        </div>
       </Reveal>
     </section>
   );

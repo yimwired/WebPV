@@ -25,10 +25,21 @@ export interface PricingTier {
  */
 export const introOffer = { active: true, projects: 3, percentOff: 30 };
 
+// Each demo is picked to match what the tier actually buys, using the
+// `buildTime` on the lab itself: Grid is "Under a week" (Starter is 5 days),
+// Nebula is "About a week", Trine is "Two weeks, the 3D object is the work".
+// Signature's blurb names Trine outright, so that pairing is fixed by the copy.
+// Custom is quoted per project and has no representative demo.
 export const pricingTiers: PricingTier[] = [
-  { id: "starter", price: "9,900", introPrice: "6,900" },
-  { id: "standard", price: "24,900", introPrice: "17,900", featured: true },
-  { id: "signature", price: "49,900", introPrice: "34,900" },
+  { id: "starter", price: "9,900", introPrice: "6,900", demoHref: "/labs/minimal" },
+  {
+    id: "standard",
+    price: "24,900",
+    introPrice: "17,900",
+    demoHref: "/labs/nebula",
+    featured: true,
+  },
+  { id: "signature", price: "49,900", introPrice: "34,900", demoHref: "/labs/trine" },
   { id: "custom", price: null },
 ];
 

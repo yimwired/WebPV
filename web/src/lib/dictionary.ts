@@ -146,6 +146,7 @@ const en = {
     ctaTitle: "Have something in mind?",
     ctaSub: "Tell me roughly what you need and I'll send back scope, timeline and a price.",
     ctaButton: "Ask for a quote",
+    ctaPricing: "See the packages",
   },
   // Numbers live in `pricing.ts`; only the wording is here, keyed by tier id.
   pricing: {
@@ -230,7 +231,7 @@ const en = {
     faq: [
       {
         q: "What is not included?",
-        a: "Domain and hosting stay in your name: a domain runs about 500 baht a year, and a site this size hosts free on Vercel. Photography, licensed fonts and long-form copywriting are quoted separately if you want them.",
+        a: "Domain and hosting stay in your name: a domain runs about 500 baht a year, and a site this size hosts free on Cloudflare Pages, commercial use included. Photography, licensed fonts and long-form copywriting are quoted separately if you want them.",
       },
       {
         q: "How does payment work?",
@@ -561,6 +562,7 @@ const th: typeof en = {
     ctaTitle: "มีงานในใจแล้วใช่ไหม",
     ctaSub: "เล่าคร่าวๆ มาได้เลย เดี๋ยวสรุปขอบเขตงาน เวลา และราคากลับไปให้",
     ctaButton: "ขอใบเสนอราคา",
+    ctaPricing: "ดูแพ็กเกจกับราคา",
   },
   pricing: {
     title: "ราคาคุยกันจบ​ตั้งแต่​ก่อนเริ่มงาน",
@@ -644,7 +646,7 @@ const th: typeof en = {
     faq: [
       {
         q: "อะไรที่ไม่รวมในราคา",
-        a: "โดเมนกับโฮสต์อยู่ในชื่อคุณ โดเมนราวปีละ 500 บาท เว็บขนาดนี้โฮสต์บน Vercel ได้ฟรี ส่วนภาพถ่าย ฟอนต์ที่มีลิขสิทธิ์ และงานเขียนยาวๆ คิดแยกถ้าอยากได้",
+        a: "โดเมนกับโฮสต์อยู่ในชื่อคุณ โดเมนราวปีละ 500 บาท เว็บขนาดนี้โฮสต์บน Cloudflare Pages ได้ฟรี ใช้เชิงพาณิชย์ได้ด้วย ส่วนภาพถ่าย ฟอนต์ที่มีลิขสิทธิ์ และงานเขียนยาวๆ คิดแยกถ้าอยากได้",
       },
       {
         q: "จ่ายเงินยังไง",
