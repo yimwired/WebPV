@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SITE_HOST } from "@/lib/site";
 
 export const alt = "Nuttapon Yimnoi (Film), builder of trading systems and AI agents";
 export const size = { width: 1200, height: 630 };
@@ -75,7 +76,7 @@ export default function Image() {
             <div
               style={{ width: "10px", height: "10px", backgroundColor: BRAND }}
             />
-            <div>webpv.vercel.app</div>
+            <div>{SITE_HOST}</div>
           </div>
         </div>
       </div>
