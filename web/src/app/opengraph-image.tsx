@@ -4,6 +4,9 @@ export const alt = "Nuttapon Yimnoi (Film), builder of trading systems and AI ag
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// `output: "export"` needs image routes pinned static too.
+export const dynamic = "force-static";
+
 const BRAND = "#f7a445";
 const LINE = "rgba(250,250,250,0.14)";
 

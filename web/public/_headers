@@ -1,0 +1,24 @@
+# Cloudflare Pages reads this file from the deploy root and applies it to
+# matching paths. Order matters: later rules win.
+
+# Next's generated OG route exports as an extensionless file, so Pages cannot
+# infer the type from the name and would serve it as text. Facebook, X and LINE
+# all drop a share image whose Content-Type is wrong.
+/opengraph-image
+  Content-Type: image/png
+  Cache-Control: public, max-age=3600
+
+# Hashed build assets never change under the same name.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Project and lab imagery is stable but replaceable; a day is long enough that
+# repeat visits are free and short enough that a swap shows up without a purge.
+/projects/*
+  Cache-Control: public, max-age=86400
+/labs/*
+  Cache-Control: public, max-age=86400
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
