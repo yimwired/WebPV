@@ -47,11 +47,27 @@ await page.getByRole("link", { name: /^(Work|ผลงาน)$/ }).first().click
 await page.waitForTimeout(1500);
 console.log(`landed on → ${new URL(page.url()).pathname + new URL(page.url()).hash}`);
 
-// and the labs gallery CTA reaches /services
+// /services has to offer a way through to the prices; the navbar is the only
+// other route there and it is not where a reader who just finished is looking
+await page.goto(`${BASE}/services`, { waitUntil: "load" });
+await page.waitForTimeout(1000);
+await revealAll();
+await page
+  .getByRole("link", { name: /^(See the packages|ดูแพ็กเกจกับราคา)$/ })
+  .click();
+await page.waitForTimeout(1200);
+console.log(`services → pricing → ${new URL(page.url()).pathname}`);
+
+// the labs gallery CTAs reach /services and /pricing
+// (label is "What I build", renamed from "See what I build" in 6251edc)
 await page.goto(`${BASE}/labs`, { waitUntil: "load" });
 await page.waitForTimeout(1000);
 await revealAll();
-await page.getByRole("link", { name: /see what i build/i }).click();
+const labsCosts = await page
+  .getByRole("link", { name: /^What it costs$/ })
+  .getAttribute("href");
+console.log(`labs "What it costs" href → ${labsCosts}`);
+await page.getByRole("link", { name: /^What I build$/ }).click();
 await page.waitForTimeout(1200);
 console.log(`labs CTA → ${new URL(page.url()).pathname}`);
 
