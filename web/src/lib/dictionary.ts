@@ -146,6 +146,7 @@ const en = {
     ctaTitle: "Have something in mind?",
     ctaSub: "Tell me roughly what you need and I'll send back scope, timeline and a price.",
     ctaButton: "Ask for a quote",
+    ctaPricing: "See the packages",
   },
   // Numbers live in `pricing.ts`; only the wording is here, keyed by tier id.
   pricing: {
@@ -561,6 +562,7 @@ const th: typeof en = {
     ctaTitle: "มีงานในใจแล้วใช่ไหม",
     ctaSub: "เล่าคร่าวๆ มาได้เลย เดี๋ยวสรุปขอบเขตงาน เวลา และราคากลับไปให้",
     ctaButton: "ขอใบเสนอราคา",
+    ctaPricing: "ดูแพ็กเกจกับราคา",
   },
   pricing: {
     title: "ราคาคุยกันจบ​ตั้งแต่​ก่อนเริ่มงาน",
