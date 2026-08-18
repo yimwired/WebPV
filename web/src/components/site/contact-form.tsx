@@ -11,8 +11,12 @@ const FORM_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || "xdenayky";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+// border-line-control, not border-line: --surface sits only 1.06:1 off the page,
+// so the border is the only thing marking where the field is. WCAG 1.4.11 wants
+// 3:1 for that. Placeholder is the solid token -- at /70 it composited to 4.11:1,
+// just under the 4.5:1 text floor.
 const fieldClass =
-  "w-full rounded-md border border-line bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40";
+  "w-full rounded-md border border-line-control bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40";
 
 /**
  * Posts straight to Formspree, so the site stays static and keyless.
