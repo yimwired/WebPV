@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { LocaleProvider } from "@/lib/i18n";
 import { MotionProvider } from "@/components/site/motion-provider";
@@ -33,6 +33,13 @@ export const metadata: Metadata = {
     description:
       "Five systems in production, all designed and built solo.",
   },
+};
+
+// Matches --background in the .dark block. On a phone the browser paints its
+// own bar with this colour, so without it the chrome stays white above a black
+// page.
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({

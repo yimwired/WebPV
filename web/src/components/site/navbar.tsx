@@ -90,6 +90,16 @@ export function Navbar() {
         scrolled && "bg-background border-line border-b",
       )}
     >
+      {/* Six links and a CTA stand between the tab key and the page, on every
+          page. Visible only once focused; `not-sr-only` resets padding to 0, so
+          the visible sizing has to come back on the focus variant. */}
+      <a
+        href="#main"
+        className="bg-surface border-line-control text-foreground sr-only rounded-md border text-sm focus:not-sr-only focus:absolute focus:top-3 focus:left-5 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:px-4"
+      >
+        {t.nav.skipToContent}
+      </a>
+
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
         <a
           href={onHome ? "#top" : "/"}
