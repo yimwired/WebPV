@@ -14,14 +14,17 @@ const reader = await ctx.newPage();
 await reader.goto("about:blank");
 
 await page.goto(BASE + ROUTE, { waitUntil: "load" });
-await page.waitForTimeout(1500);
+// WebGL scenes paint after load; measuring before they do gives every element
+// the base page colour as its plate.
+await page.waitForTimeout(4000);
 
 // Walk the page in viewport-sized steps so scroll-driven acts settle before
 // their text is measured.
 const results = [];
 const height = await page.evaluate(() => document.body.scrollHeight);
+const STEP = Number(process.env.STEP ?? 400);
 
-for (let y = 0; y < height; y += 700) {
+for (let y = 0; y < height; y += STEP) {
   await page.evaluate((top) => window.scrollTo(0, top), y);
   await page.waitForTimeout(900);
 
@@ -32,7 +35,14 @@ for (let y = 0; y < height; y += 700) {
       const r = el.getBoundingClientRect();
       if (r.width < 4 || r.height < 4 || r.top < 0 || r.bottom > window.innerHeight) continue;
       const cs = getComputedStyle(el);
-      if (cs.visibility === "hidden" || +cs.opacity < 0.05) continue;
+      if (cs.visibility === "hidden") continue;
+
+      // Scroll-driven acts crossfade. Mid-fade the text is half-transparent
+      // over the *outgoing* act's backdrop, which is neither what the visitor
+      // reads nor what the author chose. Measure each act at full strength.
+      let effective = 1;
+      for (let n = el; n; n = n.parentElement) effective *= +getComputedStyle(n).opacity;
+      if (effective < 0.95) continue;
       out.push({
         text: el.textContent.trim().slice(0, 34),
         color: cs.color,

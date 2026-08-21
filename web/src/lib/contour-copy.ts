@@ -26,7 +26,6 @@ export interface ContourCopy {
   eyebrow: string;
   headline: string;
   intro: string;
-  scroll: string;
   stats: { energy: string; sugar: string; height: string };
   lineup: { title: string; body: string };
   disclaimer: string;
@@ -39,7 +38,6 @@ export const contourCopy: Record<Locale, ContourCopy> = {
     headline: "One drink, three ways to hold it",
     intro:
       "The same 10.6 grams of sugar per 100 ml, tooled three ways for three different moments. Scroll to take each one apart.",
-    scroll: "Scroll",
     stats: { energy: "Energy", sugar: "Sugar", height: "Height" },
     lineup: {
       title: "The range, to scale",
@@ -101,7 +99,6 @@ export const contourCopy: Record<Locale, ContourCopy> = {
     headline: "หนึ่งรสชาติ​สามขนาดบรรจุ",
     intro:
       "น้ำตาล 10.6 กรัมต่อ 100 มล. เท่ากันทุกขนาด แต่ขึ้นรูปคนละแบบเพื่อคนละโอกาส เลื่อนลงเพื่อดูทีละใบ",
-    scroll: "เลื่อนลง",
     stats: { energy: "พลังงาน", sugar: "น้ำตาล", height: "ความสูง" },
     lineup: {
       title: "ทั้งกลุ่ม​ตามขนาดจริง",
