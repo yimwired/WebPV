@@ -13,3 +13,6 @@ web/.git_disabled_scaffold/
 
 # dev artifacts — screenshots from verify scripts
 web/screenshots/
+
+# local state written by `wrangler dev`
+.wrangler/
