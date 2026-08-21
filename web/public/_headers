@@ -14,9 +14,13 @@
 
 # Project and lab imagery is stable but replaceable; a day is long enough that
 # repeat visits are free and short enough that a swap shows up without a purge.
+# Scoped to the image folders on purpose: /labs/* would also match the lab
+# pages themselves, and a day-old cached page survives a deploy.
 /projects/*
   Cache-Control: public, max-age=86400
-/labs/*
+/labs/cards/*
+  Cache-Control: public, max-age=86400
+/labs/trine-hand.webp
   Cache-Control: public, max-age=86400
 
 /*

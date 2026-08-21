@@ -104,6 +104,11 @@
 }
 
 .dark {
+  /* Tells the browser to render its own chrome dark too: scrollbars, the
+     autofill background on the contact form, and native form controls. Without
+     it they stay light and read as a rendering bug on a dark page. */
+  color-scheme: dark;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -168,10 +173,15 @@
   /* One visible focus ring for every interactive element on the site. The
      accent is the only colour that never appears as decoration, so a ring
      in it always means "keyboard is here". */
-  :focus-visible {
+  :focus-visible:not([tabindex="-1"]) {
     outline: 2px solid var(--brand);
     outline-offset: 3px;
     border-radius: 2px;
+  }
+  /* Skip-link targets take focus so the next Tab continues inside the content,
+     but they are not controls: ringing the whole <main> would be noise. */
+  [tabindex="-1"]:focus {
+    outline: none;
   }
 }
 

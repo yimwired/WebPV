@@ -13,7 +13,7 @@ export default function PricingPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <Pricing />
         <Footer />
       </main>

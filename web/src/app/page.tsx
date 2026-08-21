@@ -8,7 +8,9 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main>
+      {/* tabIndex -1: without it the skip link moves the scroll position but
+          not the focus, so the next Tab goes back into the navbar */}
+      <main id="main" tabIndex={-1}>
         <Hero />
         <Projects />
         <About />

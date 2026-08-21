@@ -195,13 +195,13 @@ export function ContourDemo({
           style={{ opacity: familyOpacity }}
           className="pointer-events-none absolute inset-x-0 top-[15vh] z-20 px-6 text-center sm:top-[18vh] sm:px-10"
         >
-          <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-black/45">
+          <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-black/80">
             {copy.eyebrow}
           </p>
           <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold leading-[1.02] tracking-tight text-black/85 sm:text-5xl">
             {display(copy.headline)}
           </h1>
-          <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-black/55">
+          <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-black/75">
             {copy.intro}
           </p>
         </motion.div>
@@ -212,17 +212,17 @@ export function ContourDemo({
           className="pointer-events-none absolute inset-x-0 top-[11vh] z-20 px-6 sm:top-auto sm:bottom-[16vh] sm:px-10"
         >
           <div className="max-w-xs sm:max-w-sm">
-            <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-white/55">
+            <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-white/75">
               {String(active + 1).padStart(2, "0")} /{" "}
               {String(PACKS.length).padStart(2, "0")}
             </p>
             <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
               {display(packCopy.name)}
             </h2>
-            <p className="mt-1 text-lg text-white/70 sm:text-xl">
+            <p className="mt-1 text-lg text-white/85 sm:text-xl">
               {pack.volume}
             </p>
-            <p className="mt-5 text-sm leading-relaxed text-white/65">
+            <p className="mt-5 text-sm leading-relaxed text-white/85">
               {packCopy.line}
             </p>
 
@@ -233,7 +233,7 @@ export function ContourDemo({
                 { label: copy.stats.height, value: `${pack.heightMm} mm` },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <dt className="text-[10px] uppercase tracking-[0.16em] text-white/45">
+                  <dt className="text-[10px] uppercase tracking-[0.16em] text-white/75">
                     {stat.label}
                   </dt>
                   <dd className="mt-1 text-base font-medium tabular-nums">
@@ -242,7 +242,7 @@ export function ContourDemo({
                 </div>
               ))}
             </dl>
-            <p className="mt-3 text-[11px] text-white/40">{packCopy.serves}</p>
+            <p className="mt-3 text-[11px] text-white/75">{packCopy.serves}</p>
           </div>
         </motion.div>
 
@@ -261,13 +261,13 @@ export function ContourDemo({
                   : "right-5 bottom-[22vh] sm:right-[4vw] sm:bottom-[20vh]"
               )}
             >
-              <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/75">
                 {String(i + 1).padStart(2, "0")}
               </p>
               <p className="mt-2 text-sm font-semibold leading-snug">
                 {callout.title}
               </p>
-              <p className="mt-2 text-xs leading-relaxed text-white/60">
+              <p className="mt-2 text-xs leading-relaxed text-white/80">
                 {callout.body}
               </p>
             </div>
@@ -282,10 +282,10 @@ export function ContourDemo({
           <h2 className="text-3xl font-semibold tracking-tight text-black/85 sm:text-5xl">
             {display(copy.lineup.title)}
           </h2>
-          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-black/55">
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-black/75">
             {copy.lineup.body}
           </p>
-          <p className="mt-5 text-[11px] uppercase tracking-[0.22em] text-black/45 tabular-nums">
+          <p className="mt-5 text-[11px] uppercase tracking-[0.22em] text-black/75 tabular-nums">
             {PACKS.map((p) => `${p.volume} · ${p.heightMm} mm`).join("   /   ")}
           </p>
         </motion.div>
@@ -314,16 +314,13 @@ export function ContourDemo({
           ))}
         </motion.div>
 
-        <motion.p
-          style={{ opacity: familyOpacity }}
-          className="pointer-events-none absolute inset-x-0 bottom-24 z-20 text-center text-[10px] uppercase tracking-[0.3em] text-black/40"
-        >
-          {copy.scroll}
-        </motion.p>
-
         {/* Not optional. The page borrows a real brand to make a point about
-            craft, and it has to say so where nobody can miss it. */}
-        <p className="absolute inset-x-0 bottom-[4.5rem] z-20 px-6 text-center text-[9px] leading-relaxed text-white/30 mix-blend-difference sm:px-10 sm:text-[10px]">
+            craft, and it has to say so where nobody can miss it. It carries its
+            own plate rather than blending into the scene: at 9px, white/30 and
+            mix-blend-difference measured 2.4:1 over the red, which is a notice
+            nobody can read. Solid white on black/70 clears 9:1 over every act,
+            light or dark, because the plate is ours and not the background's. */}
+        <p className="absolute inset-x-4 bottom-[4.5rem] z-20 mx-auto max-w-3xl rounded-md bg-black/70 px-4 py-2 text-center text-[11px] leading-relaxed text-white sm:text-xs">
           {copy.disclaimer}
         </p>
       </div>

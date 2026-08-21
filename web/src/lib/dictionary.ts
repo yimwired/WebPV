@@ -17,6 +17,7 @@ const en = {
     cta: "Get in touch",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+    skipToContent: "Skip to content",
   },
   hero: {
     name: "Nuttapon Yimnoi (Film)",
@@ -429,6 +430,7 @@ const th: typeof en = {
     cta: "ทักมาคุยกัน",
     openMenu: "เปิดเมนู",
     closeMenu: "ปิดเมนู",
+    skipToContent: "ข้ามไปที่เนื้อหา",
   },
   hero: {
     // Roman spelling on both sides: it is how the name appears on GitHub and

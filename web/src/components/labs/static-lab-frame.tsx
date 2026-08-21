@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 interface StaticLabFrameProps {
-  /** file under /public/labs, e.g. "sable.html" */
+  /** file under /public/lab-demos, e.g. "sable.html" */
   file: string;
   /** accessible name for the embedded document */
   title: string;
@@ -15,10 +15,14 @@ interface StaticLabFrameProps {
  * Wrapper for the two lab demos that are standalone HTML documents
  * rather than React pages.
  *
- * They stay in `/public/labs` and load in a frame on purpose: both
+ * They stay in `/public/lab-demos` and load in a frame on purpose: both
  * declare their own `:root` custom properties (`--paper`, `--ink`,
- * `--slate`…), which would leak into the site's shadcn oklch tokens
+ * `--slate`), which would leak into the site's shadcn oklch tokens
  * if their CSS were imported into the app.
+ *
+ * The folder is deliberately not `/public/labs`: `output: "export"` writes the
+ * route /labs/sable to out/labs/sable.html, which overwrites a public file of
+ * the same name, and the frame then loads this very page inside itself.
  */
 export function StaticLabFrame({ file, title, backdrop }: StaticLabFrameProps) {
   const [loaded, setLoaded] = useState(false);
@@ -29,7 +33,7 @@ export function StaticLabFrame({ file, title, backdrop }: StaticLabFrameProps) {
       style={{ background: backdrop }}
     >
       <iframe
-        src={`/labs/${file}`}
+        src={`/lab-demos/${file}`}
         title={title}
         onLoad={() => setLoaded(true)}
         className="h-full w-full border-0 transition-opacity duration-500"
