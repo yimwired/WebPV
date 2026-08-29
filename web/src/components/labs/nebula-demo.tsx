@@ -1,9 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { motion, useReducedMotion } from "framer-motion";
 import { projects } from "@/lib/projects";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
+
+const NebulaScene = dynamic(() => import("./nebula-scene"), {
+  ssr: false,
+  loading: () => null,
+});
 
 /**
  * "Nebula": the maximal AI-startup look from the reference clip:
@@ -11,6 +17,8 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const;
  * a floating chrome-like shape, glass nav, marquee.
  */
 export function NebulaDemo() {
+  const reduced = useReducedMotion();
+
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#0b0416] text-white selection:bg-violet-400/30">
       {/* ── backdrop: layered violet glow ── */}
@@ -88,41 +96,16 @@ export function NebulaDemo() {
           </motion.div>
         </div>
 
-        {/* floating chrome shape */}
+        {/* The object: a lit core inside a shell, with rings that actually
+            pass behind it. Previously a gradient div, a blurred highlight and
+            two bordered circles, which is why it read as a sticker. */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          initial={{ opacity: 0, scale: 0.86 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.3, ease }}
           className="relative mx-auto h-72 w-72 sm:h-88 sm:w-88"
         >
-          <motion.div
-            animate={{ y: [-12, 12, -12] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            {/* glossy planet */}
-            <div className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle_at_32%_28%,#ffffff_0%,#d8c7ff_18%,#8b5cf6_48%,#3b0a7e_78%,#1a0533_100%)] shadow-[0_0_120px_rgba(139,92,246,0.55),inset_-18px_-24px_60px_rgba(10,2,30,0.55)]" />
-            {/* specular highlight */}
-            <div className="absolute top-[16%] left-[22%] h-[22%] w-[30%] rounded-full bg-white/70 blur-xl" />
-            {/* tilted orbit ring */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-[-6%] [transform-style:preserve-3d]"
-              style={{ rotate: 0 }}
-            >
-              <div className="absolute inset-0 rounded-full border border-fuchsia-200/40 [transform:rotateX(68deg)]" />
-              <div className="absolute inset-[3%] rounded-full border border-violet-300/25 [transform:rotateX(68deg)]" />
-            </motion.div>
-            {/* small moon */}
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0"
-            >
-              <div className="absolute top-[6%] left-1/2 h-5 w-5 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_35%_30%,#fdf4ff,#e879f9_60%,#86198f)] shadow-[0_0_18px_rgba(232,121,249,0.8)]" />
-            </motion.div>
-          </motion.div>
+          <NebulaScene spin={!reduced} />
         </motion.div>
       </section>
 

@@ -7,8 +7,12 @@
 //
 //  (3) is the one worth automating. Nothing about a render loop left running
 //  is visible, so a regression there is silent: the page keeps looking right
-//  while a phone burns through its battery. The count comes from patching
-//  requestAnimationFrame, which is what R3F drives its loop from.
+//  while a phone burns through its battery.
+//
+//  It counts WebGL draw calls, not animation frames. Nebula runs a marquee
+//  off framer-motion that never stops, and a page-wide frame count cannot
+//  tell that apart from a scene that failed to park: draws come only from
+//  the renderer, so they answer the question directly.
 //
 //  Run from the repo root against a served build:
 //    npx wrangler dev --port 8788
@@ -19,7 +23,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 
 const BASE = process.env.SHOOT_URL ?? "http://127.0.0.1:8788";
 const OUT = "web/screenshots/labs-3d";
-const ROUTES = (process.env.ROUTES ?? "/labs/space,/labs/dimension,/labs/trine,/labs/contour").split(",");
+const ROUTES = (process.env.ROUTES ?? "/labs/nebula,/labs/space,/labs/dimension,/labs/trine,/labs/contour").split(",");
 
 /** Frames counted over this window, in and out of view. */
 const SAMPLE_MS = 2000;
@@ -29,23 +33,32 @@ const SETTLE_MS = 3500;
 
 /**
  * Headless Chromium has no GPU: it renders WebGL through SwiftShader on the
- * CPU. A retina-sized canvas with a bloom pass drops to a couple of frames a
- * second there, which is too coarse a sample to tell a gated loop from a slow
- * one, so the run is deliberately small and non-retina. Frame *counts* here
- * say nothing about real-device performance; only the ratio matters.
+ * CPU. A retina-sized canvas drops to a couple of frames a second there,
+ * which is too coarse a sample to tell a parked loop from a slow one, so the
+ * run is deliberately small and non-retina. Draw *counts* here say nothing
+ * about real-device performance; only the ratio matters.
  */
 const VIEWPORT = { width: 900, height: 640 };
 
-const COUNT_RAF = `
-  window.__raf = 0;
-  const original = window.requestAnimationFrame;
-  window.requestAnimationFrame = (cb) => { window.__raf++; return original(cb); };
+const COUNT_DRAWS = `
+  window.__draws = 0;
+  for (const ctx of [self.WebGLRenderingContext, self.WebGL2RenderingContext]) {
+    if (!ctx) continue;
+    for (const call of ["drawArrays", "drawElements", "drawArraysInstanced", "drawElementsInstanced"]) {
+      const original = ctx.prototype[call];
+      if (!original) continue;
+      ctx.prototype[call] = function (...args) {
+        window.__draws++;
+        return original.apply(this, args);
+      };
+    }
+  }
 `;
 
-async function framesOver(page, ms) {
-  await page.evaluate(() => { window.__raf = 0; });
+async function drawsOver(page, ms) {
+  await page.evaluate(() => { window.__draws = 0; });
   await page.waitForTimeout(ms);
-  return page.evaluate(() => window.__raf);
+  return page.evaluate(() => window.__draws);
 }
 
 /** True while any part of the canvas is still inside the viewport. */
@@ -124,12 +137,12 @@ for (const route of ROUTES) {
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
 
-  await page.addInitScript(COUNT_RAF);
+  await page.addInitScript(COUNT_DRAWS);
   await page.goto(BASE + route, { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(SETTLE_MS);
 
   const drawn = await live(page);
-  const inView = await framesOver(page, SAMPLE_MS);
+  const inView = await drawsOver(page, SAMPLE_MS);
   const name = route.split("/").pop();
   // the page, not the canvas element: an animating canvas never reaches the
   // "stable" state locator.screenshot() waits for, and the call times out
@@ -138,15 +151,15 @@ for (const route of ROUTES) {
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(2500);
   const leftViewport = !(await canvasOnScreen(page));
-  const scrolled = leftViewport ? await framesOver(page, SAMPLE_MS) : null;
+  const scrolled = leftViewport ? await drawsOver(page, SAMPLE_MS) : null;
 
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(1200);
   await setHidden(page, true);
   await page.waitForTimeout(600);
-  const hidden = await framesOver(page, SAMPLE_MS);
+  const hidden = await drawsOver(page, SAMPLE_MS);
 
-  report[route] = { canvas: drawn, errors, frames: { inView, scrolled, hidden } };
+  report[route] = { canvas: drawn, errors, draws: { inView, scrolled, hidden } };
   await context.close();
 }
 
@@ -155,7 +168,7 @@ writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
 
 let failed = false;
 for (const [route, r] of Object.entries(report)) {
-  const { inView, scrolled, hidden } = r.frames;
+  const { inView, scrolled, hidden } = r.draws;
 
   // A gate passes when it all but stops the loop. Both are only reported
   // where they apply: a pinned canvas never leaves the viewport, so its
@@ -166,7 +179,7 @@ for (const [route, r] of Object.entries(report)) {
 
   console.log(
     `${route.padEnd(18)} canvas=${r.canvas.size ?? r.canvas.reason}  ` +
-    `frames in=${inView} scrolled=${scrolled ?? "n/a"} hidden=${hidden}  ` +
+    `draws in=${inView} scrolled=${scrolled ?? "n/a"} hidden=${hidden}  ` +
     `gated=${gated}  thrown=${r.errors.length}`,
   );
   r.errors.slice(0, 3).forEach((e) => console.log(`    ! ${e.slice(0, 160)}`));
