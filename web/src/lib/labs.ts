@@ -89,17 +89,6 @@ export const labs: Lab[] = [
     buildTime: "Around ten days",
   },
   {
-    slug: "nebula",
-    name: "Nebula",
-    vibe: "Premium SaaS",
-    description:
-      "Deep violet gradients, oversized type and floating chrome shapes. The maximal AI-startup look, tuned to feel expensive instead of noisy.",
-    accent: "#a78bfa",
-    preview: { from: "#2e1065", to: "#6d28d9" },
-    bestFor: "SaaS, apps and startups raising attention fast",
-    buildTime: "About a week",
-  },
-  {
     slug: "space",
     name: "Deep Space",
     vibe: "Sci-fi HUD",
