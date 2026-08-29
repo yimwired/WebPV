@@ -9,10 +9,11 @@
 //  is visible, so a regression there is silent: the page keeps looking right
 //  while a phone burns through its battery.
 //
-//  It counts WebGL draw calls, not animation frames. Nebula runs a marquee
-//  off framer-motion that never stops, and a page-wide frame count cannot
-//  tell that apart from a scene that failed to park: draws come only from
-//  the renderer, so they answer the question directly.
+//  It counts WebGL draw calls, not animation frames. Several of these pages
+//  run their own animations off framer-motion that never stop, and a
+//  page-wide frame count cannot tell those apart from a scene that failed to
+//  park: draws come only from the renderer, so they answer the question
+//  directly.
 //
 //  Run from the repo root against a served build:
 //    npx wrangler dev --port 8788
@@ -23,7 +24,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 
 const BASE = process.env.SHOOT_URL ?? "http://127.0.0.1:8788";
 const OUT = "web/screenshots/labs-3d";
-const ROUTES = (process.env.ROUTES ?? "/labs/nebula,/labs/space,/labs/dimension,/labs/trine,/labs/contour").split(",");
+const ROUTES = (process.env.ROUTES ?? "/labs/space,/labs/dimension,/labs/trine,/labs/contour").split(",");
 
 /** Frames counted over this window, in and out of view. */
 const SAMPLE_MS = 2000;
