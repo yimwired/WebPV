@@ -405,6 +405,13 @@ section[id] { scroll-margin-top: 76px; }
       rgba(247, 164, 69, 0.10), transparent 62%),
     radial-gradient(60rem 40rem at 50% -8%,
       rgba(120, 140, 190, 0.09), transparent 70%);
+  /* The warm ellipse is 34rem tall and sits 34% down, so it is still carrying
+     colour when it reaches the bottom of a 90vh box: the element's own edge
+     cut it off as a hard line straight across the page. Fading the layer out
+     above that edge means the wash ends where it stops being visible rather
+     than where the box does. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
   transition: --px 260ms linear, --py 260ms linear;
 }
 
