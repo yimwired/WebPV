@@ -1,13 +1,26 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { motion, useReducedMotion } from "framer-motion";
 import { projects } from "@/lib/projects";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
-/** Animated starfield on <canvas>: slow drift + twinkle, DPR-aware. */
-function Starfield() {
+const SpaceScene = dynamic(() => import("./space-scene"), {
+  ssr: false,
+  loading: () => null,
+});
+
+/**
+ * Starfield on <canvas>: slow drift + twinkle, DPR-aware.
+ *
+ * `animate` off draws the field once and stops, for reduced motion. The loop
+ * also parks itself while the tab is in the background, which it previously
+ * did not: this canvas covers the whole page, so it never scrolls out of
+ * view and would otherwise redraw for as long as the tab existed.
+ */
+function Starfield({ animate }: { animate: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -34,31 +47,56 @@ function Starfield() {
       }));
     };
 
-    const draw = (t: number) => {
+    const paint = (t: number) => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
       for (const s of stars) {
-        s.y -= s.v;
-        if (s.y < -2) {
-          s.y = canvas.offsetHeight + 2;
-          s.x = Math.random() * canvas.offsetWidth;
+        if (animate) {
+          s.y -= s.v;
+          if (s.y < -2) {
+            s.y = canvas.offsetHeight + 2;
+            s.x = Math.random() * canvas.offsetWidth;
+          }
         }
-        const alpha = 0.45 + 0.55 * Math.abs(Math.sin(t / 1400 + s.tw));
+        const alpha = animate
+          ? 0.45 + 0.55 * Math.abs(Math.sin(t / 1400 + s.tw))
+          : 0.7;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(226, 240, 255, ${alpha})`;
         ctx.fill();
       }
+    };
+
+    const draw = (t: number) => {
+      paint(t);
       raf = requestAnimationFrame(draw);
     };
 
+    const start = () => {
+      if (!raf) raf = requestAnimationFrame(draw);
+    };
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    const onVisibility = () => (document.hidden ? stop() : start());
+
     resize();
-    raf = requestAnimationFrame(draw);
+    if (animate) {
+      start();
+      document.addEventListener("visibilitychange", onVisibility);
+    } else {
+      paint(0);
+    }
+
     window.addEventListener("resize", resize);
     return () => {
-      cancelAnimationFrame(raf);
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [animate]);
 
   return <canvas ref={ref} className="absolute inset-0 h-full w-full" />;
 }
@@ -69,13 +107,19 @@ function Starfield() {
  * projects presented as a mission log.
  */
 export function SpaceDemo() {
+  const reduced = useReducedMotion();
+
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#020617] font-mono text-slate-200 selection:bg-cyan-400/30">
-      <Starfield />
+      <Starfield animate={!reduced} />
 
-      {/* planet on the horizon */}
-      <div className="pointer-events-none absolute inset-x-0 top-[62vh] flex justify-center sm:top-[55vh]">
-        <div className="h-[80vw] w-[80vw] max-h-[44rem] max-w-[44rem] rounded-full bg-[radial-gradient(circle_at_50%_18%,#67e8f9_0%,#0e7490_28%,#083344_55%,#020617_78%)] shadow-[0_-20px_120px_rgba(34,211,238,0.35)]" />
+      {/* The planet on the horizon: a real lit sphere, so it turns, carries a
+          terminator and holds an atmosphere at its edge. The box is wider than
+          the body itself to leave the halo somewhere to fall off. */}
+      <div className="pointer-events-none absolute inset-x-0 top-[62vh] flex justify-center sm:top-[56vh]">
+        <div className="h-[98vw] w-[98vw] max-h-[54rem] max-w-[54rem]">
+          <SpaceScene spin={!reduced} />
+        </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-[60vh] h-24 bg-gradient-to-b from-transparent via-cyan-300/10 to-transparent blur-xl sm:top-[53vh]" />
 

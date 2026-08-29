@@ -19,7 +19,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 
 const BASE = process.env.SHOOT_URL ?? "http://127.0.0.1:8788";
 const OUT = "web/screenshots/labs-3d";
-const ROUTES = (process.env.ROUTES ?? "/labs/dimension,/labs/trine,/labs/contour").split(",");
+const ROUTES = (process.env.ROUTES ?? "/labs/space,/labs/dimension,/labs/trine,/labs/contour").split(",");
 
 /** Frames counted over this window, in and out of view. */
 const SAMPLE_MS = 2000;
@@ -86,17 +86,22 @@ async function setHidden(page, hidden) {
  */
 async function live(page) {
   return page.evaluate(() => {
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return { ok: false, reason: "no canvas on the page" };
+    // Deep Space puts a 2D starfield behind the globe, so the first canvas on
+    // the page is not the one to test: getContext("webgl") on a canvas that
+    // already handed out a 2D context returns null. Find the WebGL one.
+    const canvases = Array.from(document.querySelectorAll("canvas"));
+    if (!canvases.length) return { ok: false, reason: "no canvas on the page" };
 
-    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
-    if (!gl) return { ok: false, reason: "no WebGL context" };
-
-    return {
-      ok: !gl.isContextLost() && canvas.width > 0 && canvas.height > 0,
-      size: `${canvas.width}x${canvas.height}`,
-      lost: gl.isContextLost(),
-    };
+    for (const canvas of canvases) {
+      const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+      if (!gl) continue;
+      return {
+        ok: !gl.isContextLost() && canvas.width > 0 && canvas.height > 0,
+        size: `${canvas.width}x${canvas.height}`,
+        lost: gl.isContextLost(),
+      };
+    }
+    return { ok: false, reason: "no WebGL context on any canvas" };
   });
 }
 

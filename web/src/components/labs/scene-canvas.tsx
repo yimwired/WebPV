@@ -16,6 +16,13 @@ const FLOOR_DPR = 1;
 
 type Props = Omit<CanvasProps, "frameloop" | "dpr"> & {
   children: ReactNode;
+  /**
+   * Resolution ceiling for this scene. Lower it where the scene is textured
+   * rather than shaded: past roughly one texel per pixel a generated map
+   * stops adding detail and starts showing its own grid, so rendering it
+   * larger costs frames and looks worse.
+   */
+  maxDpr?: number;
 };
 
 /**
@@ -31,13 +38,13 @@ type Props = Omit<CanvasProps, "frameloop" | "dpr"> & {
  * The observer watches the canvas element itself rather than a wrapper div, so
  * dropping this in place of <Canvas> does not change any layout.
  */
-export function SceneCanvas({ children, onCreated, ...canvasProps }: Props) {
+export function SceneCanvas({ children, onCreated, maxDpr: ceiling = MAX_DPR, ...canvasProps }: Props) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
   // A ceiling, not a fixed value: passed to R3F as a [min, max] range so a
   // screen that reports 1 stays at 1. Handing it the scalar instead forces
   // every device to render at 2x, which is the opposite of the point.
-  const [maxDpr, setMaxDpr] = useState(MAX_DPR);
+  const [maxDpr, setMaxDpr] = useState(ceiling);
 
   // Start true so the first frame paints without waiting a tick for the
   // observer; it corrects itself immediately if the scene is below the fold.
@@ -82,7 +89,7 @@ export function SceneCanvas({ children, onCreated, ...canvasProps }: Props) {
       <PerformanceMonitor
         flipflops={3}
         onDecline={() => setMaxDpr(FLOOR_DPR)}
-        onIncline={() => setMaxDpr(MAX_DPR)}
+        onIncline={() => setMaxDpr(ceiling)}
         onFallback={() => setMaxDpr(FLOOR_DPR)}
       />
       {children}
