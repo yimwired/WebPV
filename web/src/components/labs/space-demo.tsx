@@ -238,8 +238,8 @@ export function SpaceDemo() {
             Want a site that flies like this one?
           </h3>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-300">
-            The starfield is a canvas, not a video. Every panel here is yours to
-            fill.
+            The starfield is a canvas and the planet is a lit sphere, not a
+            video. Every panel here is yours to fill.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -259,6 +259,14 @@ export function SpaceDemo() {
 
         <p className="mt-12 text-center text-[10px] tracking-[0.4em] text-slate-500 uppercase">
           end of transmission
+        </p>
+
+        {/* Whose work is whose. The imagery is NASA's and public domain; what
+            is built here is the sphere it is wrapped on. A portfolio that does
+            not say so is claiming the wrong thing. */}
+        <p className="mt-6 text-center text-[10px] leading-relaxed text-slate-600">
+          Surface, cloud and night-lights imagery: NASA Visible Earth (public
+          domain). Lighting, atmosphere and motion built for this page.
         </p>
       </section>
     </main>

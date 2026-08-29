@@ -1,17 +1,19 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
 import {
   AdditiveBlending,
   BackSide,
   CanvasTexture,
   Color,
-  RepeatWrapping,
   SRGBColorSpace,
   Vector3,
   type Group,
   type Mesh,
+  type MeshStandardMaterial,
+  type Texture,
 } from "three";
 
 import { SceneCanvas } from "./scene-canvas";
@@ -19,305 +21,89 @@ import { SceneCanvas } from "./scene-canvas";
 // ─────────────────────────────────────────────────────────────
 //  The planet on the horizon of the Deep Space lab.
 //
-//  It used to be one div with a radial gradient, which is why it read as a
-//  lit disc rather than a sphere: a gradient has no terminator, so the light
-//  sat dead centre and the eye got no cue about which way the star was.
+//  It began as one div with a radial gradient, which is why it read as a lit
+//  disc: a gradient has no terminator, so the light sat dead centre and the
+//  eye got no cue about which way the star was.
 //
-//  Everything here is generated in the browser at load: the continents, the
-//  bump, the city lights and the clouds are fractal noise painted onto
-//  canvases and uploaded as textures. No image ships with the page, which is
-//  the same trade the Contour lab makes for its labels.
+//  The ground, the weather and the city lights are NASA imagery, which is
+//  public domain. Everything that makes it behave like a body rather than a
+//  photograph wrapped on a ball is here: the atmosphere knows where the star
+//  is, the night side only lights up once the sun has left it, the water is
+//  the only part that glints, and the cloud deck turns at its own rate.
+//
+//  Sources, all NASA Visible Earth:
+//    day     Blue Marble, land surface, shallow water and shaded topography
+//    clouds  cloud cover composite
+//    night   Earth at night, city lights
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Texture size. The coastline ramp below is measured in elevation, so the
- * finer the grid the less ground a texel covers and the less the blend has
- * to smear to hide the step. Octave counts are trimmed to pay for it.
- */
-const TEX_W = 1024;
-const TEX_H = 512;
+const TEXTURES = {
+  day: "/planet/earth-day.webp",
+  clouds: "/planet/earth-clouds.webp",
+  night: "/planet/earth-night.webp",
+};
 
-/** Above this the surface is land rather than water. */
-const SEA_LEVEL = 0.5;
+/** One rotation of the planet, in seconds. Slow enough to notice only if you wait. */
+const DAY_LENGTH = 90;
 
 /**
- * Latitude, as a fraction from the equator, where ice starts to take hold.
+ * Where the star sits, and the one place it is written down: the light, the
+ * atmosphere shader and the night-side mask all have to agree or the globe
+ * lights one way and glows another.
  *
- * The globe is tilted and framed low, so the visible face is mostly the
- * northern half: a cap that starts too near the equator becomes the whole
- * picture, and a white lid with no structure under it is exactly what makes
- * a sphere look moulded rather than mapped.
+ * The camera never moves and carries no rotation, so this direction is the
+ * same in view space as in world space and the shaders can take it as a
+ * constant. Move the camera and it would have to be recomputed per frame.
  */
-const ICE_LATITUDE = 0.86;
+const SUN = new Vector3(-6.6, 2.2, 1.1).normalize();
 
-// ── noise ────────────────────────────────────────────────────────────────
-//  Sampled in 3D against the point on the sphere rather than in UV space:
-//  a 2D field would seam where the map wraps and smear at the poles.
+// ── water mask ───────────────────────────────────────────────────────────
+
+/** Roughness written into the mask: 0 is a mirror, 255 is chalk. */
+const WATER_ROUGHNESS = 22;
+const LAND_ROUGHNESS = 236;
 
 /**
- * Deterministic hash so the same world is generated on every visit.
+ * A roughness map, read off the daylight image.
  *
- * Every step goes through Math.imul. Written as plain `*`, the products run
- * past 2^53 and lose their low bits, which leaves neighbouring lattice points
- * correlated: the noise then builds out of visible rectangles, and the
- * coastlines come out looking chipped rather than drawn.
- */
-function hash(x: number, y: number, z: number): number {
-  let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263) ^ Math.imul(z | 0, 1442695041);
-  h = Math.imul(h ^ (h >>> 15), 2246822519);
-  h = Math.imul(h ^ (h >>> 13), 3266489917);
-  h ^= h >>> 16;
-  return (h >>> 0) / 4294967295;
-}
-
-/**
- * Quintic fade. Cubic smoothstep leaves a discontinuity in the second
- * derivative at every lattice line, which shows up as faint creases running
- * along the axes once the field is lit.
- */
-const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t);
-
-/** Continuous 0..1 ramp across [edge0, edge1]. */
-function smoothstep(edge0: number, edge1: number, x: number): number {
-  const t = clamp01((x - edge0) / (edge1 - edge0));
-  return t * t * (3 - 2 * t);
-}
-
-/**
- * The twelve edges of a cube, the standard Perlin gradient set: evenly spread
- * directions, and every dot product reduces to two adds.
- */
-const GRADIENTS: ReadonlyArray<readonly [number, number, number]> = [
-  [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
-  [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
-  [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1],
-];
-
-function dotGradient(
-  ix: number, iy: number, iz: number,
-  dx: number, dy: number, dz: number,
-): number {
-  const g = GRADIENTS[Math.floor(hash(ix, iy, iz) * 12) % 12];
-  return g[0] * dx + g[1] * dy + g[2] * dz;
-}
-
-/**
- * Gradient noise, not value noise.
+ * NASA publishes a water mask too, but the ocean is already the one thing in
+ * the colour map that is unmistakable, so deriving it saves a request. The
+ * map only feeds a highlight, so half size is plenty.
  *
- * Value noise interpolates a random number per lattice point, so its level
- * sets follow the cubes they were sampled from: threshold it into land and
- * sea and the coastlines come out as staircases running along the axes.
- * Gradient noise interpolates random *directions* instead, which puts the
- * zero crossings at angles the lattice never suggested.
+ * It earns its place because shading a whole globe at one roughness is the
+ * loudest tell that a sphere is painted: real water throws the star back at
+ * you and ground does not.
  */
-function noise(x: number, y: number, z: number): number {
-  const xi = Math.floor(x);
-  const yi = Math.floor(y);
-  const zi = Math.floor(z);
-  const dx = x - xi;
-  const dy = y - yi;
-  const dz = z - zi;
-  const u = fade(dx);
-  const v = fade(dy);
-  const w = fade(dz);
+function waterMask(day: Texture): CanvasTexture {
+  const width = 512;
+  const height = 256;
 
-  const n000 = dotGradient(xi, yi, zi, dx, dy, dz);
-  const n100 = dotGradient(xi + 1, yi, zi, dx - 1, dy, dz);
-  const n010 = dotGradient(xi, yi + 1, zi, dx, dy - 1, dz);
-  const n110 = dotGradient(xi + 1, yi + 1, zi, dx - 1, dy - 1, dz);
-  const n001 = dotGradient(xi, yi, zi + 1, dx, dy, dz - 1);
-  const n101 = dotGradient(xi + 1, yi, zi + 1, dx - 1, dy, dz - 1);
-  const n011 = dotGradient(xi, yi + 1, zi + 1, dx, dy - 1, dz - 1);
-  const n111 = dotGradient(xi + 1, yi + 1, zi + 1, dx - 1, dy - 1, dz - 1);
-
-  const value = lerp(
-    lerp(lerp(n000, n100, u), lerp(n010, n110, u), v),
-    lerp(lerp(n001, n101, u), lerp(n011, n111, u), v),
-    w,
-  );
-  // roughly [-1, 1] to [0, 1]
-  return value * 0.5 + 0.5;
-}
-
-function fbm(x: number, y: number, z: number, octaves: number): number {
-  let value = 0;
-  let amplitude = 0.5;
-  let frequency = 1;
-  let total = 0;
-
-  for (let i = 0; i < octaves; i += 1) {
-    value += noise(x * frequency, y * frequency, z * frequency) * amplitude;
-    total += amplitude;
-    amplitude *= 0.5;
-    frequency *= 2.07; // off an exact double so octaves do not line up
-  }
-  return value / total;
-}
-
-// ── texture building ─────────────────────────────────────────────────────
-
-interface Grid {
-  /** unit-sphere coordinates per texel, flattened */
-  xs: Float32Array;
-  ys: Float32Array;
-  zs: Float32Array;
-}
-
-/**
- * Sphere coordinates for every texel of an equirectangular map.
- *
- * The trig runs once per row and once per column rather than once per texel:
- * at this size that is 1,152 sin/cos calls instead of nearly 600,000.
- */
-function sphereGrid(width: number, height: number): Grid {
-  const xs = new Float32Array(width * height);
-  const ys = new Float32Array(width * height);
-  const zs = new Float32Array(width * height);
-
-  const sinLon = new Float32Array(width);
-  const cosLon = new Float32Array(width);
-  for (let x = 0; x < width; x += 1) {
-    const lon = (x / width) * Math.PI * 2;
-    sinLon[x] = Math.sin(lon);
-    cosLon[x] = Math.cos(lon);
-  }
-
-  for (let y = 0; y < height; y += 1) {
-    const lat = (y / height - 0.5) * Math.PI;
-    const cosLat = Math.cos(lat);
-    const sinLat = Math.sin(lat);
-    const row = y * width;
-
-    for (let x = 0; x < width; x += 1) {
-      const i = row + x;
-      xs[i] = cosLat * cosLon[x];
-      ys[i] = sinLat;
-      zs[i] = cosLat * sinLon[x];
-    }
-  }
-
-  return { xs, ys, zs };
-}
-
-function textureFrom(data: ImageData, srgb: boolean): CanvasTexture {
   const canvas = document.createElement("canvas");
-  canvas.width = data.width;
-  canvas.height = data.height;
-  canvas.getContext("2d")!.putImageData(data, 0, 0);
+  canvas.width = width;
+  canvas.height = height;
 
-  const texture = new CanvasTexture(canvas);
-  texture.wrapS = RepeatWrapping;
-  if (srgb) texture.colorSpace = SRGBColorSpace;
-  texture.anisotropy = 4;
-  return texture;
-}
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(day.image as CanvasImageSource, 0, 0, width, height);
 
-/** Palette, sampled between by elevation. Cyan family, to sit in this lab. */
-const DEEP = new Color("#031a33");
-const SHALLOW = new Color("#0d7ea3");
-const SHORE = new Color("#1d7d63");
-const LOWLAND = new Color("#1a5138");
-const HIGHLAND = new Color("#4a5f42");
-const ICE = new Color("#cddfe9");
+  const frame = ctx.getImageData(0, 0, width, height);
+  const { data } = frame;
 
-function buildSurface(grid: Grid) {
-  const surface = new ImageData(TEX_W, TEX_H);
-  const lights = new ImageData(TEX_W, TEX_H);
-  const gloss = new ImageData(TEX_W, TEX_H);
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
 
-  const colour = new Color();
-  const ground = new Color();
+    // Ocean here is blue-dominant and dark. Brightness alone would call the
+    // ice caps water, and hue alone would call the shallows land.
+    const blueLead = b - Math.max(r, g);
+    const wet = blueLead > 12 && b < 150;
 
-  for (let i = 0; i < TEX_W * TEX_H; i += 1) {
-    const x = grid.xs[i];
-    const y = grid.ys[i];
-    const z = grid.zs[i];
-
-    // Two scales: the continents, and a finer field that breaks up their
-    // coastlines so they do not read as blobs.
-    const base = fbm(x * 2.6, y * 2.6, z * 2.6, 5);
-    const detail = fbm(x * 13.1 + 11, y * 13.1 + 11, z * 13.1 + 11, 3);
-    const elevation = base * 0.8 + detail * 0.2;
-
-    const latitude = Math.abs(y);
-    // ragged, so the ice line is not a drawn circle
-    const iceEdge = ICE_LATITUDE + (detail - 0.5) * 0.2;
-
-    // Every boundary here is a ramp rather than a branch. A hard `if` on sea
-    // level makes neighbouring texels jump straight from water to land, and
-    // at this texture size that staircase is plainly visible on the sphere:
-    // the coastline reads as pixel steps however good the noise underneath
-    // it is. Blending across a narrow band costs nothing and the texel grid
-    // stops being findable.
-    const land = smoothstep(SEA_LEVEL - 0.035, SEA_LEVEL + 0.035, elevation);
-
-    // water: deeper the further below sea level
-    colour.copy(DEEP).lerp(SHALLOW, smoothstep(SEA_LEVEL - 0.16, SEA_LEVEL, elevation));
-
-    if (land > 0) {
-      const height = (elevation - SEA_LEVEL) / (1 - SEA_LEVEL);
-      ground.copy(SHORE).lerp(LOWLAND, smoothstep(0.02, 0.34, height));
-      ground.lerp(HIGHLAND, smoothstep(0.3, 0.72, height));
-      colour.lerp(ground, land);
-    }
-
-    const ice = smoothstep(iceEdge - 0.14, iceEdge + 0.05, latitude);
-    if (ice > 0) colour.lerp(ICE, ice * 0.88);
-
-    const p = i * 4;
-    surface.data[p] = colour.r * 255;
-    surface.data[p + 1] = colour.g * 255;
-    surface.data[p + 2] = colour.b * 255;
-    surface.data[p + 3] = 255;
-
-    // Settlements: low ground, off the ice, and sparse. The threshold is
-    // high on purpose, so the night side reads as scattered points of life
-    // rather than an evenly lit grid.
-    // Water is smooth and throws a highlight back at the star; ground is not
-    // and does not. Shading the whole globe at one roughness is the single
-    // loudest tell that a sphere is a painted ball: real oceans glint.
-    const rough = 26 + land * 210 + ice * 40;
-    gloss.data[p] = gloss.data[p + 1] = gloss.data[p + 2] = Math.min(255, rough);
-    gloss.data[p + 3] = 255;
-
-    const habitable = land * (1 - ice) * (1 - smoothstep(0.1, 0.2, elevation - SEA_LEVEL));
-    const density = noise(x * 34 + 5, y * 34 + 5, z * 34 + 5);
-    const lit = habitable * smoothstep(0.78, 0.9, density);
-    lights.data[p] = 255 * lit;
-    lights.data[p + 1] = 205 * lit;
-    lights.data[p + 2] = 140 * lit;
-    lights.data[p + 3] = 255;
+    data[i] = data[i + 1] = data[i + 2] = wet ? WATER_ROUGHNESS : LAND_ROUGHNESS;
+    data[i + 3] = 255;
   }
 
-  return {
-    surface: textureFrom(surface, true),
-    lights: textureFrom(lights, true),
-    gloss: textureFrom(gloss, false),
-  };
-}
-
-function buildClouds(grid: Grid) {
-  const clouds = new ImageData(TEX_W, TEX_H);
-
-  for (let i = 0; i < TEX_W * TEX_H; i += 1) {
-    const x = grid.xs[i];
-    const y = grid.ys[i];
-    const z = grid.zs[i];
-
-    // Stretched along longitude, the way weather bands actually sit. The
-    // threshold is high: thin cover lets the ground stay the subject, and a
-    // planet under total overcast is just a white ball again.
-    const density = fbm(x * 5.6 + 41, y * 11.5 + 41, z * 5.6 + 41, 4);
-    const cover = smoothstep(0.58, 0.75, density);
-
-    const p = i * 4;
-    clouds.data[p] = clouds.data[p + 1] = clouds.data[p + 2] = 255;
-    clouds.data[p + 3] = cover * 190;
-  }
-
-  return textureFrom(clouds, true);
+  ctx.putImageData(frame, 0, 0);
+  return new CanvasTexture(canvas);
 }
 
 // ── atmosphere ───────────────────────────────────────────────────────────
@@ -359,9 +145,9 @@ const ATMOSPHERE_FRAGMENT = /* glsl */ `
     float sun = dot(normal, normalize(uSun));
     float daylight = smoothstep(-0.45, 0.35, sun);
 
-    // Along the terminator the light is travelling through the most air, so
-    // it arrives warm. That thin copper band is what sunrise looks like from
-    // orbit, and the eye reads it as depth.
+    // Along the terminator the light is crossing the most air, so it arrives
+    // warm. That thin copper band is what sunrise looks like from orbit, and
+    // the eye reads it as depth.
     float grazing = 1.0 - smoothstep(0.0, 0.55, abs(sun));
     vec3 tint = mix(uColor, uWarm, grazing * 0.75);
 
@@ -370,29 +156,44 @@ const ATMOSPHERE_FRAGMENT = /* glsl */ `
   }
 `;
 
-// ── scene ────────────────────────────────────────────────────────────────
-
 /**
- * Where the star sits, and the one place it is written down: the light and
- * the atmosphere shader have to agree or the halo lights the wrong limb.
+ * Confines the city lights to the night side.
  *
- * The camera never moves and carries no rotation, so this direction is the
- * same in view space as it is in world space and the shader can take it as a
- * constant. Move the camera and it would have to be recomputed per frame.
+ * An emissive map is unconditional: left alone, every city burns through the
+ * daylight image as well, which reads as a decal rather than a planet. The
+ * standard material has no property for this, so the emissive term is scaled
+ * by how far the fragment has turned away from the star. `normal` is in view
+ * space and is already computed by the time the emissive chunk runs.
  */
-const SUN = new Vector3(-6.6, 2.2, 1.1).normalize();
+function confineLightsToNightSide(material: MeshStandardMaterial) {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uSun = { value: SUN };
 
-/** One rotation of the planet, in seconds. Slow enough to notice only if you wait. */
-const DAY_LENGTH = 90;
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", "#include <common>\nuniform vec3 uSun;")
+      .replace(
+        "#include <emissivemap_fragment>",
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance *= smoothstep(-0.02, -0.34, dot(normalize(normal), normalize(uSun)));`,
+      );
+  };
+  material.needsUpdate = true;
+}
+
+// ── scene ────────────────────────────────────────────────────────────────
 
 function Planet({ spin }: { spin: boolean }) {
   const body = useRef<Group>(null);
   const clouds = useRef<Mesh>(null);
 
-  const textures = useMemo(() => {
-    const grid = sphereGrid(TEX_W, TEX_H);
-    return { ...buildSurface(grid), clouds: buildClouds(grid) };
-  }, []);
+  const [day, cloud, night] = useTexture([TEXTURES.day, TEXTURES.clouds, TEXTURES.night]);
+
+  const gloss = useMemo(() => {
+    // useTexture does not know which maps carry colour and which carry data
+    day.colorSpace = SRGBColorSpace;
+    night.colorSpace = SRGBColorSpace;
+    return waterMask(day);
+  }, [day, night]);
 
   useFrame((_, delta) => {
     if (!spin) return;
@@ -408,19 +209,15 @@ function Planet({ spin }: { spin: boolean }) {
       <group ref={body}>
         <mesh>
           <sphereGeometry args={[2, 96, 96]} />
-          {/* No bumpMap. It is tempting on a planet, but three derives the
-              normal from screen-space derivatives of the height texture, and
-              at roughly one texel per pixel those derivatives are noise: the
-              land broke into flat facets while the ocean, which had no relief
-              to sample, stayed smooth. The terminator carries the form. */}
           <meshStandardMaterial
-            map={textures.surface}
-            roughnessMap={textures.gloss}
-            emissiveMap={textures.lights}
-            emissive="#ffb066"
-            emissiveIntensity={1.5}
+            map={day}
+            roughnessMap={gloss}
+            emissiveMap={night}
+            emissive="#ffc98a"
+            emissiveIntensity={1.6}
             roughness={1}
             metalness={0}
+            onUpdate={confineLightsToNightSide}
           />
         </mesh>
       </group>
@@ -428,10 +225,10 @@ function Planet({ spin }: { spin: boolean }) {
       <mesh ref={clouds}>
         <sphereGeometry args={[2.035, 64, 64]} />
         <meshStandardMaterial
-          alphaMap={textures.clouds}
-          color="#dff4ff"
+          alphaMap={cloud}
+          color="#eef6ff"
           transparent
-          opacity={0.26}
+          opacity={0.62}
           depthWrite={false}
           roughness={1}
         />
@@ -471,25 +268,18 @@ export default function SpaceScene({ spin = true }: { spin?: boolean }) {
       camera={{ position: [0, 0, 6.4], fov: 42 }}
       gl={{ antialias: true, alpha: true }}
       className="touch-none"
-      /*
-        The surface map is 1024 across for the whole globe, so a hemisphere
-        gets about 512 texels. Rendered at 2x on a retina screen the sphere is
-        some 1,400 device pixels wide and each texel covers nearly three of
-        them: the map runs out of detail and its own grid becomes the texture.
-        Holding the ceiling near one texel per pixel keeps the surface reading
-        as ground, and costs a phone less than half the pixels to draw.
-      */
-      maxDpr={1.35}
     >
       {/* The star sits well round to the side rather than over the camera's
           shoulder. Behind the viewer it lights the whole visible face evenly,
           which is the flat bullseye the gradient had; from here the shadow
           line falls across the disc and the sphere reads as one. */}
-      <directionalLight position={SUN.toArray()} intensity={3.4} color="#eaf6ff" />
+      <directionalLight position={SUN.toArray()} intensity={3.2} color="#fff4e6" />
       {/* barely there, so the night side keeps its shape without going grey */}
       <ambientLight intensity={0.05} color="#2b6f88" />
 
-      <Planet spin={spin} />
+      <Suspense fallback={null}>
+        <Planet spin={spin} />
+      </Suspense>
     </SceneCanvas>
   );
 }
