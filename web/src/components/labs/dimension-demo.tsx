@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { projects } from "@/lib/projects";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
@@ -20,12 +20,14 @@ const DimensionScene = dynamic(() => import("./dimension-scene"), {
  * iridescent lighting, drag to orbit. Content floats above the canvas.
  */
 export function DimensionDemo() {
+  const reduced = useReducedMotion();
+
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#05060f] text-slate-100 selection:bg-fuchsia-400/30">
       {/* ── hero: full-viewport canvas ── */}
       <section className="relative h-dvh">
         <div className="absolute inset-0">
-          <DimensionScene />
+          <DimensionScene spin={!reduced} />
         </div>
 
         {/* vignette so text stays readable over chrome */}

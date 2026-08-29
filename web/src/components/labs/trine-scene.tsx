@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import type { Group } from "three";
+
+import { SceneCanvas } from "./scene-canvas";
 
 export interface Finish {
   id: string;
@@ -83,9 +85,8 @@ export default function TrineScene({
   spin?: boolean;
 }) {
   return (
-    <Canvas
+    <SceneCanvas
       camera={{ position: [0, 0, 8.4], fov: 30 }}
-      dpr={[1, 2]}
       gl={{ antialias: true, alpha: true }}
       className="touch-none"
     >
@@ -127,6 +128,6 @@ export default function TrineScene({
         dampingFactor={0.09}
         rotateSpeed={0.7}
       />
-    </Canvas>
+    </SceneCanvas>
   );
 }
