@@ -375,7 +375,25 @@ section[id] { scroll-margin-top: 76px; }
   overflow: hidden;
 }
 
-/* Pointer-tracked wash. Ambient only; nothing depends on seeing it. */
+/* Registering the two lets them be transitioned. Declared as plain custom
+   properties they are just strings, so the browser snaps between values and
+   the wash jumps from one pointer sample to the next. */
+@property --px {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --py {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 34%;
+}
+
+/* Pointer-tracked wash. Ambient only; nothing depends on seeing it.
+   The script measures the pointer against this element's own box, not the
+   hero's: the two are deliberately different sizes, so a percentage taken
+   from one and painted into the other lands the highlight away from the
+   cursor, further off the closer you get to an edge. */
 .hero-wash {
   position: absolute;
   inset: -20% -10% auto;
@@ -383,11 +401,18 @@ section[id] { scroll-margin-top: 76px; }
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(46rem 34rem at var(--px, 50%) var(--py, 34%),
+    radial-gradient(46rem 34rem at var(--px) var(--py),
       rgba(247, 164, 69, 0.10), transparent 62%),
     radial-gradient(60rem 40rem at 50% -8%,
       rgba(120, 140, 190, 0.09), transparent 70%);
-  transition: background-position 400ms linear;
+  /* The warm ellipse is 34rem tall and sits 34% down, so it is still carrying
+     colour when it reaches the bottom of a 90vh box: the element's own edge
+     cut it off as a hard line straight across the page. Fading the layer out
+     above that edge means the wash ends where it stops being visible rather
+     than where the box does. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
+  transition: --px 260ms linear, --py 260ms linear;
 }
 
 .hero-copy {
@@ -1755,8 +1780,12 @@ section[id] { scroll-margin-top: 76px; }
     var washQueued = false;
     var washX = 50, washY = 34;
 
+    // Measured against the wash, not the hero: the wash is the element the
+    // percentages are painted into, and it is both wider and taller than the
+    // hero (inset -20% -10%, height 90vh). Taking the fraction from the hero
+    // put the highlight increasingly off the pointer towards the edges.
     hero.addEventListener("pointermove", function (event) {
-      var box = hero.getBoundingClientRect();
+      var box = heroWash.getBoundingClientRect();
       washX = ((event.clientX - box.left) / box.width) * 100;
       washY = ((event.clientY - box.top) / box.height) * 100;
 

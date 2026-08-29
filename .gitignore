@@ -11,8 +11,12 @@ webpv/
 # disabled scaffold git dir (renamed aside from web/.git)
 web/.git_disabled_scaffold/
 
-# dev artifacts — screenshots from verify scripts
+# dev artifacts — screenshots from verify scripts.
+# Two paths on purpose: most scripts write to web/screenshots/ when run from
+# the repo root, but shoot-audit resolves its output against the cwd and
+# lands one level up.
 web/screenshots/
+screenshots/
 
 # local state written by `wrangler dev`
 .wrangler/

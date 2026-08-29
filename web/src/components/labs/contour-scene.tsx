@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import {
   CanvasTexture,
@@ -13,6 +13,8 @@ import {
   Vector2,
   type Mesh,
 } from "three";
+
+import { SceneCanvas } from "./scene-canvas";
 
 // ─────────────────────────────────────────────────────────────
 //  An unofficial concept. Every asset here is generated: the
@@ -849,9 +851,8 @@ export default function ContourScene({
   const weights = useRef<number[]>([1, 0, 0, 0]);
 
   return (
-    <Canvas
+    <SceneCanvas
       camera={{ position: [0, 0, CAMERA[0]], fov: FOV }}
-      dpr={[1, 2]}
       gl={{ antialias: true, alpha: true }}
       className="touch-none"
     >
@@ -910,6 +911,6 @@ export default function ContourScene({
           scale={[7, 3, 1]}
         />
       </Environment>
-    </Canvas>
+    </SceneCanvas>
   );
 }
