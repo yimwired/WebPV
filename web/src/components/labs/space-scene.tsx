@@ -9,6 +9,7 @@ import {
   Color,
   RepeatWrapping,
   SRGBColorSpace,
+  Vector3,
   type Group,
   type Mesh,
 } from "three";
@@ -39,8 +40,15 @@ const TEX_H = 512;
 /** Above this the surface is land rather than water. */
 const SEA_LEVEL = 0.5;
 
-/** Latitude, as a fraction from the equator, where ice starts to take hold. */
-const ICE_LATITUDE = 0.74;
+/**
+ * Latitude, as a fraction from the equator, where ice starts to take hold.
+ *
+ * The globe is tilted and framed low, so the visible face is mostly the
+ * northern half: a cap that starts too near the equator becomes the whole
+ * picture, and a white lid with no structure under it is exactly what makes
+ * a sphere look moulded rather than mapped.
+ */
+const ICE_LATITUDE = 0.86;
 
 // ── noise ────────────────────────────────────────────────────────────────
 //  Sampled in 3D against the point on the sphere rather than in UV space:
@@ -207,16 +215,17 @@ function textureFrom(data: ImageData, srgb: boolean): CanvasTexture {
 }
 
 /** Palette, sampled between by elevation. Cyan family, to sit in this lab. */
-const DEEP = new Color("#04222e");
-const SHALLOW = new Color("#0e6f86");
-const SHORE = new Color("#16846f");
-const LOWLAND = new Color("#14493f");
-const HIGHLAND = new Color("#3d6152");
-const ICE = new Color("#dbf3fb");
+const DEEP = new Color("#031a33");
+const SHALLOW = new Color("#0d7ea3");
+const SHORE = new Color("#1d7d63");
+const LOWLAND = new Color("#1a5138");
+const HIGHLAND = new Color("#4a5f42");
+const ICE = new Color("#cddfe9");
 
 function buildSurface(grid: Grid) {
   const surface = new ImageData(TEX_W, TEX_H);
   const lights = new ImageData(TEX_W, TEX_H);
+  const gloss = new ImageData(TEX_W, TEX_H);
 
   const colour = new Color();
   const ground = new Color();
@@ -234,7 +243,7 @@ function buildSurface(grid: Grid) {
 
     const latitude = Math.abs(y);
     // ragged, so the ice line is not a drawn circle
-    const iceEdge = ICE_LATITUDE + (detail - 0.5) * 0.12;
+    const iceEdge = ICE_LATITUDE + (detail - 0.5) * 0.2;
 
     // Every boundary here is a ramp rather than a branch. A hard `if` on sea
     // level makes neighbouring texels jump straight from water to land, and
@@ -254,8 +263,8 @@ function buildSurface(grid: Grid) {
       colour.lerp(ground, land);
     }
 
-    const ice = smoothstep(iceEdge - 0.05, iceEdge + 0.03, latitude);
-    if (ice > 0) colour.lerp(ICE, ice);
+    const ice = smoothstep(iceEdge - 0.14, iceEdge + 0.05, latitude);
+    if (ice > 0) colour.lerp(ICE, ice * 0.88);
 
     const p = i * 4;
     surface.data[p] = colour.r * 255;
@@ -266,6 +275,13 @@ function buildSurface(grid: Grid) {
     // Settlements: low ground, off the ice, and sparse. The threshold is
     // high on purpose, so the night side reads as scattered points of life
     // rather than an evenly lit grid.
+    // Water is smooth and throws a highlight back at the star; ground is not
+    // and does not. Shading the whole globe at one roughness is the single
+    // loudest tell that a sphere is a painted ball: real oceans glint.
+    const rough = 26 + land * 210 + ice * 40;
+    gloss.data[p] = gloss.data[p + 1] = gloss.data[p + 2] = Math.min(255, rough);
+    gloss.data[p + 3] = 255;
+
     const habitable = land * (1 - ice) * (1 - smoothstep(0.1, 0.2, elevation - SEA_LEVEL));
     const density = noise(x * 34 + 5, y * 34 + 5, z * 34 + 5);
     const lit = habitable * smoothstep(0.78, 0.9, density);
@@ -278,6 +294,7 @@ function buildSurface(grid: Grid) {
   return {
     surface: textureFrom(surface, true),
     lights: textureFrom(lights, true),
+    gloss: textureFrom(gloss, false),
   };
 }
 
@@ -293,7 +310,7 @@ function buildClouds(grid: Grid) {
     // threshold is high: thin cover lets the ground stay the subject, and a
     // planet under total overcast is just a white ball again.
     const density = fbm(x * 5.6 + 41, y * 11.5 + 41, z * 5.6 + 41, 4);
-    const cover = smoothstep(0.52, 0.68, density);
+    const cover = smoothstep(0.58, 0.75, density);
 
     const p = i * 4;
     clouds.data[p] = clouds.data[p + 1] = clouds.data[p + 2] = 255;
@@ -324,19 +341,46 @@ const ATMOSPHERE_VERTEX = /* glsl */ `
 
 const ATMOSPHERE_FRAGMENT = /* glsl */ `
   uniform vec3 uColor;
+  uniform vec3 uWarm;
+  uniform vec3 uSun;
   uniform float uIntensity;
   varying vec3 vNormal;
   varying vec3 vView;
 
   void main() {
-    float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
+    vec3 normal = normalize(vNormal);
+    float rim = 1.0 - abs(dot(normal, normalize(vView)));
     // pow tightens the band to the edge instead of hazing the whole disc
-    float glow = pow(rim, 3.2) * uIntensity;
-    gl_FragColor = vec4(uColor * glow, glow);
+    float edge = pow(rim, 3.2);
+
+    // Air only glows where the star reaches it. An even ring all the way
+    // round is the giveaway that the halo is a drawn outline rather than
+    // atmosphere, so the night limb has to fall away to nothing.
+    float sun = dot(normal, normalize(uSun));
+    float daylight = smoothstep(-0.45, 0.35, sun);
+
+    // Along the terminator the light is travelling through the most air, so
+    // it arrives warm. That thin copper band is what sunrise looks like from
+    // orbit, and the eye reads it as depth.
+    float grazing = 1.0 - smoothstep(0.0, 0.55, abs(sun));
+    vec3 tint = mix(uColor, uWarm, grazing * 0.75);
+
+    float glow = edge * daylight * uIntensity;
+    gl_FragColor = vec4(tint * glow, glow);
   }
 `;
 
 // ── scene ────────────────────────────────────────────────────────────────
+
+/**
+ * Where the star sits, and the one place it is written down: the light and
+ * the atmosphere shader have to agree or the halo lights the wrong limb.
+ *
+ * The camera never moves and carries no rotation, so this direction is the
+ * same in view space as it is in world space and the shader can take it as a
+ * constant. Move the camera and it would have to be recomputed per frame.
+ */
+const SUN = new Vector3(-6.6, 2.2, 1.1).normalize();
 
 /** One rotation of the planet, in seconds. Slow enough to notice only if you wait. */
 const DAY_LENGTH = 90;
@@ -371,10 +415,11 @@ function Planet({ spin }: { spin: boolean }) {
               to sample, stayed smooth. The terminator carries the form. */}
           <meshStandardMaterial
             map={textures.surface}
+            roughnessMap={textures.gloss}
             emissiveMap={textures.lights}
             emissive="#ffb066"
             emissiveIntensity={1.5}
-            roughness={0.86}
+            roughness={1}
             metalness={0}
           />
         </mesh>
@@ -386,7 +431,7 @@ function Planet({ spin }: { spin: boolean }) {
           alphaMap={textures.clouds}
           color="#dff4ff"
           transparent
-          opacity={0.34}
+          opacity={0.26}
           depthWrite={false}
           roughness={1}
         />
@@ -399,7 +444,9 @@ function Planet({ spin }: { spin: boolean }) {
           fragmentShader={ATMOSPHERE_FRAGMENT}
           uniforms={{
             uColor: { value: new Color("#5fd8f2") },
-            uIntensity: { value: 1.25 },
+            uWarm: { value: new Color("#ffb37a") },
+            uSun: { value: SUN.clone() },
+            uIntensity: { value: 1.55 },
           }}
           side={BackSide}
           blending={AdditiveBlending}
@@ -438,7 +485,7 @@ export default function SpaceScene({ spin = true }: { spin?: boolean }) {
           shoulder. Behind the viewer it lights the whole visible face evenly,
           which is the flat bullseye the gradient had; from here the shadow
           line falls across the disc and the sphere reads as one. */}
-      <directionalLight position={[-6.6, 2.2, 1.1]} intensity={3.4} color="#eaf6ff" />
+      <directionalLight position={SUN.toArray()} intensity={3.4} color="#eaf6ff" />
       {/* barely there, so the night side keeps its shape without going grey */}
       <ambientLight intensity={0.05} color="#2b6f88" />
 
