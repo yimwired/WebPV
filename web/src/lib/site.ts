@@ -10,3 +10,11 @@ export const SITE_URL = "https://webpv.yimwired.workers.dev";
 
 /** What the share card prints. Same host, without the scheme. */
 export const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
+
+/** Contact address. The footer, the schema and llms.txt all read this one. */
+export const CONTACT_EMAIL = "yimwired@gmail.com";
+
+/** Profiles that prove the same person owns this site elsewhere. */
+export const PROFILES = [
+  { label: "GitHub", href: "https://github.com/yimwired" },
+];

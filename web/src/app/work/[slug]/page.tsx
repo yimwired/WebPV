@@ -7,6 +7,7 @@ import {
   isCaseStudySlug,
 } from "@/lib/dictionary";
 import { projects } from "@/lib/projects";
+import { caseStudyGraph, jsonLdHtml } from "@/lib/structured-data";
 
 /** every case study is known at build time; anything else is a 404 */
 export const dynamicParams = false;
@@ -41,5 +42,15 @@ export default async function CaseStudyPage({
   const { slug } = await params;
   if (!isCaseStudySlug(slug)) notFound();
 
-  return <CaseStudy slug={slug} />;
+  return (
+    <>
+      {/* Names the built thing, its author and its keywords outright, so a
+          crawler citing this page has the facts without parsing the layout. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(caseStudyGraph(slug)) }}
+      />
+      <CaseStudy slug={slug} />
+    </>
+  );
 }

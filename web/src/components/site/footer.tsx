@@ -5,13 +5,11 @@ import { ArrowUpRight, Check, Copy, Mail } from "lucide-react";
 import { Reveal } from "./reveal";
 import { ContactForm } from "./contact-form";
 import { useLocale } from "@/lib/i18n";
+import { CONTACT_EMAIL, PROFILES } from "@/lib/site";
 
-const EMAIL = "yimwired@gmail.com";
-
-const socials = [
-  // add YouTube / X here when the channels are ready
-  { label: "GitHub", href: "https://github.com/yimwired" },
-];
+// add YouTube / X to PROFILES in lib/site.ts when the channels are ready
+const EMAIL = CONTACT_EMAIL;
+const socials = PROFILES;
 
 export function Footer() {
   const { t } = useLocale();
