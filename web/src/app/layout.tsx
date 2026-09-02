@@ -4,6 +4,7 @@ import { LocaleProvider } from "@/lib/i18n";
 import { MotionProvider } from "@/components/site/motion-provider";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
+import { jsonLdHtml, siteGraph } from "@/lib/structured-data";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -54,6 +55,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full bg-background text-foreground">
+        {/* Who built this and what it is, stated to crawlers in a form
+            they parse rather than infer. Rendered at build time. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(siteGraph) }}
+        />
         <LocaleProvider>
           <MotionProvider>{children}</MotionProvider>
         </LocaleProvider>
