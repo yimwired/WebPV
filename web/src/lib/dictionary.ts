@@ -126,24 +126,45 @@ const en = {
       },
     ],
     processTitle: "How it works",
-    process: [
-      {
-        h: "Tell me what you need",
-        p: "A message with the rough idea is enough. No brief, no forms to fill in.",
-      },
-      {
-        h: "Scope and quote",
-        p: "I come back with what I would build, how long it takes and a fixed price. That part costs nothing.",
-      },
-      {
-        h: "Build in the open",
-        p: "You see working versions as they land instead of waiting for one big reveal at the end.",
-      },
-      {
-        h: "Ship and hand over",
-        p: "It goes live, the code is yours, and revisions are included as agreed.",
-      },
-    ],
+    processSub:
+      "From the first message to the day it goes live, including everything that happens after you say yes.",
+    // Split in two so the timeline can mark the moment money changes hands.
+    // The steps after it are the ones a client normally has to take on faith.
+    process: {
+      before: [
+        {
+          h: "Tell me what you need",
+          p: "A message with the rough idea is enough. No brief, no forms to fill in.",
+        },
+        {
+          h: "Scope and quote",
+          p: "I come back with what I would build, how long it takes and a fixed price. That part costs nothing.",
+        },
+      ],
+      deal: "You say yes",
+      after: [
+        {
+          h: "Everything in writing",
+          p: "Scope, deliverables, timeline and payment terms in one document, agreed before any work starts.",
+        },
+        {
+          h: "Deposit, then work starts",
+          p: "Half up front, half on the day it goes live. Bank transfer or PromptPay, at the number you already agreed to.",
+        },
+        {
+          h: "A short kickoff call",
+          p: "Thirty minutes to line up goals, direction and whatever I need from you. Cheaper than a week spent building the wrong thing.",
+        },
+        {
+          h: "One link for progress",
+          p: "Where the build is now and what lands next. You see working versions as they arrive instead of waiting for one big reveal at the end.",
+        },
+        {
+          h: "Ship and hand over",
+          p: "It goes live, the code is yours, and revisions are included as agreed.",
+        },
+      ],
+    },
     ctaTitle: "Have something in mind?",
     ctaSub: "Tell me roughly what you need and I'll send back scope, timeline and a price.",
     ctaButton: "Ask for a quote",
@@ -543,24 +564,43 @@ const th: typeof en = {
       },
     ],
     processTitle: "ทำงานกันยังไง",
-    process: [
-      {
-        h: "เล่าให้ฟังก่อน",
-        p: "ส่งไอเดียคร่าวๆ มาก็พอ ไม่ต้องมีเอกสารหรือแบบฟอร์มอะไร",
-      },
-      {
-        h: "สรุปงานและเสนอราคา",
-        p: "ผมตอบกลับว่าจะทำอะไรให้บ้าง ใช้เวลาเท่าไหร่ ราคาเท่าไหร่ ขั้นนี้ไม่มีค่าใช้จ่าย",
-      },
-      {
-        h: "ทำให้เห็นระหว่างทาง",
-        p: "ได้เห็นของที่ใช้ได้จริงเป็นระยะ ไม่ต้องรอลุ้นทีเดียวตอนจบ",
-      },
-      {
-        h: "ส่งมอบและขึ้นจริง",
-        p: "ขึ้นออนไลน์ให้เรียบร้อย โค้ดเป็นของคุณ แล้วแก้ให้ตามรอบที่ตกลงกันไว้",
-      },
-    ],
+    processSub:
+      "ตั้งแต่ทักมาครั้งแรก จนถึงวันที่เว็บขึ้นจริง รวมทุกขั้นหลังตกลงจ้างกันแล้วด้วย",
+    process: {
+      before: [
+        {
+          h: "เล่าให้ฟังก่อน",
+          p: "ส่งไอเดียคร่าวๆ มาก็พอ ไม่ต้องมีเอกสารหรือแบบฟอร์มอะไร",
+        },
+        {
+          h: "สรุปงานและเสนอราคา",
+          p: "ผมตอบกลับว่าจะทำอะไรให้บ้าง ใช้เวลาเท่าไหร่ ราคาเท่าไหร่ ขั้นนี้ไม่มีค่าใช้จ่าย",
+        },
+      ],
+      deal: "ตกลงจ้าง",
+      after: [
+        {
+          h: "เขียนทุกอย่างเป็นลายลักษณ์อักษร",
+          p: "ขอบเขตงาน สิ่งที่ส่งมอบ กำหนดเวลา และเงื่อนไขการจ่ายเงิน อยู่ในเอกสารเดียว ตกลงกันให้จบก่อนเริ่มลงมือ",
+        },
+        {
+          h: "วางมัดจำแล้วเริ่มได้เลย",
+          p: "จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง โอนธนาคารหรือพร้อมเพย์ ยอดตรงกับที่ตกลงกันไว้",
+        },
+        {
+          h: "คุย kickoff สั้นๆ",
+          p: "ครึ่งชั่วโมงเคลียร์ให้ตรงกัน ทั้งเป้าหมาย ทิศทางงาน และของที่ผมต้องขอจากคุณ คุ้มกว่าทำผิดทางไปทั้งอาทิตย์",
+        },
+        {
+          h: "ลิงก์เดียวเห็นความคืบหน้า",
+          p: "ดูได้ว่าตอนนี้ทำถึงไหน อะไรกำลังจะตามมา ได้เห็นของที่ใช้ได้จริงเป็นระยะ ไม่ต้องรอลุ้นทีเดียวตอนจบ",
+        },
+        {
+          h: "ส่งมอบและขึ้นจริง",
+          p: "ขึ้นออนไลน์ให้เรียบร้อย โค้ดเป็นของคุณ แล้วแก้ให้ตามรอบที่ตกลงกันไว้",
+        },
+      ],
+    },
     ctaTitle: "มีงานในใจแล้วใช่ไหม",
     ctaSub: "เล่าคร่าวๆ มาได้เลย เดี๋ยวสรุปขอบเขตงาน เวลา และราคากลับไปให้",
     ctaButton: "ขอใบเสนอราคา",
