@@ -50,25 +50,39 @@ export function Services() {
       </div>
 
       <Reveal className="mt-20">
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          {s.processTitle}
-        </h2>
-        <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {s.process.map((step, i) => (
-            <li
-              key={step.h}
-              className="border-line rounded-lg border p-6"
-            >
-              <span className="text-brand font-mono text-sm">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-2 font-semibold tracking-tight">{step.h}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {step.p}
-              </p>
-            </li>
-          ))}
-        </ol>
+        <div className="grid gap-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-16">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              {s.processTitle}
+            </h2>
+            <p className="text-muted-foreground mt-4 leading-relaxed">
+              {s.processSub}
+            </p>
+          </div>
+
+          {/* A rail, not a second card grid: the offerings above are already
+              a grid, and here the order is the message. The one amber mark
+              is the moment the client commits, which is the only state
+              change on the timeline. */}
+          {/* Indented on phones so the numbers, which straddle the hairline,
+              line up with the page gutter instead of crowding the edge. */}
+          <div className="border-line ml-4 max-w-2xl border-l lg:ml-0">
+            <ProcessSteps steps={s.process.before} start={1} />
+
+            <div className="relative py-9 pl-8">
+              <span
+                aria-hidden
+                className="bg-brand absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              />
+              <span className="spec text-brand">{s.process.deal}</span>
+            </div>
+
+            <ProcessSteps
+              steps={s.process.after}
+              start={s.process.before.length + 1}
+            />
+          </div>
+        </div>
       </Reveal>
 
       <Reveal className="border-line mt-20 border-t pt-12">
@@ -94,5 +108,38 @@ export function Services() {
         </div>
       </Reveal>
     </section>
+  );
+}
+
+/**
+ * One run of numbered steps on the process rail. Split into two runs so the
+ * deal marker can sit between them while the numbering stays continuous.
+ */
+function ProcessSteps({
+  steps,
+  start,
+}: {
+  steps: readonly { h: string; p: string }[];
+  start: number;
+}) {
+  return (
+    <ol start={start} className="space-y-9">
+      {steps.map((step, i) => (
+        <li key={step.h} className="relative pl-8">
+          {/* Sits on the hairline and paints over it, so the rail reads as
+              one line passing behind each number. */}
+          <span
+            aria-hidden
+            className="text-muted-foreground bg-background absolute left-0 top-0 w-8 -translate-x-1/2 text-center font-mono text-xs leading-6"
+          >
+            {String(start + i).padStart(2, "0")}
+          </span>
+          <h3 className="font-semibold leading-6 tracking-tight">{step.h}</h3>
+          <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+            {step.p}
+          </p>
+        </li>
+      ))}
+    </ol>
   );
 }
