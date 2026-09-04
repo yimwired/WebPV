@@ -1,8 +1,8 @@
 "use client";
 
 import { Reveal } from "./reveal";
+import { withCounts } from "@/lib/counts";
 import { useLocale } from "@/lib/i18n";
-import { projects } from "@/lib/projects";
 import { skills } from "@/lib/skills";
 
 export function About() {
@@ -43,7 +43,7 @@ export function About() {
                 <dt className="text-muted-foreground text-sm">{s.label}</dt>
                 <dd className="text-xl font-semibold tracking-tight tabular-nums">
                   {/* keeps the project count honest as projects.ts grows */}
-                  {s.value.replace("{projects}", String(projects.length))}
+                  {withCounts(s.value)}
                 </dd>
               </div>
             ))}

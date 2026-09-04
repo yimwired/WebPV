@@ -2,8 +2,8 @@
 
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import { withCounts } from "@/lib/counts";
 import { useLocale } from "@/lib/i18n";
-import { projects } from "@/lib/projects";
 import { thaiWrap } from "@/lib/thai-text";
 
 const container: Variants = {
@@ -24,9 +24,7 @@ export function Hero() {
   const { locale, t } = useLocale();
 
   // the headline count stays honest as projects.ts grows
-  const facts = t.hero.facts.map((f) =>
-    f.value.replace("{projects}", String(projects.length)),
-  );
+  const facts = t.hero.facts.map((f) => withCounts(f.value));
 
   return (
     <section
@@ -49,7 +47,7 @@ export function Hero() {
           variants={item}
           className="text-muted-foreground mt-6 max-w-xl text-base leading-relaxed text-pretty sm:text-lg"
         >
-          {t.hero.sub}
+          {withCounts(t.hero.sub)}
         </motion.p>
 
         <motion.div variants={item} className="mt-9 flex flex-wrap gap-3">
