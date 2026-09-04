@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
+import { withCounts } from "@/lib/counts";
 import { useLocale } from "@/lib/i18n";
 import {
   carePlans,
@@ -118,7 +119,9 @@ export function Pricing() {
             {p.ctaSecondary}
           </Link>
         </div>
-        <p className="text-muted-foreground mt-5 text-sm">{p.proof}</p>
+        <p className="text-muted-foreground mt-5 text-sm">
+          {withCounts(p.proof)}
+        </p>
       </Reveal>
     </section>
   );

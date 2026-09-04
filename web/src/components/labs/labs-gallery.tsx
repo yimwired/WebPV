@@ -26,7 +26,7 @@ export function LabsGallery() {
           </Link>
 
           <h1 className="mt-10 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-            Ten directions your site could take
+            {labs.length} directions your site could take
           </h1>
           <p className="mt-5 max-w-2xl leading-relaxed text-muted-foreground">
             Every one is a working page built from scratch, not a theme with the

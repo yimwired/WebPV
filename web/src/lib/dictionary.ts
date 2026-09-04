@@ -23,11 +23,11 @@ const en = {
     name: "Nuttapon Yimnoi (Film)",
     location: "Bangkok",
     headline: "I build trading systems, AI agents and the tools around them.",
-    sub: "Five systems running in production right now, all designed and built solo, from the first sketch to the thing that runs while I sleep.",
+    sub: "{projects} projects shipped and in use, all designed and built solo, from the first sketch to the thing that runs while I sleep.",
     viewWork: "See the work",
     contact: "Get in touch",
     facts: [
-      { value: "{projects}", label: "Systems in production" },
+      { value: "{projects}", label: "Projects shipped" },
       { value: "12", label: "Strategy engines in AURUM" },
       { value: "11", label: "AI agents in the fleet" },
       { value: "4", label: "Platforms published to" },
@@ -45,7 +45,7 @@ const en = {
     p1: "I'm Film. I build trading bots, AI assistants, dashboards and content pipelines, and I own each project from the first sketch to the thing running in production.",
     p2: "My default is to ship: small, real, improving over time. Whether it's an automated strategy or a short-form video system, the goal is the same. Make it work, then make it better.",
     stats: [
-      { value: "{projects}", label: "Systems in production" },
+      { value: "{projects}", label: "Projects shipped" },
       { value: "Solo", label: "Design, build and run" },
       { value: "EN · TH", label: "Languages I work in" },
     ],
@@ -327,7 +327,7 @@ const en = {
     ctaSub: "Send the rough idea. I'll tell you which package it lands in, or that it doesn't need one.",
     ctaButton: "Ask for a quote",
     ctaSecondary: "See the styles",
-    proof: "Five systems running in production, nine styles you can click through.",
+    proof: "{projects} projects you can read the build of, {labs} styles you can click through.",
   },
   // Chrome shared by every case-study page.
   caseStudy: {
@@ -570,11 +570,11 @@ const th: typeof en = {
     // The zero-width spaces are deliberate: they mark where a line may break
     // inside a Thai run, for engines with no Thai dictionary loaded.
     headline: "ผมสร้าง​ระบบเทรด เอเจนต์ AI และ​เครื่องมือ​รอบๆ มัน",
-    sub: "ตอนนี้มีห้าระบบรันอยู่จริง ทำเองคนเดียวทุกตัว ตั้งแต่สเก็ตช์แรกจนถึงวันที่มันทำงานเองตอนผมหลับ",
+    sub: "ผลงาน {projects} ชิ้นที่ส่งแล้วและมีคนใช้จริง ทำเองคนเดียวทุกตัว ตั้งแต่สเก็ตช์แรกจนถึงวันที่มันทำงานเองตอนผมหลับ",
     viewWork: "ดูผลงาน",
     contact: "ทักมาคุยกัน",
     facts: [
-      { value: "{projects}", label: "ระบบที่รันอยู่จริง" },
+      { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
       { value: "12", label: "strategy engine ใน AURUM" },
       { value: "11", label: "AI agent ในกองยาน" },
       { value: "4", label: "แพลตฟอร์มที่โพสต์ขึ้น" },
@@ -592,7 +592,7 @@ const th: typeof en = {
     p1: "ผมชื่อฟิล์ม สร้างบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดทำโปรเจกต์แบบจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
     p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นบอทเทรดหรือระบบทำวิดีโอสั้นก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
     stats: [
-      { value: "{projects}", label: "ระบบที่รันอยู่จริง" },
+      { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
       { value: "ทำเอง", label: "ออกแบบ สร้าง และดูแลต่อ" },
       { value: "ไทย · อังกฤษ", label: "ภาษาที่ทำงานได้" },
     ],
@@ -870,7 +870,7 @@ const th: typeof en = {
     ctaSub: "เล่าไอเดียคร่าวๆ มา เดี๋ยวบอกให้ว่าเข้าแพ็กเกจไหน หรือจริงๆ แล้วไม่ต้องใช้แพ็กเกจเลย",
     ctaButton: "ขอใบเสนอราคา",
     ctaSecondary: "ดูสไตล์ทั้งหมด",
-    proof: "5 ระบบที่รันอยู่จริงตอนนี้ กับ 9 สไตล์ที่กดเล่นได้เลย",
+    proof: "ผลงาน {projects} ชิ้นที่อ่านเบื้องหลังได้ กับ {labs} สไตล์ที่กดเล่นได้เลย",
   },
   caseStudy: {
     back: "กลับหน้าแรก",
