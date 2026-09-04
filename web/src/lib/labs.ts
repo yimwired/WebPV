@@ -67,6 +67,28 @@ export const labs: Lab[] = [
     buildTime: "About a week",
   },
   {
+    slug: "counter",
+    name: "Counter",
+    vibe: "Restaurant menu, one link",
+    description:
+      "The page a shop actually needs. Today's menu with prices, an open-or-closed badge that reads the visitor's own clock, and a phone number that never scrolls away. Warm paper, one hot accent, no hero video.",
+    accent: "#c1440e",
+    preview: { from: "#fbf7f0", to: "#e8ddc9" },
+    bestFor: "Restaurants, cafes, bakeries, anywhere with a menu and a phone",
+    buildTime: "Three days once the menu exists",
+  },
+  {
+    slug: "stall",
+    name: "Stall",
+    vibe: "Marketplace, sign in and list",
+    description:
+      "Accounts, listings, search and filters: the plain marketplace people keep asking for. Buyers message the seller directly and the site never holds the money, which is the version worth building.",
+    accent: "#facc15",
+    preview: { from: "#171a20", to: "#0e1013" },
+    bestFor: "Classifieds, second-hand goods, in-game accounts and items",
+    buildTime: "Two to three weeks, the accounts are the work",
+  },
+  {
     slug: "dimension",
     name: "Dimension",
     vibe: "Real-time 3D",
