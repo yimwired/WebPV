@@ -194,8 +194,9 @@ export function StallDemo() {
             className="mt-5 max-w-xl leading-relaxed"
             style={{ color: MUTED }}
           >
-            สมัครแล้วลงประกาศได้เลย ค้นหาตามเกม ดูประวัติคนขาย
-            แล้วทักไปคุยเอง เว็บไม่ถือเงินให้ใครทั้งนั้น
+            เข้าด้วย Google หรือ Facebook หรือรับรหัส OTP ทางเบอร์ก็ได้
+            แล้วลงประกาศได้เลย ค้นหาตามเกม ดูประวัติคนขาย ทักไปคุยกันเอง
+            เว็บไม่ถือเงินให้ใครทั้งนั้น
           </motion.p>
 
           <motion.div
@@ -341,8 +342,8 @@ export function StallDemo() {
                 อยากได้เว็บแบบนี้เป็นของตัวเอง
               </h2>
               <p className="mt-3 max-w-md leading-relaxed" style={{ color: MUTED }}>
-                สมาชิก ลงประกาศ ค้นหา ระบบหลังบ้านจริง ใช้ได้กับตลาดอะไรก็ได้
-                ไม่ใช่แค่ของในเกม
+                ระบบสมาชิกเข้าได้ทั้ง Google, Facebook, อีเมล และเบอร์แบบรับ OTP
+                ลงประกาศ ค้นหา ฟิลเตอร์ ใช้ได้กับตลาดอะไรก็ได้ ไม่ใช่แค่ของในเกม
               </p>
             </div>
             <div className="flex gap-3">
@@ -384,11 +385,22 @@ export function StallDemo() {
   );
 }
 
+
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 30;
+
+/** Thai mobile number, in the shape people actually type it. */
+const isPhone = (value: string) => /^0\d{9}$/.test(value.replace(/[\s-]/g, ""));
+const isEmail = (value: string) => /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(value);
+
 /**
- * Sign in and register, as a demo. Nothing is sent anywhere and nothing is
- * stored: the form hands a display name back to the page and forgets the rest
- * on unmount. The notice under the button is not decoration - a login box that
- * looks real will otherwise collect a real password from a curious visitor.
+ * Sign in, as a demo: a social provider, or an email or phone number that gets
+ * a one time code. Nothing is sent and nothing is stored. The dialog hands a
+ * display name back to the page and forgets everything else on unmount.
+ *
+ * The notice under the form is not decoration. A login box that looks this real
+ * will otherwise collect a real password, or a real phone number, from someone
+ * who only came to look at the design.
  */
 function AuthDialog({
   onClose,
@@ -397,12 +409,14 @@ function AuthDialog({
   onClose: () => void;
   onSignIn: (name: string) => void;
 }) {
-  const [mode, setMode] = useState<"in" | "up">("in");
-  const [email, setEmail] = useState("");
-  const emailRef = useRef<HTMLInputElement>(null);
+  const [step, setStep] = useState<"method" | "code">("method");
+  const [handle, setHandle] = useState("");
+  const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+
+  const digitRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    emailRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
@@ -410,10 +424,60 @@ function AuthDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const submit = (event: React.FormEvent) => {
+  // the resend timer only runs while the code step is on screen
+  useEffect(() => {
+    if (step !== "code") return;
+    const id = window.setInterval(() => {
+      setSecondsLeft((left) => (left > 0 ? left - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [step]);
+
+  const handleIsValid = isPhone(handle) || isEmail(handle);
+  const sentTo = isPhone(handle) ? "เบอร์" : "อีเมล";
+
+  const finish = (name: string) => onSignIn(name);
+
+  const sendCode = (event: React.FormEvent) => {
     event.preventDefault();
-    const handle = email.split("@")[0];
-    onSignIn(handle.length > 1 ? handle : "สมาชิกใหม่");
+    if (!handleIsValid) return;
+    setStep("code");
+    setSecondsLeft(RESEND_SECONDS);
+    window.setTimeout(() => digitRefs.current[0]?.focus(), 60);
+  };
+
+  const finishWithHandle = () =>
+    finish(isPhone(handle) ? handle : handle.split("@")[0]);
+
+  const setDigit = (index: number, value: string) => {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    const next = [...digits];
+    next[index] = digit;
+    setDigits(next);
+
+    if (digit && index < OTP_LENGTH - 1) digitRefs.current[index + 1]?.focus();
+    if (next.every(Boolean)) finishWithHandle();
+  };
+
+  const onDigitKey = (index: number, event: React.KeyboardEvent) => {
+    if (event.key !== "Backspace" || digits[index]) return;
+    digitRefs.current[index - 1]?.focus();
+  };
+
+  // one paste fills the whole row, because that is how the code arrives:
+  // copied straight out of the message
+  const onPaste = (event: React.ClipboardEvent) => {
+    const pasted = event.clipboardData.getData("text").replace(/\D/g, "");
+    if (!pasted) return;
+    event.preventDefault();
+
+    const next = Array.from(
+      { length: OTP_LENGTH },
+      (_, i) => pasted[i] ?? "",
+    );
+    setDigits(next);
+    digitRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
+    if (next.every(Boolean)) finishWithHandle();
   };
 
   return (
@@ -439,8 +503,11 @@ function AuthDialog({
         style={{ borderColor: LINE, background: PANEL }}
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 id="stall-auth-title" className="text-lg font-semibold tracking-tight">
-            {mode === "in" ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
+          <h2
+            id="stall-auth-title"
+            className="text-lg font-semibold tracking-tight"
+          >
+            {step === "method" ? "เข้าสู่ระบบหรือสมัคร" : "ใส่รหัสยืนยัน"}
           </h2>
           <button
             onClick={onClose}
@@ -452,80 +519,154 @@ function AuthDialog({
           </button>
         </div>
 
-        <div
-          className="mt-5 grid grid-cols-2 gap-1 rounded-md border p-1"
-          style={{ borderColor: LINE }}
+        {step === "method" ? (
+          <>
+            <div className="mt-5 space-y-2.5">
+              <ProviderButton
+                name="Google"
+                mark="G"
+                markBackground="#ffffff"
+                markColor="#1f1f1f"
+                onClick={() => finish("บัญชี Google")}
+              />
+              <ProviderButton
+                name="Facebook"
+                mark="f"
+                markBackground="#1877f2"
+                markColor="#ffffff"
+                onClick={() => finish("บัญชี Facebook")}
+              />
+            </div>
+
+            <div className="my-5 flex items-center gap-3">
+              <span className="h-px flex-1" style={{ background: LINE }} />
+              <span className="text-xs" style={{ color: FAINT }}>
+                หรือ
+              </span>
+              <span className="h-px flex-1" style={{ background: LINE }} />
+            </div>
+
+            <form onSubmit={sendCode} className="space-y-3">
+              <label className="block">
+                <span className="text-sm" style={{ color: MUTED }}>
+                  อีเมลหรือเบอร์มือถือ
+                </span>
+                <input
+                  autoFocus
+                  value={handle}
+                  onChange={(event) => setHandle(event.target.value)}
+                  autoComplete="off"
+                  placeholder="you@example.com หรือ 0812345678"
+                  aria-describedby="stall-auth-note"
+                  className="mt-1.5 w-full rounded-md border px-3 py-2.5 text-sm outline-none placeholder:text-[#7d8593] focus:border-[#3a424f]"
+                  style={{ borderColor: LINE, background: BG }}
+                />
+              </label>
+
+              <button
+                type="submit"
+                disabled={!handleIsValid}
+                className="w-full rounded-md py-2.5 text-sm font-medium transition-opacity enabled:hover:opacity-90 disabled:opacity-40"
+                style={{ background: ACCENT, color: "#1a1400" }}
+              >
+                ส่งรหัสยืนยัน
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="mt-5">
+            <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
+              ส่งรหัส {OTP_LENGTH} หลักไปที่{sentTo} {handle} แล้ว
+            </p>
+
+            <div className="mt-4 flex justify-between gap-2">
+              {digits.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(node) => {
+                    digitRefs.current[index] = node;
+                  }}
+                  value={digit}
+                  onChange={(event) => setDigit(index, event.target.value)}
+                  onKeyDown={(event) => onDigitKey(index, event)}
+                  onPaste={onPaste}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={1}
+                  aria-label={"หลักที่ " + (index + 1)}
+                  className="h-12 w-full rounded-md border text-center text-lg tabular-nums outline-none focus:border-[#3a424f]"
+                  style={{ borderColor: LINE, background: BG }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm">
+              <button
+                onClick={() => setStep("method")}
+                className="transition-colors hover:text-white"
+                style={{ color: MUTED }}
+              >
+                แก้ไข{sentTo}
+              </button>
+              <button
+                onClick={() => setSecondsLeft(RESEND_SECONDS)}
+                disabled={secondsLeft > 0}
+                className="transition-colors enabled:hover:opacity-80"
+                style={{ color: secondsLeft > 0 ? FAINT : ACCENT }}
+              >
+                {secondsLeft > 0
+                  ? "ส่งรหัสใหม่ใน " + secondsLeft + " วินาที"
+                  : "ส่งรหัสใหม่"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <p
+          id="stall-auth-note"
+          className="mt-5 text-xs leading-relaxed"
+          style={{ color: FAINT }}
         >
-          {(["in", "up"] as const).map((value) => (
-            <button
-              key={value}
-              onClick={() => setMode(value)}
-              aria-pressed={mode === value}
-              className="rounded py-2 text-sm font-medium transition-colors"
-              style={{
-                background: mode === value ? ACCENT : "transparent",
-                color: mode === value ? "#1a1400" : MUTED,
-              }}
-            >
-              {value === "in" ? "เข้าสู่ระบบ" : "สมัครใหม่"}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={submit} className="mt-5 space-y-3">
-          <label className="block">
-            <span className="text-sm" style={{ color: MUTED }}>
-              อีเมล
-            </span>
-            <input
-              ref={emailRef}
-              type="email"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="off"
-              placeholder="you@example.com"
-              className="mt-1.5 w-full rounded-md border px-3 py-2.5 text-sm outline-none placeholder:text-[#7d8593] focus:border-[#3a424f]"
-              style={{ borderColor: LINE, background: BG }}
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm" style={{ color: MUTED }}>
-              รหัสผ่าน
-            </span>
-            <input
-              type="password"
-              required
-              minLength={6}
-              autoComplete="off"
-              placeholder="อย่างน้อย 6 ตัวอักษร"
-              className="mt-1.5 w-full rounded-md border px-3 py-2.5 text-sm outline-none placeholder:text-[#7d8593] focus:border-[#3a424f]"
-              style={{ borderColor: LINE, background: BG }}
-            />
-          </label>
-
-          {mode === "up" && (
-            <label className="flex items-start gap-2.5 pt-1 text-sm" style={{ color: MUTED }}>
-              <input type="checkbox" required className="mt-1" />
-              <span>ยอมรับกติกาการซื้อขายและนโยบายข้อมูลส่วนบุคคล</span>
-            </label>
-          )}
-
-          <button
-            type="submit"
-            className="w-full rounded-md py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
-            style={{ background: ACCENT, color: "#1a1400" }}
-          >
-            {mode === "in" ? "เข้าสู่ระบบ" : "สร้างบัญชี"}
-          </button>
-        </form>
-
-        <p className="mt-4 text-xs leading-relaxed" style={{ color: FAINT }}>
-          ตัวอย่างงานออกแบบ ยังไม่มีระบบหลังบ้านจริง ไม่มีการส่งหรือเก็บข้อมูลใดๆ
-          กรุณาอย่ากรอกรหัสผ่านที่คุณใช้จริง
+          ตัวอย่างงานออกแบบ ยังไม่มีระบบหลังบ้านจริง ไม่ส่ง SMS ไม่เก็บข้อมูล
+          และใส่รหัสอะไรก็ผ่าน อย่ากรอกเบอร์หรืออีเมลจริง
         </p>
       </motion.div>
     </motion.div>
+  );
+}
+
+/**
+ * A social sign in button. The provider marks are set as a letter rather than
+ * the official logo artwork: this is a design study, and a badly redrawn brand
+ * mark reads worse than an honest stand-in.
+ */
+function ProviderButton({
+  name,
+  mark,
+  markBackground,
+  markColor,
+  onClick,
+}: {
+  name: string;
+  mark: string;
+  markBackground: string;
+  markColor: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex h-11 w-full items-center gap-3 rounded-md border px-3 text-sm font-medium transition-colors hover:border-[#3a424f]"
+      style={{ borderColor: LINE }}
+    >
+      <span
+        aria-hidden
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-sm font-bold"
+        style={{ background: markBackground, color: markColor }}
+      >
+        {mark}
+      </span>
+      ดำเนินการต่อด้วย {name}
+    </button>
   );
 }
