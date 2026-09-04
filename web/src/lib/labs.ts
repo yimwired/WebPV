@@ -78,6 +78,17 @@ export const labs: Lab[] = [
     buildTime: "Three days once the menu exists",
   },
   {
+    slug: "longtail",
+    name: "Longtail",
+    vibe: "Day tours, live booking",
+    description:
+      "A tour operator that takes bookings. Pick a trip, set how many adults and children are coming, add hotel pickup, and the panel quotes the total and the 30% deposit as you go. Deep water, sand and one coral accent.",
+    accent: "#ff7a59",
+    preview: { from: "#0e262a", to: "#07191c" },
+    bestFor: "Tours, boat charters, dive shops, anything sold by the seat",
+    buildTime: "Three to five weeks with a booking back end",
+  },
+  {
     slug: "stall",
     name: "Stall",
     vibe: "Marketplace, sign in and list",
