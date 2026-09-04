@@ -67,6 +67,17 @@ export const labs: Lab[] = [
     buildTime: "About a week",
   },
   {
+    slug: "cart",
+    name: "Cart",
+    vibe: "One product, one page",
+    description:
+      "The single product page a dropshipper asks for: one offer repeated at four heights, a bundle picker that does the arithmetic, and a dispatch countdown read off the visitor's own clock rather than a timer that resets on reload.",
+    accent: "#15803d",
+    preview: { from: "#ffffff", to: "#e7e5e4" },
+    bestFor: "One hero product, dropshipping, a launch, a pre-order",
+    buildTime: "Four days once the product photos exist",
+  },
+  {
     slug: "counter",
     name: "Counter",
     vibe: "Restaurant menu, one link",
