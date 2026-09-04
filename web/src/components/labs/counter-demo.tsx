@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -38,6 +39,8 @@ interface Dish {
   category: string;
   note?: string;
   tags?: string[];
+  /** file under `public/lab-demos/counter/`. Falls back to a drawn plate. */
+  photo?: string;
 }
 
 const MENU: Dish[] = [
@@ -129,6 +132,10 @@ const MENU: Dish[] = [
 ];
 
 const DAY_NAMES = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+
+// Derived rather than a second hand-kept list: the dishes a shop photographs
+// are the ones it already calls its best sellers.
+const FEATURED = MENU.filter((dish) => dish.tags?.includes("ขายดี")).slice(0, 3);
 
 // The badge depends on the visitor's own clock, which exists only on the
 // client. That makes it external state, the same reasoning as the locale store
@@ -290,6 +297,39 @@ export function CounterDemo() {
           </motion.div>
         </section>
 
+        {/* ── the three the shop would photograph ── */}
+        <section className="pb-6">
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            จานเด่น
+          </h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {FEATURED.map((dish, i) => (
+              <motion.article
+                key={dish.name}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.45, delay: i * 0.06, ease }}
+                className="overflow-hidden rounded-xl border"
+                style={{ borderColor: "#e3dbcd" }}
+              >
+                <div className="relative aspect-[4/3]">
+                  <DishImage dish={dish} sizes="(min-width: 640px) 30vw, 92vw" />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="font-medium">{dish.name}</h3>
+                    <span className="shrink-0 tabular-nums">{dish.price}.-</span>
+                  </div>
+                  <p className="mt-1 text-sm" style={{ color: MUTED }}>
+                    {dish.en}
+                  </p>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
         {/* ── menu ── */}
         <section id="menu" className="scroll-mt-20 pb-8">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -330,9 +370,16 @@ export function CounterDemo() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: Math.min(i, 8) * 0.03 }}
-                className="flex items-baseline gap-4 border-t py-5 first:border-t-0"
+                className="flex items-start gap-4 border-t py-5 first:border-t-0"
                 style={{ borderColor: "#e8e0d2" }}
               >
+                <div
+                  className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg sm:h-20 sm:w-20"
+                  style={{ background: "#f6f0e6" }}
+                >
+                  <DishImage dish={dish} sizes="80px" />
+                </div>
+
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                     <h3 className="font-medium">{dish.name}</h3>
@@ -474,5 +521,39 @@ export function CounterDemo() {
         </section>
       </div>
     </main>
+  );
+}
+
+/**
+ * A dish photo, or the plate that stands in for one.
+ *
+ * The demo ships without photography and an empty grey box reads as a page
+ * that failed to load. A plate seen from above reads as a decision, and it is
+ * exactly the slot a shop's own photo drops into: set `photo` on the dish and
+ * nothing else here changes.
+ */
+function DishImage({ dish, sizes }: { dish: Dish; sizes: string }) {
+  if (dish.photo) {
+    return (
+      <Image
+        src={dish.photo}
+        alt={dish.name}
+        fill
+        sizes={sizes}
+        unoptimized
+        className="object-cover"
+      />
+    );
+  }
+
+  return (
+    <div
+      aria-hidden
+      className="h-full w-full"
+      style={{
+        background:
+          "radial-gradient(circle at 50% 50%, #f4ede1 0 34%, #e7dcc9 34% 37%, #f7f2e8 37%)",
+      }}
+    />
   );
 }
