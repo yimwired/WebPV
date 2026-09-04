@@ -173,7 +173,7 @@ const en = {
   // Numbers live in `pricing.ts`; only the wording is here, keyed by tier id.
   pricing: {
     title: "Prices agreed before anything starts",
-    sub: "Three packages cover most of what people ask me for. Anything larger is quoted per project. Whatever number you agree to is the number on the invoice.",
+    sub: "Four packages cover most of what people ask me for. Anything larger is quoted per project. Whatever number you agree to is the number on the invoice.",
     recommended: "Recommended",
     perProject: "Per project",
     seeDemo: "See it live",
@@ -182,6 +182,20 @@ const en = {
     introBadge: "Launch price",
     regularPrice: "Regular price",
     tiers: {
+      quick: {
+        name: "Quick page",
+        forWho: "You already have the words",
+        blurb:
+          "Pick any style from The Lab and I build it out with your text and your photos, then put it online. It stays close to the demo you picked, which is the whole reason it lands this fast.",
+        points: [
+          "One page, in a Lab style used as it looks",
+          "You send the text and the images",
+          "Live on your own domain",
+          "One round of revisions",
+        ],
+        timeline: "3 days",
+        cta: "Start with a Quick page",
+      },
       starter: {
         name: "Starter",
         forWho: "One page, one message",
@@ -249,6 +263,35 @@ const en = {
       "Deployment set up and running",
       "30 days of free fixes after launch",
     ],
+    careTitle: "After the 30 days",
+    careSub:
+      "Every package comes with a month of free fixes. If you would rather never log in after that, one of these keeps the site looked after. Month to month, stop whenever: the site, the domain and the code stay yours either way.",
+    carePer: "a month",
+    carePlans: {
+      care: {
+        name: "Care",
+        forWho: "Keep it running",
+        points: [
+          "Domain and hosting renewals handled for you",
+          "A monthly backup you can restore from",
+          "Two text or image changes a month",
+          "Checked every week, so a break is found before your customers find it",
+        ],
+      },
+      carePlus: {
+        name: "Care Plus",
+        forWho: "Keep it moving",
+        points: [
+          "Everything in Care",
+          "Five changes a month",
+          "One new section every quarter",
+          "A monthly note on speed and what people searched to reach you",
+          "Answered within one working day",
+        ],
+      },
+    },
+    careNote:
+      "Renewals are passed on at cost. Nothing here is billed on top of your own domain fee.",
     faqTitle: "Before you ask",
     faq: [
       {
@@ -266,6 +309,10 @@ const en = {
       {
         q: "What if I need changes later?",
         a: "Fixes to what we agreed are free for 30 days after launch. After that, small edits are 1,200 baht an hour with a one hour minimum, and anything new gets quoted before I touch it.",
+      },
+      {
+        q: "Do I have to take a care plan?",
+        a: "No, and plenty of sites never need one. The domain and the hosting are in your name and the code is yours, so nothing switches off if you never pay me again. A plan is for owners who would rather not log in at all.",
       },
       {
         q: "What if the project gets cancelled?",
@@ -637,7 +684,7 @@ const th: typeof en = {
   },
   pricing: {
     title: "ราคาคุยกันจบ​ตั้งแต่​ก่อนเริ่มงาน",
-    sub: "สามแพ็กเกจนี้ครอบคลุมงานที่มีคนถามหาบ่อยที่สุด ถ้าใหญ่กว่านั้นคิดตามงานจริง ตกลงราคาไหนไว้ ก็จ่ายเท่านั้น ไม่มีบวกเพิ่มทีหลัง",
+    sub: "สี่แพ็กเกจนี้ครอบคลุมงานที่มีคนถามหาบ่อยที่สุด ถ้าใหญ่กว่านั้นคิดตามงานจริง ตกลงราคาไหนไว้ ก็จ่ายเท่านั้น ไม่มีบวกเพิ่มทีหลัง",
     recommended: "แนะนำ",
     perProject: "คิดตามงาน",
     seeDemo: "ดูของจริง",
@@ -646,6 +693,20 @@ const th: typeof en = {
     introBadge: "ราคาเปิดตัว",
     regularPrice: "ราคาปกติ",
     tiers: {
+      quick: {
+        name: "Quick page",
+        forWho: "มีข้อความพร้อมอยู่แล้ว",
+        blurb:
+          "เลือกสไตล์ไหนก็ได้จาก The Lab แล้วผมเอาข้อความกับรูปของคุณใส่ลงไป จัดให้ขึ้นออนไลน์เลย หน้าตาจะใกล้ตัวที่เลือกไว้ ตรงนี้แหละที่ทำให้เสร็จเร็วขนาดนี้",
+        points: [
+          "หน้าเดียว ใช้สไตล์จาก The Lab ตามที่เห็น",
+          "คุณส่งข้อความกับรูปมาให้",
+          "ขึ้นออนไลน์บนโดเมนของคุณเอง",
+          "แก้งานได้หนึ่งรอบ",
+        ],
+        timeline: "3 วัน",
+        cta: "เริ่มที่ Quick page",
+      },
       starter: {
         name: "Starter",
         forWho: "หน้าเดียว จบในหน้าเดียว",
@@ -713,6 +774,34 @@ const th: typeof en = {
       "ติดตั้งขึ้นเซิร์ฟเวอร์ให้พร้อมใช้",
       "แก้บั๊กฟรี 30 วันหลังขึ้นจริง",
     ],
+    careTitle: "หลังพ้น 30 วัน",
+    careSub:
+      "ทุกแพ็กเกจแก้บั๊กฟรีให้เดือนนึงอยู่แล้ว ถ้าหลังจากนั้นไม่อยากยุ่งกับเว็บเอง เลือกแพ็กเกจดูแลไว้สักตัวก็ได้ คิดรายเดือน หยุดเมื่อไหร่ก็ได้ จะเอาหรือไม่เอา เว็บ โดเมน และโค้ดก็เป็นของคุณเหมือนเดิม",
+    carePer: "ต่อเดือน",
+    carePlans: {
+      care: {
+        name: "Care",
+        forWho: "ให้เว็บอยู่รอด",
+        points: [
+          "ต่ออายุโดเมนกับโฮสต์ให้",
+          "สำรองข้อมูลเดือนละครั้ง ย้อนกลับได้",
+          "แก้ข้อความหรือรูปได้เดือนละ 2 ครั้ง",
+          "เช็คให้ทุกสัปดาห์ เว็บล่มจะรู้ก่อนลูกค้าคุณ",
+        ],
+      },
+      carePlus: {
+        name: "Care Plus",
+        forWho: "ให้เว็บเดินหน้าต่อ",
+        points: [
+          "ได้ทุกอย่างใน Care",
+          "แก้ได้เดือนละ 5 ครั้ง",
+          "เพิ่มส่วนใหม่ได้ไตรมาสละ 1 ส่วน",
+          "สรุปทุกเดือนว่าเว็บเร็วแค่ไหน คนค้นคำว่าอะไรถึงเจอ",
+          "ตอบกลับภายใน 1 วันทำการ",
+        ],
+      },
+    },
+    careNote: "ค่าต่ออายุโดเมนจ่ายตามจริง ไม่บวกเพิ่ม",
     faqTitle: "คำถามที่มักถามก่อน",
     faq: [
       {
@@ -730,6 +819,10 @@ const th: typeof en = {
       {
         q: "ส่งงานแล้วอยากแก้เพิ่มทีหลัง",
         a: "แก้ในสิ่งที่ตกลงกันไว้ ฟรี 30 วันหลังขึ้นจริง หลังจากนั้นงานเล็กคิดชั่วโมงละ 1,200 บาท ขั้นต่ำหนึ่งชั่วโมง ส่วนของที่เพิ่มใหม่เสนอราคาให้ดูก่อนลงมือทุกครั้ง",
+      },
+      {
+        q: "จำเป็นต้องซื้อแพ็กเกจดูแลไหม",
+        a: "ไม่ต้อง หลายเว็บก็ไม่ได้ใช้ โดเมนกับโฮสต์อยู่ในชื่อคุณ โค้ดก็เป็นของคุณ ต่อให้ไม่จ่ายผมอีกเลยก็ไม่มีอะไรดับ แพ็กเกจนี้มีไว้สำหรับคนที่ไม่อยากล็อกอินเข้าไปยุ่งเอง",
       },
       {
         q: "ถ้ายกเลิกกลางทาง",

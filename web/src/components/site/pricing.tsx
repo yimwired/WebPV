@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
-import { introOffer, pricingTiers, type PricingTier } from "@/lib/pricing";
+import {
+  carePlans,
+  introOffer,
+  pricingTiers,
+  type CarePlan,
+  type PricingTier,
+} from "@/lib/pricing";
 import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./reveal";
@@ -32,7 +38,9 @@ export function Pricing() {
         )}
       </Reveal>
 
-      <div className="mt-14 grid gap-5 lg:grid-cols-3">
+      {/* four fixed packages: two up at tablet, all four only once the
+          column is wide enough for a price to sit on one line */}
+      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {packages.map((tier, i) => (
           <Reveal key={tier.id} delay={i * 0.05}>
             <TierCard tier={tier} />
@@ -58,6 +66,21 @@ export function Pricing() {
             </li>
           ))}
         </ul>
+      </Reveal>
+
+      <Reveal className="border-line mt-20 border-t pt-12">
+        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          {p.careTitle}
+        </h2>
+        <p className="text-muted-foreground mt-3 max-w-2xl leading-relaxed">
+          {p.careSub}
+        </p>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2">
+          {carePlans.map((plan) => (
+            <CarePlanCard key={plan.id} plan={plan} />
+          ))}
+        </div>
+        <p className="text-muted-foreground mt-5 text-sm">{p.careNote}</p>
       </Reveal>
 
       <Reveal className="mt-20">
@@ -110,7 +133,9 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
   return (
     <article
       className={cn(
-        "flex h-full flex-col rounded-lg border p-6 sm:p-8",
+        "flex h-full flex-col rounded-lg border p-6",
+        // only the full-width quoted card has room for the roomier padding
+        wide && "sm:p-8",
         tier.featured ? "border-line-strong bg-surface" : "border-line",
       )}
     >
@@ -126,6 +151,8 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
         )}
       </div>
 
+      {/* the struck list price sits on the badge line, not beside the number:
+          four columns leave a card too narrow for both prices in one row */}
       <div className="mt-6">
         <p className="text-3xl font-semibold tracking-tight tabular-nums">
           {tier.price ? (
@@ -134,12 +161,6 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
                 ฿
               </span>
               {onIntro ? tier.introPrice : tier.price}
-              {onIntro && (
-                <s className="text-muted-foreground ml-2.5 text-lg font-normal">
-                  <span className="sr-only">{p.regularPrice} </span>฿
-                  {tier.price}
-                </s>
-              )}
             </>
           ) : (
             <span className="text-muted-foreground text-xl font-normal">
@@ -147,7 +168,14 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
             </span>
           )}
         </p>
-        {onIntro && <p className="spec text-brand mt-2">{p.introBadge}</p>}
+        {onIntro && (
+          <p className="mt-2 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+            <span className="spec text-brand">{p.introBadge}</span>
+            <s className="text-muted-foreground text-sm tabular-nums">
+              <span className="sr-only">{p.regularPrice} </span>฿{tier.price}
+            </s>
+          </p>
+        )}
       </div>
 
       <p
@@ -210,6 +238,48 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
           </Link>
         )}
       </div>
+    </article>
+  );
+}
+
+// Upkeep sold after handover. No CTA of its own: these get offered on the day
+// a site goes live, so the card only has to make the offer legible here.
+function CarePlanCard({ plan }: { plan: CarePlan }) {
+  const { t } = useLocale();
+  const p = t.pricing;
+  const copy = p.carePlans[plan.id];
+
+  return (
+    <article
+      className={cn(
+        "flex h-full flex-col rounded-lg border p-6 sm:p-8",
+        plan.featured ? "border-line-strong bg-surface" : "border-line",
+      )}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+        <div>
+          <h3 className="text-xl font-semibold tracking-tight">{copy.name}</h3>
+          <p className="text-muted-foreground mt-1 text-sm">{copy.forWho}</p>
+        </div>
+        <p className="text-2xl font-semibold tracking-tight tabular-nums">
+          <span className="text-muted-foreground mr-0.5 text-base font-normal">
+            ฿
+          </span>
+          {plan.price}
+          <span className="text-muted-foreground ml-1.5 text-sm font-normal">
+            {p.carePer}
+          </span>
+        </p>
+      </div>
+
+      <ul className="mt-6 space-y-2.5">
+        {copy.points.map((point) => (
+          <li key={point} className="flex items-start gap-2.5 text-sm">
+            <Check className="text-brand mt-0.5 h-4 w-4 shrink-0" />
+            <span className="text-foreground/80">{point}</span>
+          </li>
+        ))}
+      </ul>
     </article>
   );
 }
