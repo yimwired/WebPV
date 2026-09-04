@@ -431,7 +431,7 @@ const en = {
       subtitle: "Tour booking for Phuket, on a codebase that had stopped running",
       imageAlt: "PET Travel tour listing, filters beside seven Phuket tours",
       meta: [
-        { k: "Role", v: "Recovery, security and data. Team project" },
+        { k: "Role", v: "Design and UX, then recovery, security and data. Team project" },
         { k: "Stack", v: "Next.js 15 · Strapi 4.20 · SQLite" },
         { k: "Source", v: "github.com/yimwired/PET-travel" },
         { k: "Status", v: "Runs clean, repo public" },
@@ -440,6 +440,10 @@ const en = {
         {
           h: "What it is",
           p: "A storefront for day tours around Phuket sitting on a Strapi CMS. Seven tours with real photography, filters for time of day and for the things people actually choose on (halal food, an English-speaking guide, seats for small children, private hire), star reviews tied to a booking, and payments that carry an uploaded transfer slip through pending, approved and rejected.",
+        },
+        {
+          h: "What I designed",
+          p: "Every screen, in the sense that decides whether a site works: what belongs on which page, the order a visitor meets it in, where the filters sit against the results, and where the button lands once someone has made up their mind. Filters run down a rail beside the listing rather than hiding behind a button, because choosing a tour is a comparison and comparisons want everything visible at once. Each card leads with the price, the rating and the seats left, since those are the three facts that end the decision. Booking is a straight line ending at the payment slip instead of a wizard: a day trip is not a complicated purchase, and a wizard would only make it feel like one.",
         },
         {
           h: "The state I found it in",
@@ -972,7 +976,7 @@ const th: typeof en = {
       subtitle: "เว็บจองทัวร์ภูเก็ต บนโค้ดที่รันไม่ได้มาหลายเดือน",
       imageAlt: "หน้ารวมทัวร์ของ PET Travel มีฟิลเตอร์อยู่ข้างทัวร์ภูเก็ต 7 รายการ",
       meta: [
-        { k: "บทบาท", v: "กู้ระบบ ความปลอดภัย และข้อมูล (งานกลุ่ม)" },
+        { k: "บทบาท", v: "ออกแบบและ UX ทั้งหมด แล้วมากู้ระบบ ความปลอดภัย และข้อมูล (งานกลุ่ม)" },
         { k: "Stack", v: "Next.js 15 · Strapi 4.20 · SQLite" },
         { k: "ซอร์ส", v: "github.com/yimwired/PET-travel" },
         { k: "สถานะ", v: "รันได้สะอาด repo เปิดสาธารณะ" },
@@ -981,6 +985,10 @@ const th: typeof en = {
         {
           h: "มันคืออะไร",
           p: "หน้าร้านขายทัวร์รอบภูเก็ตแบบไปเช้าเย็นกลับ ต่ออยู่กับ Strapi มีทัวร์ 7 รายการพร้อมรูปจริง ฟิลเตอร์ตามช่วงเวลาและตามเงื่อนไขที่คนเลือกกันจริงๆ อย่างอาหารฮาลาล ไกด์พูดอังกฤษ ที่นั่งเด็กเล็ก หรือเหมาส่วนตัว มีรีวิวให้ดาวผูกกับการจองจริง และมีระบบจ่ายเงินที่แนบสลิปโอนแล้วไล่สถานะรออนุมัติ ผ่าน ไม่ผ่าน",
+        },
+        {
+          h: "ส่วนที่ผมออกแบบ",
+          p: "ทุกหน้าจอ ในความหมายที่ตัดสินว่าเว็บใช้งานได้จริงไหม อะไรควรอยู่หน้าไหน คนเข้ามาเจออะไรก่อนหลัง ฟิลเตอร์วางตรงไหนเทียบกับผลลัพธ์ และปุ่มไปโผล่ตรงไหนตอนคนตัดสินใจแล้ว ฟิลเตอร์เลยเรียงเป็นแถบข้างผลลัพธ์ ไม่ซ่อนหลังปุ่ม เพราะการเลือกทัวร์คือการเทียบ และการเทียบต้องเห็นทุกอย่างพร้อมกัน การ์ดแต่ละใบขึ้นราคา คะแนน และที่นั่งที่เหลือก่อนอย่างอื่น เพราะสามอย่างนี้คือสิ่งที่ปิดการตัดสินใจ ส่วนขั้นตอนจองเป็นเส้นตรงจบที่แนบสลิป ไม่ทำเป็น wizard หลายขั้น เพราะทัวร์วันเดียวไม่ใช่ของที่ซื้อยาก ทำเป็น wizard มีแต่จะทำให้รู้สึกว่ายาก",
         },
         {
           h: "ตอนรับมามันเป็นแบบไหน",
