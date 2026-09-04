@@ -51,6 +51,7 @@ const MENU: Dish[] = [
     category: "ของทานเล่น",
     note: "ห่อสดทุกจาน ทอดหลังสั่ง",
     tags: ["ขายดี"],
+    photo: "/lab-demos/counter/spring-rolls.webp",
   },
   {
     name: "ยำมะม่วงปลาแห้ง",
@@ -73,6 +74,7 @@ const MENU: Dish[] = [
     category: "จานหลัก",
     note: "น้ำแกงเคี่ยวทุกเช้า สั่งเผ็ดน้อยได้",
     tags: ["ขายดี", "เผ็ด"],
+    photo: "/lab-demos/counter/sour-curry.webp",
   },
   {
     name: "ปลากะพงทอดน้ำปลา",
@@ -80,6 +82,7 @@ const MENU: Dish[] = [
     price: 420,
     category: "จานหลัก",
     note: "ตัวละ 700-800 กรัม",
+    photo: "/lab-demos/counter/sea-bass.webp",
   },
   {
     name: "หมูฮ้องริมคลอง",
@@ -88,6 +91,7 @@ const MENU: Dish[] = [
     category: "จานหลัก",
     note: "เคี่ยวสามชั่วโมง หมดแล้วหมดเลย",
     tags: ["ขายดี"],
+    photo: "/lab-demos/counter/braised-pork.webp",
   },
   {
     name: "ผัดผักบุ้งไฟแดง",
@@ -95,6 +99,7 @@ const MENU: Dish[] = [
     price: 90,
     category: "จานหลัก",
     tags: ["มังสวิรัติ", "เผ็ด"],
+    photo: "/lab-demos/counter/morning-glory.webp",
   },
   {
     name: "ข้าวเหนียวมะม่วง",

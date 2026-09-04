@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check, Minus, Plus, Star } from "lucide-react";
@@ -28,7 +29,9 @@ interface Tour {
   reviews: number;
   blurb: string;
   includes: string[];
+  /** the gradient shown under the photo, and on its own without one */
   swatch: [string, string];
+  photo?: string;
 }
 
 const TOURS: Tour[] = [
@@ -43,6 +46,7 @@ const TOURS: Tour[] = [
     blurb:
       "ออกเรือเร็วตอนเจ็ดโมง ถึงอ่าวมาหยาก่อนเรือทัวร์กลุ่มใหญ่ ได้ถ่ายรูปตอนหาดยังโล่ง",
     includes: ["อาหารกลางวันบุฟเฟต์", "อุปกรณ์ดำน้ำตื้น", "ประกันเดินทาง"],
+    photo: "/lab-demos/longtail/phi-phi.webp",
     swatch: ["#0f6f75", "#062a2e"],
   },
   {
@@ -56,6 +60,7 @@ const TOURS: Tour[] = [
     blurb:
       "ไปให้ตรงจังหวะน้ำลงถึงจะเห็นสันทรายเชื่อมสามเกาะ เราเช็คตารางน้ำให้ทุกวัน",
     includes: ["อาหารกลางวัน", "อุปกรณ์ดำน้ำตื้น", "ไกด์พูดไทยและอังกฤษ"],
+    photo: "/lab-demos/longtail/four-islands.webp",
     swatch: ["#1a7f6b", "#07302a"],
   },
   {
@@ -68,6 +73,7 @@ const TOURS: Tour[] = [
     reviews: 156,
     blurb: "พายเรือแคนูลอดถ้ำลอด แวะหมู่บ้านปันหยี กินข้าวบนน้ำ",
     includes: ["เรือแคนูพร้อมคนพาย", "อาหารกลางวัน", "รับส่งที่พัก"],
+    photo: "/lab-demos/longtail/james-bond.webp",
     swatch: ["#2b6f9e", "#0a2b3e"],
   },
   {
@@ -80,6 +86,7 @@ const TOURS: Tour[] = [
     reviews: 97,
     blurb: "ออกบ่ายสอง คนน้อยกว่ารอบเช้ามาก แล้วปิดท้ายที่เกาะปอดูพระอาทิตย์ตก",
     includes: ["ของว่างและผลไม้", "อุปกรณ์ดำน้ำตื้น", "ประกันเดินทาง"],
+    photo: "/lab-demos/longtail/sunset-krabi.webp",
     swatch: ["#b4552f", "#3a1608"],
   },
   {
@@ -92,6 +99,7 @@ const TOURS: Tour[] = [
     reviews: 63,
     blurb: "ทัวร์ที่ไม่มีคิวแวะร้านของฝาก เวลาที่เหลือเอาไปอยู่บนหาดแทน",
     includes: ["ของว่าง", "อุปกรณ์ดำน้ำตื้น", "ค่าธรรมเนียมอุทยาน"],
+    photo: "/lab-demos/longtail/bamboo.webp",
     swatch: ["#0f6f75", "#052227"],
   },
   {
@@ -104,6 +112,7 @@ const TOURS: Tour[] = [
     reviews: 28,
     blurb: "ราคาต่อลำไม่เกิน 8 คน เลือกเกาะเอง ออกกี่โมงก็ได้ ไม่มีรอบรวม",
     includes: ["กัปตันและลูกเรือ", "อาหารกลางวัน", "รับส่งที่พัก"],
+    photo: "/lab-demos/longtail/private-boat.webp",
     swatch: ["#7a5a2e", "#2a1c08"],
   },
 ];
@@ -244,15 +253,25 @@ export function LongtailDemo() {
                     {/* the operator's own photography goes here; a demo has none,
                         so the card commits to colour instead of a grey box */}
                     <div
-                      className="flex aspect-[16/9] items-end justify-between p-4"
+                      className="relative flex aspect-[16/9] items-end justify-between p-4"
                       style={{
                         background: `linear-gradient(140deg, ${tour.swatch[0]}, ${tour.swatch[1]})`,
                       }}
                     >
-                      <span className="rounded-md bg-black/45 px-2 py-1 text-xs font-medium">
+                      {tour.photo && (
+                        <Image
+                          src={tour.photo}
+                          alt=""
+                          fill
+                          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+                          unoptimized
+                          className="object-cover"
+                        />
+                      )}
+                      <span className="relative rounded-md bg-black/55 px-2 py-1 text-xs font-medium">
                         {tour.area}
                       </span>
-                      <span className="flex items-center gap-1 rounded-md bg-black/45 px-2 py-1 text-xs">
+                      <span className="relative flex items-center gap-1 rounded-md bg-black/55 px-2 py-1 text-xs">
                         <Star className="h-3 w-3" style={{ color: ACCENT }} />
                         {tour.rating} ({tour.reviews})
                       </span>
