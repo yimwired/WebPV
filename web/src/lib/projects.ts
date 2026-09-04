@@ -83,6 +83,23 @@ export const projects: Project[] = [
     },
   },
   {
+    id: "llm-fusebox",
+    name: "fusebox",
+    tagline: "A spend limit for LLM API calls",
+    description:
+      "An open-source Python library that prices an LLM call before you make it, blocks it if it would blow the budget, and keeps a ledger of what was really spent. No runtime dependencies, 96 tests.",
+    category: "Open source",
+    tags: ["Python", "LLM", "Cost control", "Library"],
+    status: "live",
+    href: "/work/llm-fusebox",
+    accent: "#fb7185", // rose — a blown fuse
+    th: {
+      tagline: "ตัวกันงบสำหรับการเรียก LLM API",
+      description:
+        "ไลบรารี Python โอเพนซอร์สที่คิดราคาให้ก่อนยิง LLM ถ้าเกินงบก็บล็อกไว้เลย แล้วจดไว้ว่าจ่ายจริงไปเท่าไหร่ ไม่มี dependency ตอนรัน มีเทส 96 ตัว",
+    },
+  },
+  {
     id: "product-dashboard",
     name: "Product Dashboard",
     tagline: "Product & content ops for Shopee",

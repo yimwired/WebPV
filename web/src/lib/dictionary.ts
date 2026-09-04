@@ -350,6 +350,35 @@ const en = {
         },
       ],
     },
+    "llm-fusebox": {
+      title: "fusebox",
+      subtitle: "A spend limit for LLM API calls",
+      imageAlt: "fusebox blocking a call that would exceed its budget",
+      meta: [
+        { k: "Role", v: "Design + build, solo" },
+        { k: "Stack", v: "Python · no runtime dependencies" },
+        { k: "Source", v: "github.com/yimwired/llm-fusebox" },
+        { k: "Status", v: "Published, MIT" },
+      ],
+      sections: [
+        {
+          h: "The problem",
+          p: "A runaway agent loop doesn't look like a bug while it runs. It looks like progress: tool call, tool result, tool call, tool result, each one billing a full context window, all night. You find out from the invoice. The usual defences don't catch it either — a provider-side cap is org-wide and arrives hours late, and a max_tokens ceiling bounds one response, not ten thousand of them.",
+        },
+        {
+          h: "The approach",
+          p: "fusebox is the small, boring piece that was missing: something that knows what the next call will cost and can say no. You declare fuses — fifty cents a call, five dollars a day — then check a call before making it and record what it actually cost. check raises and blocks; record never raises. Blocking belongs before the money moves, because once a response has arrived, throwing an error only discards an answer you already paid for.",
+        },
+        {
+          h: "The details that matter",
+          p: "Cached tokens bill at their own rates: a cache read costs a tenth of a normal input token, a cache write a quarter more. That is exactly where a naive input-plus-output estimate goes wrong, and it goes wrong on the long agent loops most likely to run away. Money is Decimal end to end, because sub-cent charges accumulate over thousands of calls. And no code path silently stops guarding — an unknown model id raises instead of pricing at zero, and an unreadable ledger raises instead of starting from zero. A spend cap that quietly lifts is worse than no cap at all.",
+        },
+        {
+          h: "Where it is now",
+          p: "Published under MIT: 96 tests, green on Python 3.9 through 3.13 across Linux and Windows, and nothing to install alongside it. It started as a night spent reading someone else's cost guard and asking what the general version would look like. The lesson that stuck is that the interesting part of running AI in production isn't the prompt. It's the failure states.",
+        },
+      ],
+    },
     "product-dashboard": {
       title: "Product Dashboard",
       subtitle: "Product & content ops for a Shopee store",
@@ -780,6 +809,35 @@ const th: typeof en = {
         {
           h: "สถานะตอนนี้",
           p: "ตอนนี้เล่นได้ครบลูปแล้ว ตั้งแต่ฉากเปิด ผ่านด่าน เก็บเศษความทรงจำ ไปจนถึงตอนจบทั้งสองแบบ ที่เหลือคือรื้อระบบ side-scroll ทีละส่วน เสร็จส่วนไหนก็โยนเข้า playtest ทันที เป้าคือหนึ่งรอบจบใน 10-15 นาที และคุ้มพอให้กลับมาเล่นซ้ำเพื่อดูตอนจบอีกแบบ",
+        },
+      ],
+    },
+    "llm-fusebox": {
+      title: "fusebox",
+      subtitle: "ตัวกันงบสำหรับการเรียก LLM API",
+      imageAlt: "fusebox บล็อกการเรียกที่จะทำให้เกินงบ",
+      meta: [
+        { k: "บทบาท", v: "ออกแบบและสร้างเองทั้งหมด" },
+        { k: "Stack", v: "Python · ไม่มี dependency ตอนรัน" },
+        { k: "ซอร์ส", v: "github.com/yimwired/llm-fusebox" },
+        { k: "สถานะ", v: "เผยแพร่แล้ว (MIT)" },
+      ],
+      sections: [
+        {
+          h: "ปัญหา",
+          p: "agent loop ที่หลุดออกไปไม่ได้ดูเหมือนบั๊กตอนมันกำลังรัน มันดูเหมือนงานกำลังเดินหน้า เรียก tool ได้ผลลัพธ์ เรียกต่อ ได้ผลลัพธ์ วนแบบนี้ทั้งคืน โดยที่ทุกรอบจ่ายค่า context เต็มก้อน กว่าจะรู้ตัวก็ตอนบิลมาแล้ว ของที่มีอยู่ก็กันไม่ทัน เพราะ cap ฝั่งผู้ให้บริการคุมทั้งองค์กรและมาช้าเป็นชั่วโมง ส่วน max_tokens คุมได้แค่คำตอบเดียว ไม่ได้คุมหมื่นครั้ง",
+        },
+        {
+          h: "แนวทาง",
+          p: "fusebox คือชิ้นเล็กๆ ที่หายไป คืออะไรสักอย่างที่รู้ว่าการเรียกครั้งหน้าจะเสียเท่าไหร่ แล้วปฏิเสธเป็น วิธีใช้คือประกาศ fuse ไว้ก่อน เช่นครั้งละไม่เกินครึ่งดอลลาร์ วันละไม่เกินห้า แล้วเช็คก่อนยิงทุกครั้ง จากนั้นค่อยบันทึกว่าจ่ายจริงเท่าไหร่ ตัว check จะ raise แล้วบล็อกให้ ส่วน record ไม่ raise เลยสักครั้ง เพราะการบล็อกต้องเกิดก่อนเงินจะออก พอคำตอบกลับมาแล้วโยน error ทิ้งก็ได้แค่ทิ้งของที่จ่ายเงินไปแล้ว",
+        },
+        {
+          h: "รายละเอียดที่สำคัญจริง",
+          p: "token ที่มาจาก cache คิดคนละราคา อ่านจาก cache เหลือหนึ่งในสิบของ input ปกติ ส่วนเขียนลง cache แพงขึ้นอีกหนึ่งในสี่ ตรงนี้แหละที่การประเมินแบบเอา input บวก output พังหนักที่สุด และมันพังกับ agent loop ยาวๆ ซึ่งเป็นแบบที่เสี่ยงหลุดที่สุดพอดี ตัวเลขเงินใช้ Decimal ทั้งเส้นไม่แตะ float เพราะค่าใช้จ่ายระดับเศษสตางค์พอคูณเป็นพันครั้งแล้วมันเพี้ยน และไม่มีทางไหนที่ระบบจะเงียบๆ เลิกกันเงินให้ โมเดลที่ไม่รู้จักจะ raise ไม่ใช่คิดราคาเป็นศูนย์ ledger ที่อ่านไม่ได้ก็ raise ไม่ใช่เริ่มนับใหม่จากศูนย์ เพราะ cap ที่แอบหลุดไปเองแย่กว่าไม่มี cap เลย",
+        },
+        {
+          h: "สถานะตอนนี้",
+          p: "ปล่อยออกมาแล้วภายใต้ MIT มีเทส 96 ตัว ผ่านครบตั้งแต่ Python 3.9 ถึง 3.13 ทั้งบน Linux และ Windows และไม่ต้องลงอะไรเพิ่มเลยตอนรัน จุดเริ่มคือคืนหนึ่งที่นั่งอ่าน cost guard ของคนอื่นแล้วถามตัวเองว่าถ้าทำให้ใช้ได้ทั่วไปมันจะหน้าตาแบบไหน บทเรียนที่ติดมาคือ ส่วนที่น่าสนใจของการเอา AI ไปรันจริงไม่ใช่ prompt แต่เป็นตอนที่มันพัง",
         },
       ],
     },
