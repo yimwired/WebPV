@@ -426,6 +426,39 @@ const en = {
         },
       ],
     },
+    "pet-travel": {
+      title: "PET Travel",
+      subtitle: "Tour booking for Phuket, on a codebase that had stopped running",
+      imageAlt: "PET Travel tour listing, filters beside seven Phuket tours",
+      meta: [
+        { k: "Role", v: "Recovery, security and data. Team project" },
+        { k: "Stack", v: "Next.js 15 · Strapi 4.20 · SQLite" },
+        { k: "Source", v: "github.com/yimwired/PET-travel" },
+        { k: "Status", v: "Runs clean, repo public" },
+      ],
+      sections: [
+        {
+          h: "What it is",
+          p: "A storefront for day tours around Phuket sitting on a Strapi CMS. Seven tours with real photography, filters for time of day and for the things people actually choose on (halal food, an English-speaking guide, seats for small children, private hire), star reviews tied to a booking, and payments that carry an uploaded transfer slip through pending, approved and rejected.",
+        },
+        {
+          h: "The state I found it in",
+          p: "It had not run for months. Two page files had been committed with merge conflict markers still in them, so the home page and the tour listing both answered 500 with a syntax error, and the version on the main branch was the broken half of the conflict: it referenced a variable that was never declared and called an endpoint that did not exist. On top of that the pinned SQLite driver had no prebuilt binary for the Node version anyone would install today, so a fresh clone could not even start the server.",
+        },
+        {
+          h: "Getting the content back",
+          p: "The uploads folder had been gitignored since the first commit, which meant the database pointed at image records with nothing behind them and the tour table was down to two rows of test data. Twelve photographs had survived in the client's own public folder because they were committed by accident. I read them, matched each one to a tour that made sense, and wrote seed scripts that talk to the running server over its REST API, mint a full-access token for the job and revoke it when they finish. Seven tours, twenty reviews and five payments later, the count of media records pointing at missing files was zero.",
+        },
+        {
+          h: "The part that mattered more",
+          p: "The ignore file was missing the line that keeps environment files out of git. The server's environment file was in three commits and the SQLite database in thirteen, which put the signing keys and every team member's password hash in a repository anyone could clone. I started the history over rather than carry that, rotated all five secrets on the assumption the old ones were public, added the ignores that should have been there, and replaced a hardcoded admin password fallback in the seed scripts with a value read from the environment that raises when it is missing. Then an example environment file and a README, so the next person to clone it gets a working server instead of a puzzle.",
+        },
+        {
+          h: "What I took from it",
+          p: "Almost none of this was building a feature. It was reading someone else's half-finished repository, deciding which side of an old conflict was actually correct, and treating a leaked key as leaked instead of hoping nobody looked. That turns out to be most of what maintaining software is, and it is the part nobody assigns you in a course.",
+        },
+      ],
+    },
     "product-dashboard": {
       title: "Product Dashboard",
       subtitle: "Product & content ops for a Shopee store",
@@ -931,6 +964,39 @@ const th: typeof en = {
         {
           h: "สถานะตอนนี้",
           p: "ปล่อยออกมาแล้วภายใต้ MIT มีเทส 96 ตัว ผ่านครบตั้งแต่ Python 3.9 ถึง 3.13 ทั้งบน Linux และ Windows และไม่ต้องลงอะไรเพิ่มเลยตอนรัน จุดเริ่มคือคืนหนึ่งที่นั่งอ่าน cost guard ของคนอื่นแล้วถามตัวเองว่าถ้าทำให้ใช้ได้ทั่วไปมันจะหน้าตาแบบไหน บทเรียนที่ติดมาคือ ส่วนที่น่าสนใจของการเอา AI ไปรันจริงไม่ใช่ prompt แต่เป็นตอนที่มันพัง",
+        },
+      ],
+    },
+    "pet-travel": {
+      title: "PET Travel",
+      subtitle: "เว็บจองทัวร์ภูเก็ต บนโค้ดที่รันไม่ได้มาหลายเดือน",
+      imageAlt: "หน้ารวมทัวร์ของ PET Travel มีฟิลเตอร์อยู่ข้างทัวร์ภูเก็ต 7 รายการ",
+      meta: [
+        { k: "บทบาท", v: "กู้ระบบ ความปลอดภัย และข้อมูล (งานกลุ่ม)" },
+        { k: "Stack", v: "Next.js 15 · Strapi 4.20 · SQLite" },
+        { k: "ซอร์ส", v: "github.com/yimwired/PET-travel" },
+        { k: "สถานะ", v: "รันได้สะอาด repo เปิดสาธารณะ" },
+      ],
+      sections: [
+        {
+          h: "มันคืออะไร",
+          p: "หน้าร้านขายทัวร์รอบภูเก็ตแบบไปเช้าเย็นกลับ ต่ออยู่กับ Strapi มีทัวร์ 7 รายการพร้อมรูปจริง ฟิลเตอร์ตามช่วงเวลาและตามเงื่อนไขที่คนเลือกกันจริงๆ อย่างอาหารฮาลาล ไกด์พูดอังกฤษ ที่นั่งเด็กเล็ก หรือเหมาส่วนตัว มีรีวิวให้ดาวผูกกับการจองจริง และมีระบบจ่ายเงินที่แนบสลิปโอนแล้วไล่สถานะรออนุมัติ ผ่าน ไม่ผ่าน",
+        },
+        {
+          h: "ตอนรับมามันเป็นแบบไหน",
+          p: "เว็บไม่ได้รันมาหลายเดือนแล้ว มีไฟล์หน้าเว็บสองไฟล์ที่ commit ขึ้นไปทั้งที่ยังมี merge conflict marker ค้างอยู่ หน้าแรกกับหน้ารวมทัวร์เลยขึ้น 500 เป็น syntax error ทั้งคู่ แล้วฝั่งที่อยู่บน main ก็ดันเป็นฝั่งที่พังจริง เรียกตัวแปรที่ไม่เคยประกาศ ยิง endpoint ที่ไม่มีอยู่ ซ้ำร้าย driver ของ SQLite ที่ pin ไว้ก็ไม่มี binary สำหรับ Node เวอร์ชันที่คนสมัยนี้ลงกัน clone ใหม่มาแล้วสตาร์ทเซิร์ฟเวอร์ยังไม่ขึ้นเลย",
+        },
+        {
+          h: "กู้เนื้อหากลับมา",
+          p: "โฟลเดอร์รูปที่อัปโหลดอยู่ใน gitignore มาตั้งแต่ commit แรก แปลว่าในฐานข้อมูลมีแต่ระเบียนรูปที่ไม่มีไฟล์จริงรองรับ ส่วนตารางทัวร์ก็เหลือ 2 แถวที่เป็น test data มีรูปรอดมา 12 ใบเพราะเผลอ commit ไว้ในโฟลเดอร์ public ฝั่งหน้าเว็บ ผมเปิดดูทีละใบแล้วจับคู่กับทัวร์ที่เข้ากัน จากนั้นเขียน seed script ที่คุยกับเซิร์ฟเวอร์ผ่าน REST API ขอ token สิทธิ์เต็มมาใช้ชั่วคราวแล้วเพิกถอนทิ้งตอนจบ ปิดงานที่ทัวร์ 7 รายการ รีวิว 20 อัน และการจ่ายเงิน 5 รายการ ระเบียนรูปที่ชี้ไปหาไฟล์ที่ไม่มีเหลือศูนย์",
+        },
+        {
+          h: "ส่วนที่สำคัญกว่านั้น",
+          p: "ไฟล์ ignore ขาดบรรทัดที่กันไฟล์ environment ไม่ให้ขึ้น git ไฟล์ environment ฝั่งเซิร์ฟเวอร์เลยติดไปกับ 3 commit และฐานข้อมูล SQLite ติดไปอีก 13 commit เท่ากับ signing key ทั้งชุดกับ password hash ของทุกคนในทีมนอนอยู่ใน repo ที่ใครก็ clone ได้ ผมเลือกเริ่ม history ใหม่แทนที่จะแบกของพวกนี้ต่อ เปลี่ยน secret ใหม่ทั้งห้าตัวโดยถือว่าของเก่าหลุดไปแล้ว ใส่ ignore ที่ควรมีตั้งแต่แรก แล้วแก้ seed script ที่ hardcode รหัสผ่านแอดมินไว้เป็นค่าสำรอง ให้อ่านจาก environment แทนและ throw ถ้าไม่มี ปิดท้ายด้วยไฟล์ตัวอย่าง environment กับ README คนต่อไปที่ clone ไปจะได้เซิร์ฟเวอร์ที่รันได้ ไม่ใช่ปริศนา",
+        },
+        {
+          h: "ได้อะไรกลับมา",
+          p: "แทบไม่มีส่วนไหนเลยที่เป็นการสร้างฟีเจอร์ใหม่ ทั้งหมดคือการนั่งอ่าน repo ที่คนอื่นทำค้างไว้ ตัดสินใจว่า conflict เก่าอันไหนคือฝั่งที่ถูกจริง และปฏิบัติกับ key ที่หลุดว่ามันหลุดแล้ว ไม่ใช่หวังว่าจะไม่มีใครเห็น ซึ่งพอมาดูจริงๆ นี่คือเนื้องานส่วนใหญ่ของการดูแลซอฟต์แวร์ และเป็นส่วนที่ไม่มีวิชาไหนสั่งให้ทำ",
         },
       ],
     },

@@ -118,6 +118,24 @@ export const projects: Project[] = [
     },
   },
   {
+    id: "pet-travel",
+    name: "PET Travel",
+    tagline: "Tour booking for Phuket, brought back from the dead",
+    description:
+      "A Next.js storefront on a Strapi CMS: seven tours, filters, reviews and payment slips. It had been returning 500s for months and leaking its own signing keys when I took it over.",
+    category: "Travel",
+    tags: ["Next.js", "Strapi", "SQLite", "Recovery"],
+    status: "active",
+    href: "/work/pet-travel",
+    accent: "#0f766e",
+    image: "/projects/pet-travel.webp",
+    th: {
+      tagline: "เว็บจองทัวร์ภูเก็ต ที่กู้กลับมาจากของที่พังไปแล้ว",
+      description:
+        "หน้าร้าน Next.js ต่อกับ Strapi มีทัวร์ 7 รายการ ฟิลเตอร์ รีวิว และสลิปการจ่ายเงิน ตอนรับมาเว็บขึ้น 500 มาหลายเดือนแล้ว แถม signing key ของตัวเองก็หลุดอยู่ใน repo",
+    },
+  },
+  {
     id: "affiliate",
     name: "Affiliate",
     tagline: "One post → every platform",
