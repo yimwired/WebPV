@@ -71,9 +71,9 @@ export const labs: Lab[] = [
     name: "Cart",
     vibe: "One product, one page",
     description:
-      "The single product page a dropshipper asks for: one offer repeated at four heights, a bundle picker that does the arithmetic, and a dispatch countdown read off the visitor's own clock rather than a timer that resets on reload.",
-    accent: "#15803d",
-    preview: { from: "#ffffff", to: "#e7e5e4" },
+      "The single product page, in the register the genre actually works in. Off-black with one acid accent that only ever means buy, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it. The scarcity theatre is left out on purpose.",
+    accent: "#c8f04a",
+    preview: { from: "#141416", to: "#0b0b0c" },
     bestFor: "One hero product, dropshipping, a launch, a pre-order",
     buildTime: "Four days once the product photos exist",
   },
