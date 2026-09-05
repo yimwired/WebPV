@@ -66,7 +66,10 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* One step darker than the shadcn default: at 0.556 this lands on 4.4:1
+     over --surface, the ground under the featured pricing card. 4.6:1
+     there now, 5.0:1 on the page. */
+  --muted-foreground: oklch(0.545 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -82,8 +85,15 @@
 
   /* Single accent, used for state and emphasis only. Amber rather than a
      blue-violet gradient: the site should read like an instrument panel,
-     not a launch page. 9.7:1 on the dark background. */
-  --brand: oklch(0.78 0.13 66);
+     not a launch page.
+
+     Same hue as the dark theme, three steps darker, because the two are
+     measured against opposite grounds. The dark value carried over here
+     unchanged for a while and sat at 2.05:1 on white, which made every piece
+     of --brand text unreadable and the focus ring invisible. At this
+     lightness: 5.2:1 on the page, 4.9:1 on --surface, and 5.2:1 as a focus
+     ring, against the 4.5 and 3.0 those two jobs ask for. */
+  --brand: oklch(0.54 0.12 66);
   --line: oklch(0.145 0 0 / 12%);
   --line-strong: oklch(0.145 0 0 / 22%);
   /* Only for a boundary that IDENTIFIES a control (input, select, textarea).
@@ -128,6 +138,8 @@
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 
+  /* The light theme uses the same hue at oklch(0.54 0.12 66); see the note in
+     :root for why the two lightnesses differ. 9.6:1 here. */
   --brand: oklch(0.78 0.13 66);
   --line: oklch(1 0 0 / 9%);
   --line-strong: oklch(1 0 0 / 18%);

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { projects } from "@/lib/projects";
 
@@ -118,18 +119,18 @@ export function MinimalDemo() {
               </p>
             </div>
             <div className="flex gap-3">
-              <a
+              <Link
                 href="/services"
                 className="bg-neutral-900 px-6 py-3 font-mono text-[11px] tracking-widest text-white uppercase transition-opacity hover:opacity-90"
               >
                 What I build
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/#contact"
                 className="border border-neutral-900 px-6 py-3 font-mono text-[11px] tracking-widest uppercase transition-colors hover:bg-neutral-900 hover:text-white"
               >
                 Quote
-              </a>
+              </Link>
             </div>
           </motion.div>
 

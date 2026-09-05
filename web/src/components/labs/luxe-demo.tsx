@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { projects } from "@/lib/projects";
 import { cn } from "@/lib/utils";
@@ -151,19 +152,19 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
             deserves paper rather than pixels. Roughly a week.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a
+            <Link
               href="/services"
               className="border border-[#1c1917] px-8 py-3 text-[11px] tracking-[0.3em] uppercase transition-colors hover:bg-[#1c1917] hover:text-[#f7f3ea]"
             >
               What I build
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#contact"
               className="text-[11px] tracking-[0.3em] uppercase underline underline-offset-8"
               style={{ color: GOLD }}
             >
               Enquire
-            </a>
+            </Link>
           </div>
         </div>
       </section>

@@ -11,7 +11,7 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
 export function LabsGallery() {
   return (
-    <main className="bg-background min-h-dvh text-white">
+    <main className="bg-background text-foreground min-h-dvh">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -20,7 +20,7 @@ export function LabsGallery() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-white"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to site
@@ -106,7 +106,7 @@ export function LabsGallery() {
         </div>
 
         <div className="border-line mt-16 border-t pt-10">
-          <h2 className="text-2xl font-semibold tracking-tight text-white">
+          <h2 className="text-2xl font-semibold tracking-tight">
             Know which one you want?
           </h2>
           <p className="mt-3 max-w-lg text-muted-foreground">
@@ -124,13 +124,13 @@ export function LabsGallery() {
             </Link>
             <Link
               href="/pricing"
-              className="border-line-strong inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm text-white/80 transition-colors hover:border-white/40 hover:text-white"
+              className="border-line-strong text-foreground/80 hover:border-line-control hover:text-foreground inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm transition-colors"
             >
               What it costs
             </Link>
             <Link
               href="/#contact"
-              className="border-line-strong inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm text-white/80 transition-colors hover:border-white/40 hover:text-white"
+              className="border-line-strong text-foreground/80 hover:border-line-control hover:text-foreground inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm transition-colors"
             >
               Ask for a quote
             </Link>

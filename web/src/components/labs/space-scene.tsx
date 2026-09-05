@@ -186,14 +186,20 @@ function Planet({ spin }: { spin: boolean }) {
   const body = useRef<Group>(null);
   const clouds = useRef<Mesh>(null);
 
-  const [day, cloud, night] = useTexture([TEXTURES.day, TEXTURES.clouds, TEXTURES.night]);
+  // The colour space is set in the loader callback rather than after the fact:
+  // useTexture hands back objects from a shared cache, so mutating them during
+  // render is mutating something another component may already be using.
+  const [day, cloud, night] = useTexture(
+    [TEXTURES.day, TEXTURES.clouds, TEXTURES.night],
+    (loaded) => {
+      // useTexture does not know which maps carry colour and which carry data
+      const maps = Array.isArray(loaded) ? loaded : [loaded];
+      maps[0].colorSpace = SRGBColorSpace;
+      maps[2].colorSpace = SRGBColorSpace;
+    },
+  );
 
-  const gloss = useMemo(() => {
-    // useTexture does not know which maps carry colour and which carry data
-    day.colorSpace = SRGBColorSpace;
-    night.colorSpace = SRGBColorSpace;
-    return waterMask(day);
-  }, [day, night]);
+  const gloss = useMemo(() => waterMask(day), [day]);
 
   useFrame((_, delta) => {
     if (!spin) return;

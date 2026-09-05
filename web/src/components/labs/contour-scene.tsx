@@ -799,6 +799,9 @@ function Director({
       band(p, 0.78, 0.9, 2, 3),
     ];
     const total = raw.reduce((sum, v) => sum + v, 0) || 1;
+    // The scene owns this ref and every part reads it without re-rendering.
+    // Four numbers in state would re-render the whole thing sixty times a second.
+    // eslint-disable-next-line react-hooks/immutability -- written per frame by design
     for (let i = 0; i < raw.length; i++) weights.current[i] = raw[i] / total;
 
     let distance = 0;
