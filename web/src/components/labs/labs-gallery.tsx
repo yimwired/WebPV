@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { labs } from "@/lib/labs";
+import { labCardVersions } from "@/lib/lab-cards";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -58,7 +59,9 @@ export function LabsGallery() {
                   }}
                 >
                   <Image
-                    src={`/labs/cards/${lab.slug}.jpg`}
+                    // the hash comes from the file itself, so a reshoot
+                    // changes the URL and the day-long cache stops hiding it
+                    src={`/labs/cards/${lab.slug}.jpg?v=${labCardVersions[lab.slug] ?? ""}`}
                     alt={`${lab.name}: ${lab.vibe}`}
                     fill
                     sizes="(min-width: 640px) 45vw, 92vw"
