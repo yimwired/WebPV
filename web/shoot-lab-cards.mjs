@@ -2,7 +2,14 @@
 // which is what the gallery cards show. Committed output, unlike the
 // screenshots/ directory, because the site serves these.
 //
-// Needs `npm run start` on :3000. Re-run after changing any demo's look.
+// Needs the built site served on :3000. `next start` does not work here - the
+// app is `output: "export"` - so build first, then from the repo root run
+// `npx wrangler dev -c wrangler.jsonc --port 3000`, and stop it before the
+// next build or the export fails with EBUSY on web/out.
+//
+// Re-run after changing any demo's look, and after changing `lib/projects.ts`:
+// five of these demos render the project list, so adding a project silently
+// dates their cards.
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 
@@ -16,7 +23,17 @@ const SIZE = { width: 1280, height: 800 };
 const SHOT_AT = {
   contour: 0.42,
   meridian: 0.12,
-  vision: 0.08,
+  // 0.08 framed this correctly until the project list grew and the page with
+  // it: the same fraction then scrolled past the headline into empty black.
+  // Jumping further does not help either, since the sections below the hero
+  // are scroll-reveals that a teleported scroll never fires.
+  vision: 0.02,
+  // the four product templates: each one's card has to show the thing it sells,
+  // which is never the top of the page
+  cart: 0.06, // the headline and the bundle tiles, not the bare product shot
+  counter: 0.18, // the signature dishes
+  longtail: 0.3, // tour cards beside the live booking panel
+  stall: 0.22, // the rail beside the listings
 };
 
 await mkdir(OUT, { recursive: true });
