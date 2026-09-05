@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import { projects } from "@/lib/projects";
@@ -192,7 +193,9 @@ export function SpaceDemo() {
           transition={{ duration: 0.7 }}
           className="text-xs tracking-[0.5em] text-cyan-300/80 uppercase"
         >
-          // mission log
+          {/* the slashes are the costume: this demo dresses its headings as
+              lines from a mission log, so they are content and not a comment */}
+          {"// mission log"}
         </motion.h2>
 
         <div className="mt-8 space-y-3">
@@ -232,7 +235,7 @@ export function SpaceDemo() {
         {/* the transmission ends with a way to answer it */}
         <div className="mt-16 border border-cyan-400/25 bg-cyan-950/20 p-8 text-center">
           <p className="text-[10px] tracking-[0.4em] text-cyan-300/90 uppercase">
-            // incoming channel open
+            {"// incoming channel open"}
           </p>
           <h3 className="mt-4 font-sans text-2xl font-semibold tracking-tight text-slate-100">
             Want a site that flies like this one?
@@ -242,18 +245,18 @@ export function SpaceDemo() {
             video. Every panel here is yours to fill.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <a
+            <Link
               href="/services"
               className="border border-cyan-400/60 bg-cyan-400/10 px-6 py-3 text-[11px] tracking-[0.3em] text-cyan-200 uppercase transition-colors hover:bg-cyan-400/20"
             >
               What I build
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#contact"
               className="border border-slate-600 px-6 py-3 text-[11px] tracking-[0.3em] text-slate-300 uppercase transition-colors hover:border-slate-400"
             >
               Ask for a quote
-            </a>
+            </Link>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import { projects } from "@/lib/projects";
@@ -137,18 +138,18 @@ export function DimensionDemo() {
             work; the rest of the page comes with it.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a
+            <Link
               href="/services"
               className="rounded-full bg-slate-100 px-7 py-3 text-sm font-semibold text-slate-900 transition-opacity hover:opacity-90"
             >
               What I build
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#contact"
               className="rounded-full border border-white/25 px-7 py-3 text-sm text-slate-200 transition-colors hover:border-white/50"
             >
               Ask for a quote
-            </a>
+            </Link>
           </div>
         </div>
       </section>

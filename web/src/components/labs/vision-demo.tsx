@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { projects } from "@/lib/projects";
@@ -209,19 +210,19 @@ export function VisionDemo() {
           className="mt-10"
         >
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
+            <Link
               href="/services"
               className="rounded-full px-7 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.04]"
               style={{ background: BLUE }}
             >
               Build yours
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#contact"
               className="rounded-full border border-white/25 px-7 py-3 text-sm text-white/90 transition-colors hover:border-white/60"
             >
               Ask for a quote
-            </a>
+            </Link>
           </div>
         </motion.div>
 
