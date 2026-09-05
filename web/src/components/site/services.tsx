@@ -55,7 +55,7 @@ export function Services() {
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               {s.processTitle}
             </h2>
-            <p className="text-muted-foreground mt-4 leading-relaxed">
+            <p className="text-muted-foreground mt-4 max-w-[62ch] leading-relaxed">
               {s.processSub}
             </p>
           </div>
@@ -135,7 +135,7 @@ function ProcessSteps({
             {String(start + i).padStart(2, "0")}
           </span>
           <h3 className="font-semibold leading-6 tracking-tight">{step.h}</h3>
-          <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+          <p className="text-muted-foreground mt-2 max-w-[62ch] text-sm leading-relaxed">
             {step.p}
           </p>
         </li>

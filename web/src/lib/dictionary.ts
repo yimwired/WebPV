@@ -89,7 +89,7 @@ const en = {
           "Phone first, Thai and English",
           "Your repo, your domain",
         ],
-        timeline: "Usually about a week",
+        timeline: "Three days to five weeks, by package",
       },
       {
         title: "Automation & bots",
@@ -149,7 +149,7 @@ const en = {
         },
         {
           h: "Deposit, then work starts",
-          p: "Half up front, half on the day it goes live. Bank transfer or PromptPay, at the number you already agreed to.",
+          p: "Half up front and half on the day it goes live. The longest builds split three ways instead, so the middle payment lands only once you have seen the thing working. Bank transfer or PromptPay, at the number you already agreed to.",
         },
         {
           h: "A short kickoff call",
@@ -161,7 +161,7 @@ const en = {
         },
         {
           h: "Ship and hand over",
-          p: "It goes live, the code is yours, and revisions are included as agreed.",
+          p: "It goes live, the code is yours, and revisions are included as agreed. Fixes stay free for thirty days after that, and if you would rather never log in again there is a monthly plan that keeps it looked after.",
         },
       ],
     },
@@ -640,7 +640,7 @@ const th: typeof en = {
           "ออกแบบจากมือถือก่อน รองรับทั้งไทยและอังกฤษ",
           "โค้ดกับโดเมนเป็นของคุณ",
         ],
-        timeline: "ปกติราวหนึ่งสัปดาห์",
+        timeline: "3 วัน ถึง 5 สัปดาห์ แล้วแต่แพ็กเกจ",
       },
       {
         title: "ระบบอัตโนมัติและบอท",
@@ -698,7 +698,7 @@ const th: typeof en = {
         },
         {
           h: "วางมัดจำแล้วเริ่มได้เลย",
-          p: "จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง โอนธนาคารหรือพร้อมเพย์ ยอดตรงกับที่ตกลงกันไว้",
+          p: "จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง งานที่ใช้เวลานานแบ่งเป็นสามงวดแทน ก้อนกลางจ่ายตอนได้เห็นของที่ใช้งานได้แล้ว โอนธนาคารหรือพร้อมเพย์ ยอดตรงกับที่ตกลงกันไว้",
         },
         {
           h: "คุย kickoff สั้นๆ",
@@ -710,7 +710,7 @@ const th: typeof en = {
         },
         {
           h: "ส่งมอบและขึ้นจริง",
-          p: "ขึ้นออนไลน์ให้เรียบร้อย โค้ดเป็นของคุณ แล้วแก้ให้ตามรอบที่ตกลงกันไว้",
+          p: "ขึ้นออนไลน์ให้เรียบร้อย โค้ดเป็นของคุณ แล้วแก้ให้ตามรอบที่ตกลงกันไว้ หลังจากนั้นแก้บั๊กฟรีอีก 30 วัน ถ้าไม่อยากมายุ่งกับเว็บเองเลย มีแพ็กเกจดูแลรายเดือนให้เลือก",
         },
       ],
     },
