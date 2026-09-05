@@ -67,6 +67,17 @@ export const labs: Lab[] = [
     buildTime: "About a week",
   },
   {
+    slug: "cart",
+    name: "Cart",
+    vibe: "One product, one page",
+    description:
+      "The single product page, in the register the genre actually works in. Off-black with one acid accent that only ever means buy, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it. The scarcity theatre is left out on purpose.",
+    accent: "#c8f04a",
+    preview: { from: "#141416", to: "#0b0b0c" },
+    bestFor: "One hero product, dropshipping, a launch, a pre-order",
+    buildTime: "Four days once the product photos exist",
+  },
+  {
     slug: "counter",
     name: "Counter",
     vibe: "Restaurant menu, one link",
