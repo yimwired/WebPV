@@ -36,6 +36,7 @@ const SHOT_AT = {
   counter: 0.18, // the signature dishes
   longtail: 0.3, // tour cards beside the live booking panel
   stall: 0.22, // the rail beside the listings
+  playroom: 0.05, // the jar with the pile in it, not the headline alone
 };
 
 await mkdir(OUT, { recursive: true });
@@ -60,7 +61,13 @@ const slugs = await page.evaluate(() =>
 const unique = [...new Set(slugs)];
 console.log(`${unique.length} labs: ${unique.join(", ")}`);
 
-for (const slug of unique) {
+// ONLY=playroom,cart reshoots just those, for when one demo changed and the
+// rest are already correct. The hashes below are still read off every file on
+// disk, so the manifest stays complete either way.
+const only = process.env.ONLY?.split(",").map((s) => s.trim());
+const targets = only ? unique.filter((slug) => only.includes(slug)) : unique;
+
+for (const slug of targets) {
   await page.goto(`http://localhost:3000/labs/${slug}`, {
     waitUntil: "networkidle",
   });
