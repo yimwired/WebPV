@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 
 export interface PricingTier {
-  id: "quick" | "starter" | "standard" | "signature" | "custom";
+  id: "quick" | "starter" | "business" | "standard" | "signature" | "custom";
   /** formatted baht amount, or null when the tier is quoted per project */
   price: string | null;
   /** what it costs while `introOffer` is running */
@@ -25,9 +25,17 @@ export interface PricingTier {
  */
 export const introOffer = { active: true, projects: 3, percentOff: 30 };
 
+// Business exists because the survey of live Fastwork gigs on 2026-09-08 found
+// the sellers with real sales records clustered around 10,000 for four pages,
+// while this list jumped from one page at 9,900 straight to eight at 24,900.
+// The most-bought shape on the market had no card here at all. It is priced at
+// the top of that cluster rather than inside it: what it adds over the market
+// is a designed page per section instead of one template repeated.
+//
 // Each demo is picked to match what the tier actually buys, using the
 // `buildTime` on the lab itself: Minimal is "Under a week" (Starter is 5 days),
-// Meridian is "About a week", Trine is "Two weeks, the 3D object is the work".
+// Maison is "About a week" and is the multi-section business look, Meridian is
+// "About a week", Trine is "Two weeks, the 3D object is the work".
 // Signature's blurb names Trine outright, so that pairing is fixed by the copy.
 // Custom is quoted per project and has no representative demo. Neither does
 // Quick page: what it buys is any style in The Lab used as it already looks,
@@ -35,6 +43,7 @@ export const introOffer = { active: true, projects: 3, percentOff: 30 };
 export const pricingTiers: PricingTier[] = [
   { id: "quick", price: "4,900", introPrice: "3,400" },
   { id: "starter", price: "9,900", introPrice: "6,900", demoHref: "/labs/minimal" },
+  { id: "business", price: "14,900", introPrice: "10,400", demoHref: "/labs/luxe" },
   {
     id: "standard",
     price: "24,900",

@@ -39,9 +39,10 @@ export function Pricing() {
         )}
       </Reveal>
 
-      {/* four fixed packages: two up at tablet, all four only once the
-          column is wide enough for a price to sit on one line */}
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* five fixed packages, laid out as one ladder of rising prices at
+          desktop width. Five across only from xl: at lg the columns come out
+          179px, which is narrower than the longest bullet can take. */}
+      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {packages.map((tier, i) => (
           <Reveal key={tier.id} delay={i * 0.05}>
             <TierCard tier={tier} />
@@ -145,7 +146,11 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">{copy.name}</h2>
-          <p className="text-muted-foreground mt-1 text-sm">{copy.forWho}</p>
+          {/* two lines' worth of room whether the line wraps or not: the
+              prices below have to sit on one row to be comparable */}
+          <p className={cn("text-muted-foreground mt-1 text-sm", !wide && "min-h-10")}>
+            {copy.forWho}
+          </p>
         </div>
         {tier.featured && (
           <span className="spec text-brand border-line-strong shrink-0 rounded-md border px-2 py-1">

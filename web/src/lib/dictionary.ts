@@ -196,7 +196,7 @@ const en = {
   // Numbers live in `pricing.ts`; only the wording is here, keyed by tier id.
   pricing: {
     title: "Prices agreed before anything starts",
-    sub: "Four packages cover most of what people ask me for. Anything larger is quoted per project. Whatever number you agree to is the number on the invoice.",
+    sub: "Five packages cover most of what people ask me for. Anything larger is quoted per project. Whatever number you agree to is the number on the invoice.",
     recommended: "Recommended",
     perProject: "Per project",
     seeDemo: "See it live",
@@ -233,6 +233,21 @@ const en = {
         ],
         timeline: "About 5 days",
         cta: "Start with Starter",
+      },
+      business: {
+        name: "Business",
+        forWho: "A real site, several pages",
+        blurb:
+          "The shape most businesses actually need: a few pages that each do one job, so a visitor looking for your prices does not have to scroll past your story to find them.",
+        points: [
+          "Four to six pages, each designed for its job",
+          "Thai and English copy",
+          "Map, phone and social links wired up",
+          "Search engines get a sitemap and proper previews",
+          "Two rounds of revisions",
+        ],
+        timeline: "About 10 days",
+        cta: "Start with Business",
       },
       standard: {
         name: "Standard",
@@ -767,7 +782,7 @@ const th: typeof en = {
   },
   pricing: {
     title: "ราคาคุยกันจบ​ตั้งแต่​ก่อนเริ่มงาน",
-    sub: "สี่แพ็กเกจนี้ครอบคลุมงานที่มีคนถามหาบ่อยที่สุด ถ้าใหญ่กว่านั้นคิดตามงานจริง ตกลงราคาไหนไว้ ก็จ่ายเท่านั้น ไม่มีบวกเพิ่มทีหลัง",
+    sub: "ห้าแพ็กเกจนี้ครอบคลุมงานที่มีคนถามหาบ่อยที่สุด ถ้าใหญ่กว่านั้นคิดตามงานจริง ตกลงราคาไหนไว้ ก็จ่ายเท่านั้น ไม่มีบวกเพิ่มทีหลัง",
     recommended: "แนะนำ",
     perProject: "คิดตามงาน",
     seeDemo: "ดูของจริง",
@@ -804,6 +819,21 @@ const th: typeof en = {
         ],
         timeline: "ราว 5 วัน",
         cta: "เริ่มที่ Starter",
+      },
+      business: {
+        name: "Business",
+        forWho: "เว็บจริงจัง หลายหน้า",
+        blurb:
+          "รูปแบบที่ธุรกิจส่วนใหญ่ต้องการจริงๆ แยกเป็นหลายหน้า หน้าละเรื่อง คนที่เข้ามาหาราคาจะได้ไม่ต้องเลื่อนผ่านประวัติร้านกว่าจะเจอ",
+        points: [
+          "สี่ถึงหกหน้า ออกแบบแยกทีละหน้า",
+          "ข้อความทั้งไทยและอังกฤษ",
+          "ต่อแผนที่ เบอร์โทร และโซเชียลให้ครบ",
+          "ส่ง sitemap ให้ Google พร้อมภาพตัวอย่างตอนแชร์",
+          "แก้งานได้สองรอบ",
+        ],
+        timeline: "ราว 10 วัน",
+        cta: "เริ่มที่ Business",
       },
       standard: {
         name: "Standard",
