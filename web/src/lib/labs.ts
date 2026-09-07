@@ -111,6 +111,17 @@ export const labs: Lab[] = [
     buildTime: "Two to three weeks, the accounts are the work",
   },
   {
+    slug: "playroom",
+    name: "Playroom",
+    vibe: "Pick and mix, physics",
+    description:
+      "A sweet shop where the jar is the cart. Every piece you add is dropped in as a real body in a solver written for this page, so the pile stacks, rolls and can be thrown - and the plus and minus buttons still run the whole shop without it.",
+    accent: "#ff85a8",
+    preview: { from: "#fff6ec", to: "#ffd9c7" },
+    bestFor: "Sweet shops, merch, anything sold by the piece or the bag",
+    buildTime: "About a week",
+  },
+  {
     slug: "dimension",
     name: "Dimension",
     vibe: "Real-time 3D",
