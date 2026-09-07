@@ -51,7 +51,7 @@ const page = await browser.newPage({
 });
 
 // read the slug list off the gallery itself, so the two can never drift
-await page.goto("http://localhost:3000/labs", { waitUntil: "networkidle" });
+await page.goto("http://localhost:3000/labs", { waitUntil: "load" });
 const slugs = await page.evaluate(() =>
   Array.from(document.querySelectorAll('a[href^="/labs/"]'))
     .map((a) => a.getAttribute("href").replace("/labs/", ""))
@@ -68,9 +68,14 @@ const only = process.env.ONLY?.split(",").map((s) => s.trim());
 const targets = only ? unique.filter((slug) => only.includes(slug)) : unique;
 
 for (const slug of targets) {
-  await page.goto(`http://localhost:3000/labs/${slug}`, {
-    waitUntil: "networkidle",
-  });
+  // `load`, not `networkidle`. Every page carries the switcher, which
+  // prefetches an RSC payload for all fourteen labs, and those prefetches
+  // outlive the navigation that started them: with thirteen labs the pile
+  // cleared inside the 30s default and with fourteen it stopped doing so, so
+  // this timed out on whichever demo happened to be first. None of it is in
+  // the screenshot - `load` already covers the images and scripts this page
+  // needs, and the wait below covers the WebGL paint.
+  await page.goto(`http://localhost:3000/labs/${slug}`, { waitUntil: "load" });
   // WebGL scenes need a moment to light up and textures to paint
   await page.waitForTimeout(3000);
 

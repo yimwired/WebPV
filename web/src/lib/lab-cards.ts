@@ -6,18 +6,18 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const labCardVersions: Record<string, string> = {
-  "contour": "7c543f59",
-  "trine": "fdf679d1",
+  "contour": "b3b5398b",
+  "trine": "30b3d780",
   "sable": "0252e4ff",
-  "meridian": "e3820f4a",
+  "meridian": "c12cd25c",
   "cart": "43928dfd",
-  "counter": "65e53185",
+  "counter": "b046cbbd",
   "longtail": "c14b4ce7",
   "stall": "a594baea",
-  "playroom": "507cf5ec",
-  "dimension": "b242d093",
+  "playroom": "e3c40b29",
+  "dimension": "4d8f96c6",
   "vision": "578ce9b6",
-  "space": "bd7756b9",
+  "space": "fbeba2e2",
   "luxe": "7be50997",
   "minimal": "7874f897"
 };
