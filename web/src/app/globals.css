@@ -259,3 +259,30 @@
     scroll-behavior: auto !important;
   }
 }
+/* ── Theme switch ──────────────────────────────────────────────────────────
+   The new theme wipes in as a circle opening from the toggle button, which is
+   what makes the change feel caused by the control rather than by the page.
+   Chromium and Safari run this; Firefox has no View Transitions yet and the
+   toggle falls back to an instant swap, which is fine.
+
+   Both layers have to stop blending or the two themes cross-fade into a grey
+   wash halfway through, and the old theme must stay put underneath so the
+   circle looks like it is being painted over it. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* The circle itself is animated from theme-toggle.tsx with the button's real
+   coordinates: custom properties set on <html> never reach this pseudo tree, so
+   a keyframe reading var(--theme-x) would quietly open the wipe from the wrong
+   place. The toggle also skips the transition entirely under reduce motion. */

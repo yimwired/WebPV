@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/lib/i18n";
 import { LanguageSwitch } from "./language-switch";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   const { t } = useLocale();
@@ -114,6 +115,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2.5">
           <LanguageSwitch />
+          <ThemeToggle />
           <a
             href={section("#contact")}
             className="bg-foreground text-background hidden rounded-md px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90 md:inline-block"

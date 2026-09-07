@@ -127,12 +127,23 @@ export function ContourDemo({
   return (
     <div ref={container} className="relative h-[460vh] bg-[#150002]">
       <div className="sticky top-0 h-dvh overflow-hidden text-white">
+        {/*
+          A studio sweep, not a spotlight in the middle of the screen.
+
+          Both grounds used to be radial gradients centred behind the pack,
+          which puts the brightest point of the room *behind* the product and
+          gives the light no direction: everything then reads as floating on a
+          coloured disc. A real pack shot lights a curved backdrop from above,
+          so the wall falls off downwards and the floor comes back up under the
+          product. Anchoring the gradient near the top and adding the floor
+          band underneath is what gives the scene a horizon to sit on.
+        */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(75% 55% at 50% 42%, #c11119 0%, #7a0409 42%, #2c0104 78%, #150002 100%)",
+              "radial-gradient(120% 78% at 50% 4%, #d81a22 0%, #9c0a11 30%, #4d0206 62%, #220103 84%, #150002 100%)",
           }}
         />
         <motion.div
@@ -141,12 +152,36 @@ export function ContourDemo({
           style={{
             opacity: warmOpacity,
             background:
-              "radial-gradient(78% 60% at 50% 46%, #f7ded2 0%, #e9b8a8 34%, #b06a63 66%, #3b1418 100%)",
+              "radial-gradient(120% 80% at 50% 2%, #fff0e6 0%, #f6cdb9 24%, #d1857a 52%, #8a3038 78%, #3b1418 100%)",
           }}
         />
+
+        {/* The floor. A soft band the packs stand on rather than hover over,
+            with a lift at the horizon so the sweep looks curved. */}
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%]"
+          style={{
+            opacity: warmOpacity,
+            background:
+              "linear-gradient(to bottom, transparent 0%, rgba(255,236,224,0.13) 16%, rgba(120,38,40,0.15) 46%, rgba(28,4,7,0.5) 100%)",
+          }}
+        />
+
+        {/* Vignette: pulls the eye off the corners and back to the pack, the
+            way a softbox falls off at the edge of a cyclorama. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.14] mix-blend-overlay"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(100% 75% at 50% 42%, transparent 42%, rgba(12,0,2,0.32) 78%, rgba(9,0,1,0.62) 100%)",
+          }}
+        />
+
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.1] mix-blend-overlay"
           style={{
             backgroundImage:
               "repeating-linear-gradient(115deg, transparent 0 22px, rgba(255,255,255,0.5) 22px 23px)",

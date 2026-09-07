@@ -2,14 +2,23 @@
 
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
+import {
+  ContactShadows,
+  Environment,
+  Lightformer,
+  MeshTransmissionMaterial,
+} from "@react-three/drei";
 import {
   CanvasTexture,
+  DoubleSide,
+  ExtrudeGeometry,
   Group,
   LatheGeometry,
   MathUtils,
+  Path,
   RepeatWrapping,
   SRGBColorSpace,
+  Shape,
   Vector2,
   type Mesh,
 } from "three";
@@ -367,19 +376,59 @@ function paintLabel(
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
-  texture.anisotropy = 8;
+  texture.anisotropy = 16;
   // A cylinder starts its wrap at the point facing the camera, which is where
   // the join between the two panels falls. Shifting a quarter turn puts a
   // whole wordmark there instead of the gap between two of them.
   texture.wrapS = RepeatWrapping;
   texture.offset.x = 0.25;
+
+  return { texture, metalness: metalnessMaskFrom(canvas) };
+}
+
+/**
+ * Turn a painted label into the map that says which parts of it are metal.
+ *
+ * On a real can the red is a translucent ink over bare aluminium, so the metal
+ * underneath is still what reflects. The white wordmark and ribbon are opaque
+ * ink sitting on top: they are not metal, and rendering them as if they were
+ * turns every letter into a mirror that picks up the red cards around the
+ * scene and goes almost black. Reading the mask back off the finished label
+ * keeps it in sync with the artwork for free — anything close to white becomes
+ * non-metal, everything else stays metal.
+ */
+function metalnessMaskFrom(source: HTMLCanvasElement) {
+  const canvas = document.createElement("canvas");
+  canvas.width = source.width;
+  canvas.height = source.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  ctx.drawImage(source, 0, 0);
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { data } = image;
+  for (let i = 0; i < data.length; i += 4) {
+    const isInk = data[i] > 210 && data[i + 1] > 190 && data[i + 2] > 190;
+    const v = isInk ? 20 : 235;
+    data[i] = data[i + 1] = data[i + 2] = v;
+  }
+  ctx.putImageData(image, 0, 0);
+
+  const texture = new CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.wrapS = RepeatWrapping;
+  texture.offset.x = 0.25;
   return texture;
 }
 
+/** The colour map plus the metal/ink mask derived from it. */
+export interface PackLabel {
+  texture: CanvasTexture;
+  metalness: CanvasTexture | null;
+}
+
 function useLabels(scriptFamily: string) {
-  const [labels, setLabels] = useState<Record<string, CanvasTexture> | null>(
-    null
-  );
+  const [labels, setLabels] = useState<Record<string, PackLabel> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -388,10 +437,10 @@ function useLabels(scriptFamily: string) {
     // painting earlier silently falls back to a system cursive.
     const paint = () => {
       if (cancelled) return;
-      const next: Record<string, CanvasTexture> = {};
+      const next: Record<string, PackLabel> = {};
       for (const pack of PACKS) {
-        const tex = paintLabel(2048, 1024, scriptFamily, pack.volume);
-        if (tex) next[pack.id] = tex;
+        const painted = paintLabel(2048, 1024, scriptFamily, pack.volume);
+        if (painted) next[pack.id] = painted;
       }
       setLabels(next);
     };
@@ -409,7 +458,11 @@ function useLabels(scriptFamily: string) {
 
   useEffect(() => {
     return () => {
-      if (labels) for (const tex of Object.values(labels)) tex.dispose();
+      if (labels)
+        for (const label of Object.values(labels)) {
+          label.texture.dispose();
+          label.metalness?.dispose();
+        }
     };
   }, [labels]);
 
@@ -418,36 +471,326 @@ function useLabels(scriptFamily: string) {
 
 // ── packs ────────────────────────────────────────────────────
 
+/** How far the beads stand off the metal. Shared so it is not re-allocated. */
+const CONDENSATION_RELIEF = new Vector2(0.45, 0.45);
+
 const ALUMINIUM = {
   color: "#e9edf2",
   metalness: 1,
   roughness: 0.24,
 } as const;
 
-function Can({ label }: { label: CanvasTexture | null }) {
+/**
+ * A faint noise map used as a roughness map on every pack.
+ *
+ * Real aluminium is never uniformly polished — handling, the drawing process
+ * and the print itself all leave the surface varying slightly. A constant
+ * roughness gives one perfect highlight that slides across the barrel, which
+ * is the single strongest tell that a render is a render. Breaking it up by a
+ * few percent is enough to make the highlight read as a surface.
+ */
+function useSurfaceNoise() {
+  return useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const size = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // Seeded rather than Math.random: the grain is identical on every render
+    // and every visitor, which makes the finish a decision instead of an
+    // accident — and keeps this pure enough to run inside useMemo.
+    let seed = 0x9e3779b9;
+    const next = () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+
+    const image = ctx.createImageData(size, size);
+    for (let i = 0; i < image.data.length; i += 4) {
+      // mid grey ± a little: the map multiplies the material roughness, so
+      // staying near the middle keeps the finish the material asked for
+      const v = 150 + next() * 40;
+      image.data[i] = v;
+      image.data[i + 1] = v;
+      image.data[i + 2] = v;
+      image.data[i + 3] = 255;
+    }
+    ctx.putImageData(image, 0, 0);
+
+    const texture = new CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.repeat.set(6, 12);
+    texture.anisotropy = 16;
+    return texture;
+  }, []);
+}
+
+/**
+ * Condensation on a cold can, as a normal map plus the roughness map that goes
+ * with it.
+ *
+ * The page already claims this pack chills in two minutes and that aluminium
+ * pulls heat faster than PET. A cold can in a warm room is wet, so a dry one
+ * quietly contradicts the copy next to it — this is the detail that makes the
+ * claim look observed rather than written.
+ *
+ * Droplets are beads of water sitting on the metal: they bulge (normal) and
+ * they are smoother than the print around them (roughness). Density rises down
+ * the pack because beads run together and settle, and a few of them are drawn
+ * as short streaks for the same reason.
+ */
+function buildCondensation() {
+  if (typeof document === "undefined") return null;
+  const size = 1024;
+
+  const normalCanvas = document.createElement("canvas");
+  const roughCanvas = document.createElement("canvas");
+  normalCanvas.width = size;
+  normalCanvas.height = size;
+  roughCanvas.width = size;
+  roughCanvas.height = size;
+  const normalCtx = normalCanvas.getContext("2d");
+  const roughCtx = roughCanvas.getContext("2d");
+  if (!normalCtx || !roughCtx) return null;
+
+  // flat surface: straight up in tangent space, and the base finish
+  normalCtx.fillStyle = "rgb(128,128,255)";
+  normalCtx.fillRect(0, 0, size, size);
+  roughCtx.fillStyle = "rgb(165,165,165)";
+  roughCtx.fillRect(0, 0, size, size);
+
+  // A hash of the index rather than a running seed: no state to carry, so
+  // the layout is reproducible and nothing is reassigned after render.
+  const rand = (n: number) => {
+    let t = Math.imul(n ^ 0x9e3779b9, 0x85ebca6b);
+    t = Math.imul(t ^ (t >>> 13), 0xc2b2ae35);
+    return ((t ^ (t >>> 16)) >>> 0) / 4294967296;
+  };
+
+  /** One bead: a dome in the normal map, a polished spot in the roughness. */
+  const bead = (cx: number, cy: number, r: number, stretch: number) => {
+    const image = normalCtx.getImageData(
+      Math.max(0, cx - r),
+      Math.max(0, cy - r * stretch),
+      r * 2,
+      r * stretch * 2
+    );
+    const { data, width, height } = image;
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const dx = (x - width / 2) / (width / 2);
+        const dy = (y - height / 2) / (height / 2);
+        const d = Math.hypot(dx, dy);
+        if (d > 1) continue;
+        // hemisphere normal, softened at the rim so beads do not read as discs
+        const falloff = Math.min(1, (1 - d) * 3);
+        const nz = Math.sqrt(Math.max(0, 1 - d * d));
+        const i = (y * width + x) * 4;
+        data[i] = Math.round((dx * falloff * 0.5 + 0.5) * 255);
+        data[i + 1] = Math.round((-dy * falloff * 0.5 + 0.5) * 255);
+        data[i + 2] = Math.round((nz * 0.5 + 0.5) * 255);
+      }
+    }
+    normalCtx.putImageData(
+      image,
+      Math.max(0, cx - r),
+      Math.max(0, cy - r * stretch)
+    );
+
+    const gloss = roughCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    gloss.addColorStop(0, "rgba(40,40,40,0.9)");
+    gloss.addColorStop(0.7, "rgba(90,90,90,0.5)");
+    gloss.addColorStop(1, "rgba(165,165,165,0)");
+    roughCtx.fillStyle = gloss;
+    roughCtx.save();
+    roughCtx.translate(cx, cy);
+    roughCtx.scale(1, stretch);
+    roughCtx.beginPath();
+    roughCtx.arc(0, 0, r, 0, Math.PI * 2);
+    roughCtx.fill();
+    roughCtx.restore();
+  };
+
+  for (let i = 0; i < 1400; i += 1) {
+    const x = rand(i * 5) * size;
+    // bias downwards: beads run together and collect toward the base
+    const y = size * Math.pow(rand(i * 5 + 1), 0.7);
+    const r = 2 + rand(i * 5 + 2) * 6;
+    // one in eight has run, so it is longer than it is wide
+    const stretch =
+      rand(i * 5 + 3) > 0.87 ? 1.8 + rand(i * 5 + 4) * 2.4 : 1;
+    bead(x, y, r, stretch);
+  }
+
+  const normalMap = new CanvasTexture(normalCanvas);
+  const roughnessMap = new CanvasTexture(roughCanvas);
+  for (const tex of [normalMap, roughnessMap]) {
+    tex.wrapS = tex.wrapT = RepeatWrapping;
+    tex.repeat.set(2, 1.2);
+    tex.anisotropy = 16;
+  }
+  // a normal map carries vectors, not colour: leaving it in sRGB would bend
+  // every one of them
+  return { normalMap, roughnessMap };
+}
+
+function useCondensation() {
+  return useMemo(() => buildCondensation(), []);
+}
+
+/**
+ * The vertical ribs moulded into a bottle closure, as a roughness map.
+ *
+ * A cap is the one part of the pack a hand actually grips, so it is ribbed on
+ * every bottle ever made. Rendered smooth it reads as a red plastic cylinder
+ * sitting on top of the bottle rather than as a cap. Ribs as geometry would
+ * cost a few hundred triangles each; as a roughness stripe they cost one small
+ * canvas and survive being seen from any distance this scene uses.
+ */
+function useKnurlTexture() {
+  return useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const width = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = 4;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    for (let x = 0; x < width; x += 1) {
+      // a soft square wave: ribs, not a picket fence
+      const wave = (Math.sin((x / width) * Math.PI * 2 * 48) + 1) / 2;
+      const v = Math.round(90 + wave * 120);
+      ctx.fillStyle = `rgb(${v},${v},${v})`;
+      ctx.fillRect(x, 0, 1, 4);
+    }
+
+    const texture = new CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.anisotropy = 16;
+    return texture;
+  }, []);
+}
+
+/**
+ * The stay-on tab.
+ *
+ * The lid is the part of a can everyone has looked at from 20cm away, so a
+ * blank disc there is the detail that gives the whole render away no matter
+ * how good the barrel is. Built to the real ring-pull: a 22mm blade with a
+ * finger hole, lying flat, held down by a 3mm rivet, with the score line it
+ * levers open drawn around it.
+ */
+function PullTab() {
+  const geometry = useMemo(() => {
+    const length = 22 * MM;
+    const width = 11 * MM;
+    const shape = new Shape();
+    // a capsule: two straight sides closed by half-circle ends
+    const r = width / 2;
+    shape.absarc(-length / 2 + r, 0, r, Math.PI / 2, -Math.PI / 2, true);
+    shape.lineTo(length / 2 - r, -r);
+    shape.absarc(length / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2, true);
+    shape.closePath();
+
+    // the finger hole sits in the rear half, away from the rivet
+    const hole = new Path();
+    hole.absarc(-3.5 * MM, 0, 3.4 * MM, 0, Math.PI * 2, true);
+    shape.holes.push(hole);
+
+    const geo = new ExtrudeGeometry(shape, {
+      depth: 0.4 * MM,
+      bevelEnabled: true,
+      bevelSize: 0.15 * MM,
+      bevelThickness: 0.15 * MM,
+      bevelSegments: 2,
+      curveSegments: 24,
+    });
+    geo.rotateX(-Math.PI / 2);
+    return geo;
+  }, []);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  return (
+    <group position={[0, 117.4 * MM, 0]}>
+      <mesh geometry={geometry} position={[2 * MM, 0, 0]}>
+        <meshStandardMaterial color="#cdd3da" metalness={1} roughness={0.32} />
+      </mesh>
+
+      {/* rivet: the dimple the tab pivots on */}
+      <mesh position={[6.5 * MM, 0.5 * MM, 0]}>
+        <cylinderGeometry args={[1.6 * MM, 1.6 * MM, 1.1 * MM, 20]} />
+        <meshStandardMaterial color="#b9c0c8" metalness={1} roughness={0.26} />
+      </mesh>
+
+      {/* score line: the pressed groove the tab opens along */}
+      <mesh position={[-1 * MM, 0.05 * MM, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[9.6 * MM, 10.1 * MM, 40]} />
+        <meshStandardMaterial color="#9aa2ab" metalness={1} roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+function Can({ label }: { label: PackLabel | null }) {
   const base = useMemo(() => lathe(CAN_BASE), []);
   const top = useMemo(() => lathe(CAN_TOP), []);
+  const noise = useSurfaceNoise();
+  const wet = useCondensation();
   useEffect(() => () => void (base.dispose(), top.dispose()), [base, top]);
+  useEffect(
+    () => () => {
+      wet?.normalMap.dispose();
+      wet?.roughnessMap.dispose();
+    },
+    [wet]
+  );
 
   return (
     <group position={[0, -61 * MM, 0]}>
       <mesh geometry={base}>
-        <meshStandardMaterial {...ALUMINIUM} />
+        <meshStandardMaterial
+          {...ALUMINIUM}
+          roughnessMap={wet?.roughnessMap ?? noise}
+          normalMap={wet?.normalMap ?? null}
+        />
       </mesh>
 
       <mesh position={[0, 54 * MM, 0]}>
         <cylinderGeometry args={[33 * MM, 33 * MM, 105 * MM, 96, 1, true]} />
+        {/*
+          The printed sleeve is ink laid straight onto the aluminium, so the
+          metal is still what reflects: nearly full metalness, and the tint
+          comes from the label map rather than from a dielectric base. Halfway
+          values here are what make a can read as a plastic bottle wrap.
+        */}
         <meshStandardMaterial
-          map={label}
+          map={label?.texture ?? null}
+          metalnessMap={label?.metalness ?? null}
+          roughnessMap={wet?.roughnessMap ?? noise}
+          normalMap={wet?.normalMap ?? null}
+          normalScale={CONDENSATION_RELIEF}
           color={label ? "#ffffff" : BRAND_RED}
-          metalness={0.55}
-          roughness={0.36}
+          metalness={0.92}
+          roughness={0.3}
         />
       </mesh>
 
       <mesh geometry={top} position={[0, 106.5 * MM, 0]}>
-        <meshStandardMaterial {...ALUMINIUM} roughness={0.3} />
+        <meshStandardMaterial
+          {...ALUMINIUM}
+          roughnessMap={noise}
+          roughness={0.3}
+        />
       </mesh>
+
+      <PullTab />
     </group>
   );
 }
@@ -456,7 +799,7 @@ function Bottle({
   label,
   pack,
 }: {
-  label: CanvasTexture | null;
+  label: PackLabel | null;
   pack: "bottle" | "magnum";
 }) {
   const magnum = pack === "magnum";
@@ -471,6 +814,7 @@ function Bottle({
   const shell = useMemo(() => lathe(profile), [profile]);
   const drink = useMemo(() => lathe(truncate(profile, fill)), [profile, fill]);
   const cap = useMemo(() => lathe(CAP_PROFILE, 48), []);
+  const knurl = useKnurlTexture();
   useEffect(
     () => () => void (shell.dispose(), drink.dispose(), cap.dispose()),
     [shell, drink, cap]
@@ -478,32 +822,59 @@ function Bottle({
 
   return (
     <group position={[0, (-height / 2) * MM, 0]}>
-      {/* the clear PET shell, kept cheap: no transmission pass, just a low
-          opacity skin with a hard specular so the edges catch the key */}
+      {/*
+        The PET shell, now refracting rather than faked with opacity.
+
+        A transparent skin can only ever darken what is behind it; it cannot
+        bend it. That missing refraction is why the old shell read as tinted
+        glass film and the drink inside read as a solid brown lump — the eye
+        gets no cue that there is a wall with thickness between the two.
+
+        Held to a budget: 192px render target, 4 samples, and `backside` off.
+        Backside doubles the pass to trace the far wall as well, which on a
+        pack this size buys a difference nobody sees at scroll speed.
+      */}
       <mesh geometry={shell}>
-        <meshPhysicalMaterial
-          color="#e8f0f2"
-          transparent
-          opacity={0.22}
-          roughness={0.08}
-          metalness={0}
-          clearcoat={1}
-          clearcoatRoughness={0.05}
-          envMapIntensity={1.2}
+        <MeshTransmissionMaterial
+          transmission={1}
+          // 0.28 was thick enough for the attenuation to stack up through the
+          // shoulder and settle as a grey wedge above the fill line. PET walls
+          // are a third of a millimetre; the number only has to be enough to
+          // bend the edge.
+          thickness={0.1}
+          ior={1.57}
+          roughness={0.06}
+          chromaticAberration={0.015}
+          // Any blur here smears what the neck refracts into a grey wedge:
+          // there is no liquid above the fill line, so that part of the shell
+          // is showing the background through two curved walls and needs to
+          // stay legible to read as glass rather than as a defect.
+          anisotropicBlur={0}
+          distortion={0}
+          temporalDistortion={0}
+          backside={false}
+          resolution={384}
+          samples={6}
+          side={DoubleSide}
+          color="#f2f8f9"
+          attenuationColor="#eaf2f3"
+          attenuationDistance={12}
         />
       </mesh>
 
-      {/* The drink: opaque, and deliberately dulled against the environment.
-          Left reflective it picks up the red set and turns pink, which is the
-          one colour a cola cannot be. It stops at the real fill line, so the
-          shoulder and neck stay clear plastic. */}
+      {/* The drink. Reads as liquid now that the shell refracts it, so it can
+          take the environment back: at 0.55 it was a matte solid. Still kept
+          off full reflectivity — a cola that picks up the red set turns pink,
+          which is the one colour it cannot be. It stops at the real fill line,
+          so the shoulder and neck stay clear plastic. */}
       <mesh geometry={drink} scale={[0.97, 1, 0.97]}>
         <meshPhysicalMaterial
-          color="#280a04"
-          roughness={0.18}
+          color="#3a1006"
+          roughness={0.12}
           metalness={0}
-          clearcoat={0.5}
-          envMapIntensity={0.55}
+          clearcoat={1}
+          clearcoatRoughness={0.08}
+          envMapIntensity={0.9}
         />
       </mesh>
 
@@ -518,8 +889,10 @@ function Bottle({
             true,
           ]}
         />
+        {/* Printed film wrapped round PET: a dielectric all over, unlike the
+            can where the ink sits straight on metal. */}
         <meshStandardMaterial
-          map={label}
+          map={label?.texture ?? null}
           color={label ? "#ffffff" : BRAND_RED}
           roughness={0.44}
           metalness={0.05}
@@ -527,7 +900,11 @@ function Bottle({
       </mesh>
 
       <mesh geometry={cap} position={[0, (height - 16.6) * MM, 0]}>
-        <meshStandardMaterial color={BRAND_RED} roughness={0.42} />
+        <meshStandardMaterial
+          color={BRAND_RED}
+          roughness={0.42}
+          roughnessMap={knurl}
+        />
       </mesh>
     </group>
   );
@@ -639,7 +1016,7 @@ function PackModel({
   float,
 }: {
   index: number;
-  label: CanvasTexture | null;
+  label: PackLabel | null;
   weights: RefObject<number[]>;
   active: number;
   compact: boolean;
@@ -728,6 +1105,79 @@ function useGlowTexture() {
     texture.colorSpace = SRGBColorSpace;
     return texture;
   }, []);
+}
+
+/**
+ * A backdrop that exists inside the scene, not behind the canvas.
+ *
+ * The page paints its ground in CSS and leaves the canvas transparent, which
+ * is cheap and looks right — until something refracts. `transmission` samples
+ * the rendered *scene*, so above the fill line, where the bottle is hollow and
+ * nothing in the scene sits behind it, the shell was refracting empty buffer
+ * and returning it as a grey wedge across the shoulder.
+ *
+ * One unlit plane far enough back to stay out of every camera move fixes it:
+ * now the neck refracts the same sweep the CSS is painting, which is what the
+ * eye expects a clear bottle to do. Painted to match the CSS stops rather than
+ * replacing them, so the two agree wherever they meet.
+ */
+function Backdrop() {
+  const texture = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // the same sweep the CSS paints, so the two agree where they overlap
+    const sweep = ctx.createLinearGradient(0, 0, 0, size);
+    sweep.addColorStop(0, "#f6cdb9");
+    sweep.addColorStop(0.32, "#d1857a");
+    sweep.addColorStop(0.66, "#8a3038");
+    sweep.addColorStop(1, "#3b1418");
+    ctx.fillStyle = sweep;
+    ctx.fillRect(0, 0, size, size);
+
+    // Fade the edges out. Opaque to the frame edge this plane covers the floor
+    // band and the vignette the page paints in CSS. Solid only where a pack can
+    // actually be in front of it, it gives the refraction something to read and
+    // leaves the CSS ground to carry everything else.
+    ctx.globalCompositeOperation = "destination-in";
+    const mask = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      size * 0.12,
+      size / 2,
+      size / 2,
+      size * 0.52
+    );
+    mask.addColorStop(0, "rgba(0,0,0,1)");
+    mask.addColorStop(0.62, "rgba(0,0,0,0.92)");
+    mask.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = mask;
+    ctx.fillRect(0, 0, size, size);
+
+    const tex = new CanvasTexture(canvas);
+    tex.colorSpace = SRGBColorSpace;
+    return tex;
+  }, []);
+
+  useEffect(() => () => texture?.dispose(), [texture]);
+  if (!texture) return null;
+
+  return (
+    <mesh position={[0, 0, -5]}>
+      <planeGeometry args={[18, 12]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  );
 }
 
 function Pedestal({ weights }: { weights: RefObject<number[]> }) {
@@ -873,11 +1323,41 @@ export default function ContourScene({
         />
       ))}
 
+      <Backdrop />
+
       <Pedestal weights={weights} />
 
-      <ambientLight intensity={0.5} />
-      <Environment resolution={256}>
-        <Lightformer intensity={5} position={[0, 4, 3]} scale={[9, 7, 1]} />
+      {/*
+        The one thing that was missing everywhere: weight.
+        Nothing here touched a surface, so every pack read as a cut-out pasted
+        over a gradient no matter how good its material was. A soft contact
+        shadow under the group gives the scene a floor, and the floor is what
+        makes the arrangement read as staged rather than as three objects
+        floating at arbitrary heights. Kept blurry and cheap — it is doing a
+        compositional job, not a physical one.
+      */}
+      <ContactShadows
+        position={[0, -0.86, 0]}
+        scale={5.5}
+        far={1.8}
+        blur={2.6}
+        opacity={0.7}
+        resolution={256}
+        color="#140102"
+      />
+
+      {/* Low on purpose. Ambient light lifts the shadow side of a metal pack
+          uniformly, which flattens exactly the reflections the light cards
+          above are there to create. */}
+      <ambientLight intensity={0.28} />
+      {/* 256 is too coarse for metal: the light cards arrive on the barrel as
+          soft blobs instead of edges, and an edgeless highlight is what a
+          plastic surface looks like. */}
+      <Environment resolution={512}>
+        {/* The key. Held down from 5: the neck-in curves the shoulder straight
+            back at this card, and at full strength that whole band clipped to
+            flat white with no form left in it. */}
+        <Lightformer intensity={3.4} position={[0, 4, 3]} scale={[9, 7, 1]} />
         {/* dark cards either side: red aluminium needs something to reflect
             or the barrel of the can flattens out */}
         <Lightformer

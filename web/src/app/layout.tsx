@@ -36,11 +36,14 @@ export const metadata: Metadata = {
   },
 };
 
-// Matches --background in the .dark block. On a phone the browser paints its
-// own bar with this colour, so without it the chrome stays white above a black
-// page.
+// The phone paints its own bar with this colour. Two entries so the bar follows
+// the theme the visitor is actually on; the dark value matches --background in
+// the .dark block, the light one matches :root.
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
 };
 
 export default function RootLayout({
@@ -54,6 +57,17 @@ export default function RootLayout({
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Runs before first paint, so a visitor who chose light never sees the
+            dark page flash first. <html> already carries `dark`, so this only
+            has to take it off. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.remove('dark')}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-full bg-background text-foreground">
         {/* Who built this and what it is, stated to crawlers in a form
             they parse rather than infer. Rendered at build time. */}

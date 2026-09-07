@@ -18,6 +18,7 @@ const en = {
     openMenu: "Open menu",
     closeMenu: "Close menu",
     skipToContent: "Skip to content",
+    toggleTheme: "Switch between dark and light",
   },
   hero: {
     name: "Nuttapon Yimnoi (Film)",
@@ -38,6 +39,28 @@ const en = {
     title: "Built, shipped, still running",
     sub: "Each one is in daily use, not a demo. Open any of them for how it was built and what it does.",
     caseStudy: "Read the build",
+  },
+  lab: {
+    title: "Thirteen directions, every one built",
+    sub: "Each is a working page, not a theme with the colours swapped: the tour panel quotes real totals, the shop page knows whether it is open right now. Pick the one that fits your business and your content goes in it.",
+    seeAll: "All {count} in The Lab",
+    railEnd: "directions to browse",
+    proof: [
+      {
+        value: "41 ms",
+        label:
+          "The e-ink latency Sable reproduces, full-refresh flicker included.",
+      },
+      {
+        value: "30%",
+        label:
+          "The deposit Longtail quotes live as you add adults, children and hotel pickup.",
+      },
+      {
+        value: "3",
+        label: "Render real-time 3D in the browser, not a video of one.",
+      },
+    ],
   },
   about: {
     label: "What I work with",
@@ -565,6 +588,7 @@ const th: typeof en = {
     openMenu: "เปิดเมนู",
     closeMenu: "ปิดเมนู",
     skipToContent: "ข้ามไปที่เนื้อหา",
+    toggleTheme: "สลับธีมมืดกับสว่าง",
   },
   hero: {
     // Roman spelling on both sides: it is how the name appears on GitHub and
@@ -589,6 +613,28 @@ const th: typeof en = {
     title: "สร้างเสร็จ ส่งขึ้นใช้ และยังรันอยู่",
     sub: "ทุกตัวใช้งานจริงทุกวัน ไม่ใช่ตัวอย่างโชว์ กดเข้าไปดูได้ว่าสร้างยังไงและทำอะไรได้บ้าง",
     caseStudy: "ดูเบื้องหลัง",
+  },
+  lab: {
+    title: "13 แบบ สร้างขึ้นมาจริงทุกอัน",
+    sub: "ทุกอันเป็นเว็บที่ทำงานได้จริง ไม่ใช่ธีมที่เปลี่ยนแค่สี ตัวจองทัวร์คิดเงินได้จริง หน้าร้านอาหารรู้ว่าตอนนี้เปิดหรือปิด เลือกอันที่เข้ากับธุรกิจคุณ แล้วผมเอาเนื้อหาของคุณใส่ลงไปในแบบนั้น",
+    seeAll: "ดูครบ {count} แบบใน The Lab",
+    railEnd: "แบบให้เลือกดู",
+    proof: [
+      {
+        value: "41 ms",
+        label:
+          "ค่าหน่วงจริงของจอ e-ink ที่ Sable ทำซ้ำ รวมอาการกะพริบตอนรีเฟรชทั้งจอ",
+      },
+      {
+        value: "30%",
+        label:
+          "ค่ามัดจำที่ Longtail คิดให้สดๆ ตอนเพิ่มผู้ใหญ่ เด็ก และรถรับที่โรงแรม",
+      },
+      {
+        value: "3",
+        label: "อันที่เรนเดอร์ 3D สดในเบราว์เซอร์ ไม่ใช่วิดีโอที่อัดมา",
+      },
+    ],
   },
   about: {
     label: "เครื่องมือที่ใช้",
