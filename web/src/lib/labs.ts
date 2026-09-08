@@ -122,6 +122,17 @@ export const labs: Lab[] = [
     buildTime: "About a week",
   },
   {
+    slug: "signal",
+    name: "Signal",
+    vibe: "Instrumentation, measured",
+    description:
+      "A working oscilloscope for a company that sells sensors. Pick a channel and a sweep rate and the trace answers; peak to peak, RMS and frequency are computed from the same samples it draws, so the readout cannot disagree with the picture.",
+    accent: "#5cf08a",
+    preview: { from: "#0b100e", to: "#04160d" },
+    bestFor: "Sensors, lab instruments, IoT, anything sold on a spec sheet",
+    buildTime: "About a week",
+  },
+  {
     slug: "dimension",
     name: "Dimension",
     vibe: "Real-time 3D",

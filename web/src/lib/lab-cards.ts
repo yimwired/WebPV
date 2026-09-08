@@ -15,6 +15,7 @@ export const labCardVersions: Record<string, string> = {
   "longtail": "c14b4ce7",
   "stall": "a594baea",
   "playroom": "e3c40b29",
+  "signal": "f326a392",
   "dimension": "4d8f96c6",
   "vision": "578ce9b6",
   "space": "fbeba2e2",
