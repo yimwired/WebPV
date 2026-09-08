@@ -32,11 +32,8 @@ export function Pricing() {
   );
 
   return (
-    <section
-      id="pricing"
-      className="mx-auto max-w-6xl px-5 pb-8 pt-32 sm:px-8 sm:pt-40"
-    >
-      <Reveal>
+    <section id="pricing" className="pb-8 pt-32 sm:pt-40">
+      <Reveal className="mx-auto max-w-6xl px-5 sm:px-8">
         <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
           {locale === "th" ? thaiWrap(p.title) : p.title}
         </h1>
@@ -50,8 +47,10 @@ export function Pricing() {
 
       {/* the four designed packages, as one ladder of rising prices: two up at
           tablet, all four only once a column is wide enough for a price to sit
-          on one line */}
-      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          on one line. Wider than the prose around it - the cards are the point
+          of this page - but capped, since past ~1400px the lines inside a card
+          get too long to track. */}
+      <div className="mx-auto mt-14 grid max-w-[88rem] gap-5 px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
         {packages.map((tier, i) => (
           <Reveal key={tier.id} delay={i * 0.05}>
             <TierCard tier={tier} />
@@ -61,7 +60,7 @@ export function Pricing() {
 
       {/* the two ways off that ladder: cheaper and faster, or quoted per
           project. Half width each, so the longer copy in them has a measure */}
-      <div className="mt-10 grid gap-5 lg:grid-cols-2">
+      <div className="mx-auto mt-10 grid max-w-[88rem] gap-5 px-5 sm:px-8 lg:grid-cols-2">
         {asides.map((tier, i) => (
           <Reveal key={tier.id} delay={i * 0.05}>
             <TierCard tier={tier} wide />
@@ -69,7 +68,7 @@ export function Pricing() {
         ))}
       </div>
 
-      <Reveal className="border-line mt-20 border-t pt-12">
+      <Reveal className="border-line mx-auto mt-20 max-w-6xl border-t px-5 pt-12 sm:px-8">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {p.includedTitle}
         </h2>
@@ -83,7 +82,7 @@ export function Pricing() {
         </ul>
       </Reveal>
 
-      <Reveal className="border-line mt-20 border-t pt-12">
+      <Reveal className="border-line mx-auto mt-20 max-w-6xl border-t px-5 pt-12 sm:px-8">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {p.careTitle}
         </h2>
@@ -98,7 +97,7 @@ export function Pricing() {
         <p className="text-muted-foreground mt-5 text-sm">{p.careNote}</p>
       </Reveal>
 
-      <Reveal className="mt-20">
+      <Reveal className="mx-auto mt-20 max-w-6xl px-5 sm:px-8">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {p.faqTitle}
         </h2>
@@ -114,7 +113,7 @@ export function Pricing() {
         </dl>
       </Reveal>
 
-      <Reveal className="border-line mt-20 border-t pt-12">
+      <Reveal className="border-line mx-auto mt-20 max-w-6xl border-t px-5 pt-12 sm:px-8">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {p.ctaTitle}
         </h2>
