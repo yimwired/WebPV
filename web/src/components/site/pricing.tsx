@@ -19,8 +19,17 @@ export function Pricing() {
   const { t, locale } = useLocale();
   const p = t.pricing;
 
-  const packages = pricingTiers.filter((tier) => tier.price !== null);
-  const quoted = pricingTiers.filter((tier) => tier.price === null);
+  // Quick page leaves the main grid on purpose. Five cards across came out at
+  // 205px each, which is not enough for a Thai bullet to hold a line, and Quick
+  // page is the odd one out anyway: it is the only tier that uses a Lab style
+  // as it already looks instead of designing anything. It reads better beside
+  // the quoted tier as one of the two ways out of the four-card ladder.
+  const packages = pricingTiers.filter(
+    (tier) => tier.price !== null && tier.id !== "quick",
+  );
+  const asides = pricingTiers.filter(
+    (tier) => tier.price === null || tier.id === "quick",
+  );
 
   return (
     <section
@@ -39,10 +48,10 @@ export function Pricing() {
         )}
       </Reveal>
 
-      {/* five fixed packages, laid out as one ladder of rising prices at
-          desktop width. Five across only from xl: at lg the columns come out
-          179px, which is narrower than the longest bullet can take. */}
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      {/* the four designed packages, as one ladder of rising prices: two up at
+          tablet, all four only once a column is wide enough for a price to sit
+          on one line */}
+      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {packages.map((tier, i) => (
           <Reveal key={tier.id} delay={i * 0.05}>
             <TierCard tier={tier} />
@@ -50,11 +59,15 @@ export function Pricing() {
         ))}
       </div>
 
-      {quoted.map((tier) => (
-        <Reveal key={tier.id} className="mt-5">
-          <TierCard tier={tier} wide />
-        </Reveal>
-      ))}
+      {/* the two ways off that ladder: cheaper and faster, or quoted per
+          project. Half width each, so the longer copy in them has a measure */}
+      <div className="mt-10 grid gap-5 lg:grid-cols-2">
+        {asides.map((tier, i) => (
+          <Reveal key={tier.id} delay={i * 0.05}>
+            <TierCard tier={tier} wide />
+          </Reveal>
+        ))}
+      </div>
 
       <Reveal className="border-line mt-20 border-t pt-12">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -186,24 +199,9 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
         )}
       </div>
 
-      <p
-        className={cn(
-          "mt-5 leading-relaxed text-muted-foreground",
-          // the quoted card is full width, so the paragraph needs its own
-          // measure or the lines get too long to track
-          wide && "max-w-2xl",
-        )}
-      >
-        {copy.blurb}
-      </p>
+      <p className="mt-5 leading-relaxed text-muted-foreground">{copy.blurb}</p>
 
-      <ul
-        className={cn(
-          "mt-6 space-y-2.5",
-          // the quoted tier spans the full width, so its list can too
-          wide && "sm:columns-2 sm:gap-8 sm:space-y-0",
-        )}
-      >
+      <ul className="mt-6 space-y-2.5">
         {copy.points.map((point) => (
           <li
             key={point}
