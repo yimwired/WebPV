@@ -3,6 +3,7 @@
 //   node scripts/shoot-lighthouse.mjs                    # every main route, mobile
 //   ROUTES=/,/pricing node scripts/shoot-lighthouse.mjs  # just these
 //   PRESET=desktop node scripts/shoot-lighthouse.mjs     # desktop throttling
+//   RUNS=5 node scripts/shoot-lighthouse.mjs             # more samples per route
 //
 // /pricing sells "speed and accessibility measured, not assumed" and until this
 // existed nothing in the repo measured either. The other verify scripts check
@@ -44,6 +45,20 @@ const PRESET = process.env.PRESET === "desktop" ? "desktop" : "mobile";
 
 const CATEGORIES = ["performance", "accessibility", "best-practices", "seo"];
 
+/**
+ * Runs per route, reduced to the median.
+ *
+ * A single Lighthouse run against a real host is not a measurement, it is a
+ * sample: two runs minutes apart scored /labs at 96 and then 76, on identical
+ * bytes, because the throttling sits on top of whatever the network and the
+ * machine were doing at that second. Lighthouse's own guidance is to take the
+ * median of several. Three is the smallest number that has one.
+ */
+const RUNS = Number(process.env.RUNS ?? 3);
+
+/** Median of a list of numbers - for an even count, the lower middle. */
+const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor((xs.length - 1) / 2)];
+
 /** Metrics worth printing: the ones that move the performance score. */
 const METRICS = [
   ["largest-contentful-paint", "LCP"],
@@ -65,27 +80,40 @@ const rows = [];
 try {
   for (const route of ROUTES) {
     const url = BASE + route;
-    const result = await lighthouse(
-      url,
-      { port: chrome.port, output: "json", logLevel: "error" },
-      PRESET === "desktop"
-        ? { extends: "lighthouse:default", settings: { formFactor: "desktop", screenEmulation: { disabled: true } } }
-        : undefined,
-    );
+    const samples = [];
+    let lastLhr = null;
 
-    if (!result?.lhr) {
+    for (let run = 0; run < RUNS; run++) {
+      const result = await lighthouse(
+        url,
+        { port: chrome.port, output: "json", logLevel: "error" },
+        PRESET === "desktop"
+          ? { extends: "lighthouse:default", settings: { formFactor: "desktop", screenEmulation: { disabled: true } } }
+          : undefined,
+      );
+      if (!result?.lhr) continue;
+      lastLhr = result.lhr;
+      samples.push(
+        Object.fromEntries(
+          CATEGORIES.map((c) => [c, Math.round((result.lhr.categories[c]?.score ?? 0) * 100)]),
+        ),
+      );
+    }
+
+    if (!samples.length || !lastLhr) {
       console.error(`${route}: lighthouse returned nothing`);
       continue;
     }
 
-    const { lhr } = result;
-    await writeFile(join(OUT, `${slug(route)}.json`), JSON.stringify(lhr, null, 2), "utf8");
+    // The kept report is the last run's, for digging into audits; the scores
+    // printed and published are the median across runs.
+    await writeFile(join(OUT, `${slug(route)}.json`), JSON.stringify(lastLhr, null, 2), "utf8");
 
     const scores = Object.fromEntries(
-      CATEGORIES.map((c) => [c, Math.round((lhr.categories[c]?.score ?? 0) * 100)]),
+      CATEGORIES.map((c) => [c, median(samples.map((s) => s[c]))]),
     );
     const metrics = Object.fromEntries(
-      METRICS.map(([id, label]) => [label, lhr.audits[id]?.displayValue ?? "-"]),
+      METRICS.map(([id, label]) => [label, lastLhr.audits[id]?.displayValue ?? "-"]),
     );
 
     rows.push({ route, ...scores, ...metrics });
@@ -96,7 +124,7 @@ try {
 
 // ── report ───────────────────────────────────────────────────────────────
 
-console.log(`\n${PRESET} · ${BASE}\n`);
+console.log(`\n${PRESET} · ${BASE} · median of ${RUNS} runs\n`);
 console.log(
   pad("route", 16),
   pad("perf", 6),
@@ -146,6 +174,7 @@ if (!/localhost|127\.0\.0\.1/.test(BASE) && rows.length >= 3) {
     target: BASE,
     preset: PRESET,
     routes: rows.length,
+    runsPerRoute: RUNS,
     lowest: {
       performance: lowest.performance,
       accessibility: lowest.accessibility,
@@ -163,7 +192,8 @@ if (!/localhost|127\.0\.0\.1/.test(BASE) && rows.length >= 3) {
       "// The site tells clients it measures speed and accessibility rather than",
       "// assuming them, so what it claims about itself has to come from a real",
       "// run. These are the LOWEST score in each category across every route",
-      "// measured, on Lighthouse's throttled mobile preset.",
+      "// measured, each route being the median of several runs - a single run",
+      "// against a live host varies by twenty points on identical bytes.",
       "// สร้างจากสคริปต์ ห้ามแก้มือ",
       "",
       `export const lighthouse = ${JSON.stringify(manifest, null, 2)} as const;`,

@@ -4,7 +4,8 @@
 // The site tells clients it measures speed and accessibility rather than
 // assuming them, so what it claims about itself has to come from a real
 // run. These are the LOWEST score in each category across every route
-// measured, on Lighthouse's throttled mobile preset.
+// measured, each route being the median of several runs - a single run
+// against a live host varies by twenty points on identical bytes.
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const lighthouse = {
@@ -12,8 +13,9 @@ export const lighthouse = {
   "target": "https://webpv.yimwired.workers.dev",
   "preset": "mobile",
   "routes": 6,
+  "runsPerRoute": 3,
   "lowest": {
-    "performance": 86,
+    "performance": 87,
     "accessibility": 100,
     "bestPractices": 100,
     "seo": 100
