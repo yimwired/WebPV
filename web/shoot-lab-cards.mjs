@@ -56,6 +56,25 @@ const SHOT_AT = {
   playroom: 0.05, // the jar with the pile in it, not the headline alone
 };
 
+/**
+ * Demos that need to be used before they are worth a photograph.
+ *
+ * Terminal opens on an empty prompt, which is an accurate picture of a shell
+ * nobody has typed into and a poor advertisement for one that answers. The
+ * card shows it mid-deploy instead, which is the thing being sold.
+ */
+const PREPARE = {
+  terminal: async (page) => {
+    const prompt = page.locator("#ridge-prompt");
+    await prompt.fill("status");
+    await prompt.press("Enter");
+    await page.waitForTimeout(400);
+    await prompt.fill("deploy");
+    await prompt.press("Enter");
+    await page.waitForTimeout(2600);
+  },
+};
+
 await mkdir(OUT, { recursive: true });
 
 const browser = await chromium.launch();
@@ -95,6 +114,12 @@ for (const slug of targets) {
   await page.goto(`http://localhost:3000/labs/${slug}`, { waitUntil: "load" });
   // WebGL scenes need a moment to light up and textures to paint
   await page.waitForTimeout(3000);
+
+  const prepare = PREPARE[slug];
+  if (prepare) {
+    await prepare(page);
+    await page.waitForTimeout(400);
+  }
 
   const at = SHOT_AT[slug];
   if (at) {

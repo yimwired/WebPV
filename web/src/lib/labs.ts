@@ -133,6 +133,17 @@ export const labs: Lab[] = [
     buildTime: "About a week",
   },
   {
+    slug: "terminal",
+    name: "Terminal",
+    vibe: "Developer tool, amber CRT",
+    description:
+      "A command line that answers. Type deploy and it prints its steps at the pace the real thing would; history walks with the arrow keys, tab completes, and a wrong command gets a real error. The page a CLI needs, for the audience that types before it reads.",
+    accent: "#ffb000",
+    preview: { from: "#120d08", to: "#2a1c08" },
+    bestFor: "CLIs, infrastructure, APIs, anything sold to developers",
+    buildTime: "About a week",
+  },
+  {
     slug: "dimension",
     name: "Dimension",
     vibe: "Real-time 3D",
