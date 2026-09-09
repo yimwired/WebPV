@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
+import { lighthouse } from "@/lib/lighthouse";
 import { Reveal } from "./reveal";
 
 export function Services() {
@@ -83,6 +84,45 @@ export function Services() {
             />
           </div>
         </div>
+      </Reveal>
+
+      {/* The page claims speed and accessibility get measured rather than
+          assumed, so it shows what this site scores. Worst-of, not best-of:
+          a visitor lands on one page and it might be the slow one. Numbers
+          come from lib/lighthouse.ts, which only a production run writes. */}
+      <Reveal className="border-line mt-20 border-t pt-12">
+        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          {s.proof.title}
+        </h2>
+        <p className="text-muted-foreground mt-3 max-w-xl leading-relaxed">
+          {s.proof.sub.replace("{routes}", String(lighthouse.routes))}
+        </p>
+
+        <dl className="border-line mt-8 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-lg border bg-[var(--line)] sm:grid-cols-4">
+          {(
+            [
+              ["performance", lighthouse.lowest.performance],
+              ["accessibility", lighthouse.lowest.accessibility],
+              ["bestPractices", lighthouse.lowest.bestPractices],
+              ["seo", lighthouse.lowest.seo],
+            ] as const
+          ).map(([key, score]) => (
+            <div key={key} className="bg-background px-5 py-5">
+              <dt className="spec">{s.proof.labels[key]}</dt>
+              {/* tabular figures so the row of scores lines up on its digits */}
+              <dd className="mt-2 text-3xl font-semibold tracking-tight tabular-nums">
+                {score}
+                <span className="text-muted-foreground ml-1 text-base font-normal">
+                  /100
+                </span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        <p className="text-muted-foreground mt-4 text-sm">
+          {s.proof.measured.replace("{date}", lighthouse.measuredAt)}
+        </p>
       </Reveal>
 
       <Reveal className="border-line mt-20 border-t pt-12">
