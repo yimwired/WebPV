@@ -311,7 +311,10 @@ export function CounterDemo() {
             {FEATURED.map((dish, i) => (
               <motion.article
                 key={dish.name}
-                initial={{ opacity: 0, y: 12 }}
+                // the first two dishes are above the fold and one of them is
+                // the LCP element: a reveal there cannot paint until the page
+                // hydrates, however early the image itself arrived
+                initial={i < 2 ? false : { opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.45, delay: i * 0.06, ease }}
@@ -319,7 +322,11 @@ export function CounterDemo() {
                 style={{ borderColor: "#e3dbcd" }}
               >
                 <div className="relative aspect-[4/3]">
-                  <DishImage dish={dish} sizes="(min-width: 640px) 30vw, 92vw" />
+                  <DishImage
+                    dish={dish}
+                    sizes="(min-width: 640px) 30vw, 92vw"
+                    priority={i < 2}
+                  />
                 </div>
                 <div className="p-4">
                   <div className="flex items-baseline justify-between gap-3">
@@ -537,7 +544,17 @@ export function CounterDemo() {
  * exactly the slot a shop's own photo drops into: set `photo` on the dish and
  * nothing else here changes.
  */
-function DishImage({ dish, sizes }: { dish: Dish; sizes: string }) {
+function DishImage({
+  dish,
+  sizes,
+  priority = false,
+}: {
+  dish: Dish;
+  sizes: string;
+  /** true for the dishes above the fold: one of them is the LCP element, and
+   *  left lazy the browser only finds it after the layout settles. */
+  priority?: boolean;
+}) {
   if (dish.photo) {
     return (
       <Image
@@ -546,6 +563,7 @@ function DishImage({ dish, sizes }: { dish: Dish; sizes: string }) {
         fill
         sizes={sizes}
         unoptimized
+        priority={priority}
         className="object-cover"
       />
     );

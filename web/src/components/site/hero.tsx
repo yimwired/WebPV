@@ -20,6 +20,8 @@ const item: Variants = {
   },
 };
 
+
+
 export function Hero() {
   const { locale, t } = useLocale();
 
@@ -36,12 +38,18 @@ export function Hero() {
           {t.hero.name} · {t.hero.location}
         </motion.p>
 
-        <motion.h1
-          variants={item}
-          className="mt-5 max-w-4xl text-4xl leading-[1.1] font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl"
-        >
+        {/*
+          The headline does not animate, and that is a performance decision
+          rather than a stylistic one. It is the largest thing above the fold,
+          so the browser times the page by it, and every entrance - even one
+          that only moves and never fades - has to wait for hydration before it
+          can run. On a throttled phone that put the largest paint at 3.9s for
+          text that was in the HTML the whole time. Everything around it still
+          staggers in; the heading is simply already there.
+        */}
+        <h1 className="mt-5 max-w-4xl text-4xl leading-[1.1] font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl">
           {locale === "th" ? thaiWrap(t.hero.headline) : t.hero.headline}
-        </motion.h1>
+        </h1>
 
         <motion.p
           variants={item}

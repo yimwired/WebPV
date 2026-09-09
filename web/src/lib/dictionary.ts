@@ -41,7 +41,7 @@ const en = {
     caseStudy: "Read the build",
   },
   lab: {
-    title: "Thirteen directions, every one built",
+    title: "{labs} directions, every one built",
     sub: "Each is a working page, not a theme with the colours swapped: the tour panel quotes real totals, the shop page knows whether it is open right now. Pick the one that fits your business and your content goes in it.",
     seeAll: "All {count} in The Lab",
     railEnd: "directions to browse",
@@ -630,7 +630,7 @@ const th: typeof en = {
     caseStudy: "ดูเบื้องหลัง",
   },
   lab: {
-    title: "13 แบบ สร้างขึ้นมาจริงทุกอัน",
+    title: "{labs} แบบ สร้างขึ้นมาจริงทุกอัน",
     sub: "ทุกอันเป็นเว็บที่ทำงานได้จริง ไม่ใช่ธีมที่เปลี่ยนแค่สี ตัวจองทัวร์คิดเงินได้จริง หน้าร้านอาหารรู้ว่าตอนนี้เปิดหรือปิด เลือกอันที่เข้ากับธุรกิจคุณ แล้วผมเอาเนื้อหาของคุณใส่ลงไปในแบบนั้น",
     seeAll: "ดูครบ {count} แบบใน The Lab",
     railEnd: "แบบให้เลือกดู",

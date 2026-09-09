@@ -12,11 +12,28 @@
 // dates their cards.
 import { chromium } from "playwright";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { mkdir, readFile, writeFile, unlink } from "node:fs/promises";
+import { promisify } from "node:util";
+
+const run = promisify(execFile);
 
 const OUT = "public/labs/cards";
 const MANIFEST = "src/lib/lab-cards.ts";
 const SIZE = { width: 1280, height: 800 };
+
+/**
+ * Cards ship as WebP at 1200px wide, converted with ffmpeg after the shot.
+ *
+ * Playwright only writes PNG or JPEG, and the JPEGs this used to keep came out
+ * at 2560px - the full 2x of the viewport - for a card that renders about
+ * 560 CSS px wide. That is far more pixels than the densest
+ * phone can show, and it cost 2.5 MB across the gallery: Lighthouse scored
+ * /labs at 75 with an 8.2s largest paint. 1200px still covers the widest use
+ * on the page - the gallery card at 2x - and takes the whole set under 500 KB.
+ */
+const CARD_WIDTH = 1200;
+const CARD_QUALITY = 80;
 
 /**
  * How far down each demo to shoot. Most read best at the top; the scrolling
@@ -96,12 +113,19 @@ for (const slug of targets) {
     }
   });
 
-  await page.screenshot({
-    path: `${OUT}/${slug}.jpg`,
-    type: "jpeg",
-    quality: 82,
-  });
-  console.log(`  ${slug}.jpg`);
+  const shot = `${OUT}/${slug}.shot.jpg`;
+  await page.screenshot({ path: shot, type: "jpeg", quality: 92 });
+
+  // -y overwrite, and the intermediate goes away: only the webp is committed
+  await run("ffmpeg", [
+    "-y", "-loglevel", "error",
+    "-i", shot,
+    "-vf", `scale=${CARD_WIDTH}:-1`,
+    "-quality", String(CARD_QUALITY),
+    `${OUT}/${slug}.webp`,
+  ]);
+  await unlink(shot);
+  console.log(`  ${slug}.webp`);
 }
 
 await browser.close();
@@ -115,7 +139,7 @@ const hashes = Object.fromEntries(
     unique.map(async (slug) => [
       slug,
       createHash("sha1")
-        .update(await readFile(`${OUT}/${slug}.jpg`))
+        .update(await readFile(`${OUT}/${slug}.webp`))
         .digest("hex")
         .slice(0, 8),
     ]),

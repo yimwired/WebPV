@@ -39,9 +39,14 @@ export function LabsGallery() {
 
         <div className="mt-14 grid gap-5 sm:mt-16 sm:grid-cols-2">
           {labs.map((lab, i) => (
+            // The first two cards are on screen before any scrolling, and one
+            // of them is the largest thing the browser paints. An entrance
+            // cannot start until hydration does, so animating them meant the
+            // page measured as blank for five seconds with the image already
+            // downloaded. The rest of the grid still staggers in.
             <motion.div
               key={lab.slug}
-              initial={{ opacity: 0, y: 16 }}
+              initial={i < 2 ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 + i * 0.05, ease }}
             >
@@ -61,10 +66,15 @@ export function LabsGallery() {
                   <Image
                     // the hash comes from the file itself, so a reshoot
                     // changes the URL and the day-long cache stops hiding it
-                    src={`/labs/cards/${lab.slug}.jpg?v=${labCardVersions[lab.slug] ?? ""}`}
+                    src={`/labs/cards/${lab.slug}.webp?v=${labCardVersions[lab.slug] ?? ""}`}
                     alt={`${lab.name}: ${lab.vibe}`}
                     fill
                     sizes="(min-width: 640px) 45vw, 92vw"
+                    // The first two cards are above the fold at every width, so
+                    // one of them is the LCP element. Left lazy, the browser
+                    // only discovers it after the CSS resolves and Lighthouse
+                    // scored the largest paint at 8.2s.
+                    priority={i < 2}
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                 </div>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { withCounts } from "@/lib/counts";
 import { labs } from "@/lib/labs";
 import { labCardVersions } from "@/lib/lab-cards";
 import { useLocale } from "@/lib/i18n";
@@ -30,7 +31,7 @@ export function LabStrip() {
           <div className="border-line flex flex-wrap items-end justify-between gap-4 border-b pb-6">
             <div>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t.lab.title}
+                {withCounts(t.lab.title)}
               </h2>
               <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-relaxed sm:text-base">
                 {t.lab.sub}
@@ -70,7 +71,7 @@ export function LabStrip() {
                 }}
               >
                 <Image
-                  src={`/labs/cards/${lab.slug}.jpg?v=${labCardVersions[lab.slug] ?? ""}`}
+                  src={`/labs/cards/${lab.slug}.webp?v=${labCardVersions[lab.slug] ?? ""}`}
                   alt={`${lab.name}: ${lab.vibe}`}
                   fill
                   sizes="300px"
