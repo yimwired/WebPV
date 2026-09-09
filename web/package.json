@@ -33,6 +33,7 @@
     "@types/three": "^0.185.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "lighthouse": "^12.8.2",
     "playwright": "^1.61.0",
     "tailwindcss": "^4",
     "typescript": "^5"
