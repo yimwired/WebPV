@@ -1,0 +1,223 @@
+// Proves the claims /labs/unfold makes about itself, against the running page.
+//
+//   1. the slider changes the light, not a label
+//   2. the hinge readout matches the arm's actual rotation
+//   3. the control takes keyboard focus and shows a ring
+//   4. body copy clears 4.5:1 against the pixels actually painted behind it
+//   5. reduced motion still reaches every act
+//
+// From `web/`, with the site served: `node verify-unfold.mjs`
+import { chromium } from "playwright";
+
+const URL = process.env.SHOOT_URL ?? "http://localhost:3000";
+const results = [];
+const check = (name, pass, detail) => {
+  results.push({ name, pass, detail });
+  console.log(`${pass ? "PASS" : "FAIL"}  ${name}${detail ? "  " + detail : ""}`);
+};
+
+/** Relative luminance of an "rgb(r, g, b)" string. */
+function luminance(css) {
+  const [r, g, b] = css.match(/[\d.]+/g).slice(0, 3).map(Number);
+  const lin = [r, g, b].map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+}
+
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+
+const browser = await chromium.launch();
+
+async function openStage(context) {
+  const page = await context.newPage();
+  await page.goto(`${URL}/labs/unfold`, { waitUntil: "load" });
+  await page.waitForTimeout(900);
+  const height = await page.evaluate(
+    () => document.querySelector("section").getBoundingClientRect().height
+  );
+  const seek = async (fraction) => {
+    await page.evaluate(
+      ([h, f]) => window.scrollTo(0, (h - window.innerHeight) * f),
+      [height, fraction]
+    );
+    await page.waitForTimeout(550);
+  };
+  return { page, seek };
+}
+
+// ── 1-4: the full-motion page ────────────────────────────────────────────
+{
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    locale: "en-US",
+  });
+  const { page, seek } = await openStage(context);
+
+  await seek(0.68);
+  const slider = page.locator("#unfold-kelvin");
+
+  const sample = () =>
+    page.evaluate(() => {
+      const led = document.querySelector('[data-lamp="led"]');
+      return led ? getComputedStyle(led).backgroundColor : null;
+    });
+
+  // Driven with the keyboard rather than by assigning `value`: React installs
+  // its own value setter, so a scripted assignment repaints nothing and the
+  // test would be measuring itself.
+  await slider.focus();
+  for (let i = 0; i < 40; i += 1) await page.keyboard.press("ArrowLeft");
+  await page.waitForTimeout(250);
+  const warm = await sample();
+
+  for (let i = 0; i < 40; i += 1) await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(250);
+  const cool = await sample();
+
+  check(
+    "slider repaints the emitter",
+    Boolean(warm && cool && warm !== cool),
+    `${warm} -> ${cool}`
+  );
+
+  const readout = (await page.locator("output").textContent()).trim();
+  check("readout matches the slider", readout === "5,000 K", readout);
+
+  // Chrome will not report ::-webkit-slider-thumb through getComputedStyle, so
+  // the focus ring is checked the only way that proves anything: by looking.
+  const box = await slider.boundingBox();
+  const region = {
+    x: Math.round(box.x),
+    y: Math.round(box.y),
+    width: Math.round(box.width),
+    height: Math.round(box.height),
+  };
+  await page.locator("h2").first().focus();
+  await page.evaluate(() => document.activeElement?.blur?.());
+  await page.waitForTimeout(200);
+  const blurred = await page.screenshot({ clip: region });
+  await slider.focus();
+  await page.waitForTimeout(200);
+  const focused = await page.screenshot({ clip: region });
+  check(
+    "focus is visible on the control",
+    Buffer.compare(blurred, focused) !== 0,
+    `${blurred.length} vs ${focused.length} bytes`
+  );
+
+  // hinge readout vs. the arm's real matrix. The label is React state written
+  // from the same motion value, so it commits a frame behind the transform:
+  // sample only once the page has stopped moving, or the test measures the lag.
+  await seek(0.24);
+  await page.evaluate(
+    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+  );
+  await page.waitForTimeout(400);
+  const { label, degrees } = await page.evaluate(() => {
+    const li = [...document.querySelectorAll("li")].find((n) =>
+      /hinge/i.test(n.textContent ?? "")
+    );
+    const arm = document.querySelector('[data-lamp="arm"]');
+    const m = new DOMMatrix(getComputedStyle(arm).transform);
+    return {
+      label: li?.textContent?.trim() ?? "",
+      degrees: Math.round((Math.atan2(m.b, m.a) * 180) / Math.PI),
+    };
+  });
+  const claimed = Number(label.match(/\d+/)?.[0] ?? -1);
+  check(
+    "hinge readout is measured, not written",
+    Math.abs(claimed + degrees) <= 1,
+    `${label} vs arm ${degrees}°`
+  );
+
+  // Contrast for every act, measured off the pixels behind the text at the
+  // scroll position where that text is actually on screen. Reading the token
+  // values instead would miss the whole point of a page that repaints itself.
+  const SAMPLES = [
+    [0.06, "A desk light"],
+    [0.06, "Unfold"],
+    [0.24, "One hinge"],
+    [0.5, "2,200 lumens"],
+    [0.68, "Move the slider"],
+    [0.9, "Folded it is"],
+  ];
+
+  for (const [at, needle] of SAMPLES) {
+    await seek(at);
+    const measured = await page.evaluate((text) => {
+      const node = [...document.querySelectorAll("h1, h2, p")].find((n) =>
+        (n.textContent ?? "").includes(text)
+      );
+      if (!node) return null;
+      const box = node.getBoundingClientRect();
+      const behind = document
+        .elementsFromPoint(box.left + 4, box.top + box.height / 2)
+        .map((el) => getComputedStyle(el).backgroundColor)
+        .find((c) => c && c !== "rgba(0, 0, 0, 0)");
+      return { colour: getComputedStyle(node).color, behind };
+    }, needle);
+
+    const ratio = measured ? contrast(measured.colour, measured.behind) : 0;
+    check(
+      `contrast: "${needle}"`,
+      ratio >= 4.5,
+      `${ratio.toFixed(2)}:1  ${measured?.colour} on ${measured?.behind}`
+    );
+  }
+
+  await context.close();
+}
+
+// ── 5: reduced motion still reaches every act ────────────────────────────
+{
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    locale: "en-US",
+    reducedMotion: "reduce",
+  });
+  const { page, seek } = await openStage(context);
+
+  const armAngle = () =>
+    page.evaluate(() => {
+      const arm = document.querySelector('[data-lamp="arm"]');
+      const m = new DOMMatrix(getComputedStyle(arm).transform);
+      return Math.round((Math.atan2(m.b, m.a) * 180) / Math.PI);
+    });
+
+  await seek(0.05);
+  const closed = await armAngle();
+  await seek(0.5);
+  const open = await armAngle();
+  check(
+    "reduced motion still opens the lamp",
+    closed === 0 && open === -72,
+    `${closed}° -> ${open}°`
+  );
+
+  await seek(0.9);
+  const drawingVisible = await page.evaluate(() => {
+    const h = [...document.querySelectorAll("h2")].find((n) =>
+      /is a dimension/.test(n.textContent ?? "")
+    );
+    return Number(getComputedStyle(h.closest("div")).opacity);
+  });
+  check(
+    "reduced motion still reaches the last act",
+    drawingVisible > 0.9,
+    `opacity ${drawingVisible}`
+  );
+
+  await context.close();
+}
+
+await browser.close();
+
+const failed = results.filter((r) => !r.pass).length;
+console.log(`\n${results.length - failed}/${results.length} passed`);
+process.exit(failed ? 1 : 0);

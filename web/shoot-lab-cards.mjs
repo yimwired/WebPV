@@ -47,6 +47,10 @@ const SHOT_AT = {
   // Jumping further does not help either, since the sections below the hero
   // are scroll-reveals that a teleported scroll never fires.
   vision: 0.02,
+  // the lit act with the control in it, not the closed object: the folded lamp
+  // on white is the least interesting of the five frames. 0.5 landed on the
+  // crossfade between two acts, which freezes into ghost text on a still.
+  unfold: 0.575,
   // the four product templates: each one's card has to show the thing it sells,
   // which is never the top of the page
   cart: 0.06, // the headline and the bundle tiles, not the bare product shot

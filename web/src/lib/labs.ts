@@ -34,6 +34,17 @@ export const labs: Lab[] = [
     buildTime: "Two weeks, the packaging models are the work",
   },
   {
+    slug: "unfold",
+    name: "Unfold",
+    vibe: "Hardware launch, scroll-driven",
+    description:
+      "One folding desk light on a page that plays as a single shot: scrolling opens the hinge, the room drops away when the light comes on, and the colour-temperature slider recolours the light itself rather than a photograph of it. Drawn in CSS, so none of it is video and none of it weighs anything.",
+    accent: "#ffc489",
+    preview: { from: "#191512", to: "#4a3524" },
+    bestFor: "Launching one product: gadgets, appliances, anything with a spec sheet",
+    buildTime: "About ten days, the choreography is the work",
+  },
+  {
     slug: "trine",
     name: "Trine",
     vibe: "Jewellery, still life",
