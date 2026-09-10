@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   motion,
@@ -13,59 +14,85 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { DIMENSIONS, LAMP, UnfoldLamp, kelvinToRgb } from "./unfold-lamp";
+import { UnfoldSequence } from "./unfold-sequence";
+import { kelvinToRgb } from "./unfold-light";
 
 /**
  * A launch page for one physical object, in the shape the big hardware pages
- * use: a single continuous shot where scrolling moves the product itself and
+ * use: a single continuous shot where scroll position moves the product and
  * the copy arrives when the product reaches the state it describes.
  *
- * Two things separate it from a video-scrubbed page. The product is drawn in
- * CSS and lit live, so the page weighs nothing and the light is real rather
- * than a frame someone rendered; and the one control on it works, so the
- * colour temperature figure is measured off the same value that paints the
- * room.
+ * Three views of the same lamp are stacked in one frame - folded, the unfold
+ * as a scrubbed sequence, and lit on a desk - all made from one master image,
+ * so the layers cross-fade without anything appearing to jump. The
+ * colour-temperature control relights the photograph for real rather than
+ * swapping to a second picture of it.
  *
- * The product is fictional. Nothing here is for sale.
+ * The product is fictional and nothing here is for sale. The page says so.
  */
 
-/**
- * Where each act starts and ends, as a fraction of the pinned scroll. Acts
- * overlap on purpose: copy leaves while the object is already moving into the
- * next state, which is what keeps it reading as one shot.
- */
+/** Where each act starts and ends, as a fraction of the pinned scroll. */
 const ACTS = {
   closed: [0.0, 0.03, 0.11, 0.16],
-  unfold: [0.16, 0.2, 0.28, 0.33],
-  light: [0.42, 0.47, 0.54, 0.59],
-  warmth: [0.61, 0.66, 0.74, 0.79],
-  drawing: [0.81, 0.86, 0.95, 1.0],
+  unfold: [0.17, 0.21, 0.3, 0.36],
+  light: [0.44, 0.49, 0.56, 0.61],
+  warmth: [0.63, 0.68, 0.76, 0.81],
+  drawing: [0.83, 0.88, 0.96, 1.0],
 } as const;
 
-/**
- * The room has to be fully dark before any copy written for a dark room fades
- * in. Framer walks between two colours perceptually rather than linearly, so
- * this range finishes well before act three rather than trailing into it:
- * measured mid-sweep it was still rgb(67,66,65), which put the body colour at
- * 2.6:1 against its own background.
- */
-const DARKEN = [0.31, 0.41];
+/** The sequence scrubs across this range: folded, room darkens, light on. */
+const SCRUB = [0.14, 0.42] as const;
 
-const PAGE_LIGHT = "#f2f1ee";
-const PAGE_DARK = "#12100e";
+/** The room goes dark with the sequence, a beat ahead of the copy that needs it. */
+const DARKEN = [0.26, 0.4] as const;
+
+/** Sampled from the corners of the two photographs, so no seam shows. */
+const PAGE_LIGHT = "#f2f1ec";
+const PAGE_DARK = "#080704";
+
+const MEDIA = { width: 1100, height: 624 };
+
+/**
+ * The photographs are not a flat colour out to their edges, so a hard boundary
+ * drew a visible rectangle on the page even with the background sampled off
+ * their corners. Feathering all four sides dissolves it.
+ */
+const EDGE_MASK =
+  "linear-gradient(to right, transparent, #000 7%, #000 93%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 88%, transparent)";
+
+/** Roughly the colour temperature the lit photograph was generated at. */
+const NATIVE_KELVIN = 3050;
 
 const SPECS: ReadonlyArray<[string, string]> = [
   ["Output", "2,200 lm"],
   ["Colour", "2700 to 5000 K, adjustable"],
   ["Colour rendering", "CRI 97"],
   ["Power", "18 W over USB-C"],
-  ["Folded", `${DIMENSIONS.folded} x 42 x ${DIMENSIONS.thickness} mm`],
-  ["Open height", `${DIMENSIONS.openHeight} mm`],
-  ["Hinge", `${LAMP.openAngle}°, held by friction`],
+  ["Folded", "320 x 44 x 32 mm"],
+  ["Open height", "280 mm"],
   ["Weight", "340 g"],
-  ["Finish", "Anodised aluminium"],
+  ["Finish", "Anodised aluminium, graphite head"],
   ["Warranty", "5 years"],
 ];
+
+/**
+ * 0 below `from`, 1 above `to`, linear in between.
+ *
+ * Every scroll-linked ramp on this page goes through here rather than through
+ * `useTransform(value, [a, b], [c, d], { clamp: true })`. That call is read
+ * wrongly by this version of framer when the input range has only two stops:
+ * it produced a value that rose across the whole remaining scroll instead of
+ * finishing at `b`, which left two of the three stacked photographs visible
+ * at once. Four-stop ranges are unaffected.
+ */
+function ramp(value: number, from: number, to: number) {
+  return Math.min(1, Math.max(0, (value - from) / (to - from)));
+}
+
+/** Fades a block in over [a, b] and back out over [c, d]. */
+function useAct(progress: MotionValue<number>, act: readonly number[]) {
+  return useTransform(progress, [...act], [0, 1, 1, 0]);
+}
 
 /** Tracks a media query, starting false so the server and first paint agree. */
 function useMediaQuery(query: string) {
@@ -82,15 +109,12 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
-/** Fades a block in over [a, b] and back out over [c, d]. */
-function useAct(progress: MotionValue<number>, act: readonly number[]) {
-  return useTransform(progress, [...act], [0, 1, 1, 0]);
-}
-
 export function UnfoldDemo() {
   const reduced = useReducedMotion() ?? false;
+  const compact = useMediaQuery("(max-width: 639px)");
   const stage = useRef<HTMLElement>(null);
-  // measured against the pinned section alone: the spec sheet below it is not
+
+  // Measured against the pinned section alone: the spec sheet below it is not
   // part of the story, and including it would shift every act.
   const { scrollYProgress } = useScroll({
     target: stage,
@@ -98,106 +122,83 @@ export function UnfoldDemo() {
   });
 
   const [kelvin, setKelvin] = useState(3200);
-  const [hinge, setHinge] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const light = kelvinToRgb(kelvin);
 
-  // ── the object's state, driven by scroll ──────────────────────────────
-  // Reduced motion gets the same states, reached in steps rather than swept,
-  // so nothing large slides across the screen but every act still happens.
-  const sweptAngle = useTransform(
+  // How hard to push the relight. The photograph was already lit at roughly
+  // NATIVE_KELVIN, so near that value the overlay should do almost nothing;
+  // a flat blend at full strength turned the graphite head gold and flattened
+  // the whole picture into one colour.
+  const relight = (Math.abs(kelvin - NATIVE_KELVIN) / 1950) * 0.52;
+
+  // ── the sequence ───────────────────────────────────────────────────────
+  const sweptScrub = useTransform(scrollYProgress, (p): number =>
+    ramp(p, SCRUB[0], SCRUB[1])
+  );
+  const steppedScrub = useTransform(scrollYProgress, (p): number =>
+    p >= SCRUB[0] ? 1 : 0
+  );
+  const scrub = reduced ? steppedScrub : sweptScrub;
+
+  // ── which of the three layers is showing ───────────────────────────────
+  // The sequence's first frame is the folded photograph and its last frame is
+  // the lit one, so these cross-fades are between identical pictures.
+  const foldedOpacity = useTransform(scrollYProgress, (p): number =>
+    1 - ramp(p, 0.12, 0.16)
+  );
+  const sequenceOpacity = useTransform(
     scrollYProgress,
-    [0.15, 0.32],
-    [0, LAMP.openAngle],
-    { clamp: true }
+    (p): number => ramp(p, 0.12, 0.16) * (1 - ramp(p, 0.42, 0.46))
   );
-  const steppedAngle = useTransform(scrollYProgress, (p): number =>
-    p >= 0.15 ? LAMP.openAngle : 0
+  const litOpacity = useTransform(scrollYProgress, (p): number =>
+    ramp(p, 0.42, 0.46)
   );
-  const angle = reduced ? steppedAngle : sweptAngle;
 
-  const sweptLit = useTransform(
-    scrollYProgress,
-    [0.34, 0.44, 0.84, 0.9],
-    [0, 1, 1, 0.16],
-    { clamp: true }
-  );
-  const steppedLit = useTransform(scrollYProgress, (p): number =>
-    p >= 0.34 ? 1 : 0
-  );
-  const lit = reduced ? steppedLit : sweptLit;
+  // ── how the frame is composed, act by act ──────────────────────────────
+  // On a wide screen the product slides sideways to make room for a column of
+  // copy. On a phone there is no sideways to slide to, so it climbs instead
+  // and the copy takes the bottom of the screen.
+  const FRAME_AT = [0, 0.16, 0.36, 0.5, 0.68, 0.84];
+  const restingOffset = useMotionValue<string>("0%");
+  const restingScale = useMotionValue(0.9);
 
-  const sweptAmbient = useTransform(scrollYProgress, DARKEN, [0, 1], {
-    clamp: true,
-  });
-  const steppedAmbient = useTransform(scrollYProgress, (p): number =>
-    p >= DARKEN[0] ? 1 : 0
-  );
-  const ambient = reduced ? steppedAmbient : sweptAmbient;
-
-  const sweptBlueprint = useTransform(
-    scrollYProgress,
-    [0.79, 0.87],
-    [0, 1],
-    { clamp: true }
-  );
-  const steppedBlueprint = useTransform(scrollYProgress, (p): number =>
-    p >= 0.8 ? 1 : 0
-  );
-  const blueprint = reduced ? steppedBlueprint : sweptBlueprint;
-
-  // ── how the object is framed, act by act ──────────────────────────────
-  // No two neighbouring acts hold the product in the same place. On a wide
-  // screen it slides sideways to make room for a column of copy; on a phone
-  // there is no sideways to slide to, so it climbs instead and the copy takes
-  // the bottom of the screen. Sharing one set of keyframes put the slider on
-  // top of the lamp at 390px.
-  const compact = useMediaQuery("(max-width: 639px)");
-  const FRAME_AT = [0, 0.16, 0.33, 0.5, 0.66, 0.82];
-
-  const restingX = useMotionValue<string>("0%");
-  const restingScale = useMotionValue(0.84);
   const sweptX = useTransform(
     scrollYProgress,
     FRAME_AT,
     compact
       ? ["0%", "0%", "0%", "0%", "0%", "0%"]
-      : ["0%", "0%", "0%", "17%", "-19%", "0%"]
+      : ["0%", "0%", "0%", "15%", "-17%", "0%"]
+  );
+  const sweptY = useTransform(
+    scrollYProgress,
+    FRAME_AT,
+    compact
+      ? ["-2%", "-2%", "-8%", "-48%", "-50%", "-30%"]
+      : ["4%", "4%", "0%", "0%", "0%", "2%"]
   );
   const sweptScale = useTransform(
     scrollYProgress,
     FRAME_AT,
-    compact
-      ? [0.92, 0.92, 1, 0.82, 0.78, 0.74]
-      : [1, 1, 1, 0.95, 0.86, 0.74]
+    compact ? [1, 1, 1, 1, 1, 0.94] : [0.96, 0.96, 1, 0.94, 0.88, 0.86]
   );
-  const stageBottom = useTransform(
-    scrollYProgress,
-    FRAME_AT,
-    compact
-      ? ["24%", "24%", "30%", "52%", "54%", "24%"]
-      : ["32%", "32%", "28%", "26%", "26%", "20%"]
-  );
-  const stageX = reduced ? restingX : sweptX;
-  const stageScale = reduced ? restingScale : sweptScale;
 
+  const frameX = reduced ? restingOffset : sweptX;
+  const frameY = reduced ? restingOffset : sweptY;
+  const frameScale = reduced ? restingScale : sweptScale;
+
+  // ── the room, and the copy that has to stay legible in it ──────────────
+  // Derived from `onDark` rather than from scroll directly, so the room and
+  // the colours it forces are one value and cannot drift apart.
+  const onDark = useTransform(scrollYProgress, (p): number =>
+    ramp(p, DARKEN[0], DARKEN[1])
+  );
   const pageBackground = useTransform(
-    scrollYProgress,
-    DARKEN,
-    [PAGE_LIGHT, PAGE_DARK],
-    { clamp: true }
-  );
-  const onDark = useTransform(scrollYProgress, DARKEN, [0, 1], { clamp: true });
-  const bodyColour = useTransform(
     onDark,
     [0, 1],
-    ["#57544d", "#a49e93"]
+    [PAGE_LIGHT, PAGE_DARK]
   );
-  const headingColour = useTransform(
-    onDark,
-    [0, 1],
-    ["#14130f", "#f4f1ea"]
-  );
+  const bodyColour = useTransform(onDark, [0, 1], ["#57544d", "#a49e93"]);
+  const headingColour = useTransform(onDark, [0, 1], ["#14130f", "#f4f1ea"]);
 
   const closedOpacity = useAct(scrollYProgress, ACTS.closed);
   const unfoldOpacity = useAct(scrollYProgress, ACTS.unfold);
@@ -205,17 +206,16 @@ export function UnfoldDemo() {
   const warmthOpacity = useAct(scrollYProgress, ACTS.warmth);
   const drawingOpacity = useAct(scrollYProgress, ACTS.drawing);
 
-  // The hinge readout is the page's honesty check: it is measured off the
-  // same value that rotates the arm, so it cannot say 40 while the arm is at 60.
-  useMotionValueEvent(angle, "change", (value) => {
-    setHinge(Math.round(value));
-  });
+  // The relight only exists while its act is on screen, and only as far as
+  // the slider has been moved away from the photograph's own temperature.
+  const relightOpacity = useTransform(warmthOpacity, (v) => v * relight);
+
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     if (value > 0.004) setScrolled(true);
   });
 
-  // The pinned stage is 600vh of scroll, so the page needs to open at the top
-  // even when the browser restores a position from the last visit.
+  // The pinned stage is 600vh, so the page has to open at the top even when
+  // the browser restores a position from the last visit.
   useEffect(() => {
     if (!("scrollRestoration" in history)) return;
     const previous = history.scrollRestoration;
@@ -228,48 +228,96 @@ export function UnfoldDemo() {
   return (
     // The darkening lives on the element the copy sits inside, not on a fixed
     // layer behind it. Anything that resolves a text colour by walking up to
-    // the nearest painted background - the project's own audit script, and some
-    // assistive tooling - cannot see a sibling, and read this page's headline
-    // as 1.07:1 while the rendered pixels were fine.
+    // the nearest painted background - the project's own audit script, and
+    // some assistive tooling - cannot see a sibling, and read the headline as
+    // 1.07:1 while the rendered pixels were fine.
     <motion.div className="relative" style={{ background: pageBackground }}>
       <TopBar onDark={onDark} />
 
       {/* ─── the pinned stage: five acts on one continuous shot ─── */}
       <section ref={stage} className="relative h-[600vh]">
-        <div
-          className="sticky top-0 flex h-dvh items-center justify-center overflow-hidden"
-          style={{ containerType: "size" }}
-        >
-          {/* the desk, and the product standing on it. The centring translate
-              and the per-act offset live on separate elements: framer writes
-              `x` into the same transform slot and they would fight. */}
+        <div className="sticky top-0 flex h-dvh items-center justify-center overflow-hidden">
+          {/* The three layers share one box and one framing, so cross-fading
+              between them reads as the same photograph changing state. */}
           <motion.div
-            className="absolute left-1/2 -translate-x-1/2"
-            style={{
-              bottom: stageBottom,
-              fontSize: "clamp(7px, min(2.6cqw, 3cqh), 22px)",
-            }}
+            className="absolute w-full max-w-[68rem] sm:px-8"
+            style={{ x: frameX, y: frameY, scale: frameScale }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.21, 0.47, 0.32, 0.98] }}
           >
-            <motion.div
-              style={{ x: stageX, scale: stageScale }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.21, 0.47, 0.32, 0.98] }}
+            <div
+              className="relative w-full"
+              style={{
+                // A wide product shot on a portrait phone comes out tiny. The
+                // phone gets a squarer window onto the same picture instead,
+                // cropping margin the shots have plenty of, which buys about a
+                // third more height for the lamp.
+                aspectRatio: compact ? "4 / 3" : `${MEDIA.width} / ${MEDIA.height}`,
+                // The photographs are not a flat colour to their edges, so a
+                // hard boundary drew a visible rectangle on the page even with
+                // the background sampled off their corners. Feather all four.
+                maskImage: EDGE_MASK,
+                maskComposite: "intersect",
+                WebkitMaskImage: EDGE_MASK,
+                WebkitMaskComposite: "source-in",
+              }}
             >
-              <UnfoldLamp
-                angle={angle}
-                lit={lit}
-                ambient={ambient}
-                blueprint={blueprint}
-                light={light}
-              />
-              <DimensionLines opacity={drawingOpacity} />
-            </motion.div>
+              <motion.div
+                className="absolute inset-0"
+                style={{ opacity: foldedOpacity }}
+              >
+                <Image
+                  src="/lab-assets/unfold/folded-1100.webp"
+                  alt="The lamp folded flat: a slim aluminium bar with the graphite head lying along it."
+                  fill
+                  sizes="(min-width: 640px) 68rem, 100vw"
+                  priority
+                  className={compact ? "object-cover" : "object-contain"}
+                />
+              </motion.div>
+
+              <motion.div
+                className="absolute inset-0"
+                style={{ opacity: sequenceOpacity }}
+              >
+                <UnfoldSequence
+                  progress={scrub}
+                  className={`h-full w-full ${compact ? "object-cover" : "object-contain"}`}
+                />
+              </motion.div>
+
+              <motion.div
+                className="absolute inset-0"
+                style={{ opacity: litOpacity }}
+              >
+                <Image
+                  src="/lab-assets/unfold/lit-1100.webp"
+                  alt="The lamp open on a dark walnut desk, its strip lit and throwing a warm pool of light."
+                  fill
+                  sizes="(min-width: 640px) 68rem, 100vw"
+                  className={compact ? "object-cover" : "object-contain"}
+                />
+                {/* Hue and saturation come from this layer, luminosity from the
+                    photograph underneath, so moving the slider relights the
+                    whole picture instead of tinting a rectangle over it. */}
+                <motion.div
+                  aria-hidden
+                  className="absolute inset-0"
+                  style={{
+                    background: light,
+                    mixBlendMode: "color",
+                    opacity: relightOpacity,
+                  }}
+                />
+                <DimensionLines opacity={drawingOpacity} />
+              </motion.div>
+            </div>
           </motion.div>
 
-          {/* Act 1 - the object, closed. Full bleed, copy set against it. */}
+          {/* Act 1 - the object, closed. */}
           <motion.div
-            className="pointer-events-none absolute inset-x-0 top-[13%] px-6 text-center"
+            className="pointer-events-none absolute inset-x-0 top-[10%] px-6 text-center"
             style={{ opacity: closedOpacity }}
           >
             <motion.h1
@@ -277,7 +325,11 @@ export function UnfoldDemo() {
               style={{ color: headingColour }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.1,
+                ease: [0.21, 0.47, 0.32, 0.98],
+              }}
             >
               Unfold
             </motion.h1>
@@ -286,54 +338,58 @@ export function UnfoldDemo() {
               style={{ color: bodyColour }}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.24, ease: [0.21, 0.47, 0.32, 0.98] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.24,
+                ease: [0.21, 0.47, 0.32, 0.98],
+              }}
             >
               A desk light that folds down to the size of a pencil case.
             </motion.p>
             <Readout
               onDark={onDark}
               className="mt-7 justify-center"
-              items={[`${DIMENSIONS.folded} mm closed`, "340 g", "aluminium"]}
+              items={["320 mm closed", "340 g", "aluminium"]}
             />
           </motion.div>
 
-          {/* Act 2 - one line, and the angle it is describing, live. */}
+          {/* Act 2 - one line, and how far open the thing in front of you is. */}
           <motion.div
-            className="pointer-events-none absolute inset-x-0 bottom-[11%] px-6 text-center"
+            className="pointer-events-none absolute inset-x-0 bottom-[8%] px-6 text-center"
             style={{ opacity: unfoldOpacity }}
           >
-            <motion.h2
+            <h2
               className="mx-auto max-w-2xl text-[clamp(1.9rem,5.2vw,3.4rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-              style={{ color: headingColour }}
+              style={{ color: "#14130f" }}
             >
               One hinge, and it is already a lamp.
-            </motion.h2>
+            </h2>
             <Readout
               onDark={onDark}
               className="mt-6 justify-center"
-              items={[`hinge ${hinge}°`, `of ${LAMP.openAngle}°`]}
+              items={[<OpenPercent key="open" scrub={scrub} />, "one moving part"]}
             />
           </motion.div>
 
-          {/* Act 3 - split: the room has changed, so the copy moves off centre. */}
+          {/* Act 3 - the room has changed, so the copy moves off centre. */}
           <motion.div
-            className="pointer-events-none absolute inset-0 flex items-end px-6 pb-32 sm:items-center sm:px-12 sm:pb-0"
+            className="pointer-events-none absolute inset-0 flex items-end px-6 pb-28 sm:items-center sm:px-12 sm:pb-0"
             style={{ opacity: lightOpacity }}
           >
             <div className="w-full sm:max-w-md">
-              <motion.h2
+              <h2
                 className="text-[clamp(1.9rem,5vw,3.2rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-                style={{ color: headingColour }}
+                style={{ color: "#f4f1ea" }}
               >
                 Then the room changes.
-              </motion.h2>
-              <motion.p
+              </h2>
+              <p
                 className="mt-5 max-w-sm leading-relaxed"
-                style={{ color: bodyColour }}
+                style={{ color: "#a49e93" }}
               >
                 2,200 lumens off a single strip, aimed at the desk and nowhere
                 else. Nobody sitting opposite you gets it in the eyes.
-              </motion.p>
+              </p>
               <Readout
                 onDark={onDark}
                 className="mt-7"
@@ -342,59 +398,51 @@ export function UnfoldDemo() {
             </div>
           </motion.div>
 
-          {/* Act 4 - the control panel, and the only thing on the page you touch. */}
+          {/* Act 4 - the only thing on the page you touch. */}
           <motion.div
-            className="absolute inset-0 flex items-end justify-end px-6 pb-28 sm:items-center sm:px-12 sm:pb-0"
-            style={{
-              opacity: warmthOpacity,
-              pointerEvents: "none",
-            }}
+            className="absolute inset-0 flex items-end justify-end px-6 pb-24 sm:items-center sm:px-12 sm:pb-0"
+            style={{ opacity: warmthOpacity, pointerEvents: "none" }}
           >
-            <motion.div
+            <div
               className="w-full sm:max-w-sm"
               style={{ pointerEvents: "auto" }}
             >
-              <motion.h2
+              <h2
                 className="text-[clamp(1.9rem,5vw,3.2rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-                style={{ color: headingColour }}
+                style={{ color: "#f4f1ea" }}
               >
                 Warm to work by. Cool to read by.
-              </motion.h2>
-              <motion.p
-                className="mt-5 leading-relaxed"
-                style={{ color: bodyColour }}
-              >
-                Move the slider. The strip changes, and so does everything the
-                light lands on.
-              </motion.p>
+              </h2>
+              <p className="mt-5 leading-relaxed" style={{ color: "#a49e93" }}>
+                Move the slider. The light changes, and so does everything it
+                lands on.
+              </p>
               <TemperatureControl
                 kelvin={kelvin}
                 onChange={setKelvin}
                 light={light}
               />
-            </motion.div>
+            </div>
           </motion.div>
 
-          {/* Act 5 - the drawing. Centred, quiet, nothing but measurements. */}
+          {/* Act 5 - quiet, centred, nothing but measurements. */}
           <motion.div
-            className="pointer-events-none absolute inset-x-0 top-[9%] px-6 text-center"
+            className="pointer-events-none absolute inset-x-0 top-[8%] px-6 text-center"
             style={{ opacity: drawingOpacity }}
           >
-            <motion.h2
+            <h2
               className="mx-auto max-w-xl text-[clamp(1.7rem,4.4vw,2.8rem)] leading-[1.1] font-medium tracking-[-0.03em] text-balance"
-              style={{ color: headingColour }}
+              style={{ color: "#f4f1ea" }}
             >
-              Every figure on this page is a dimension.
-            </motion.h2>
-            <motion.p
+              Folded, it is a 320 mm bar.
+            </h2>
+            <p
               className="mx-auto mt-5 max-w-md leading-relaxed"
-              style={{ color: bodyColour }}
+              style={{ color: "#a49e93" }}
             >
-              Folded it is {DIMENSIONS.folded} mm end to end and{" "}
-              {DIMENSIONS.thickness} mm thick. Open, the head sits{" "}
-              {DIMENSIONS.openHeight} mm above the desk and stays there on
+              Open, the head sits 280 mm above the desk and stays there on
               friction, with no knob to tighten.
-            </motion.p>
+            </p>
           </motion.div>
 
           <ScrollHint hidden={scrolled} />
@@ -428,17 +476,18 @@ export function UnfoldDemo() {
             </p>
             <a
               href="#top"
-              className="inline-flex min-h-[44px] items-center rounded-full bg-[#f4f1ea] px-7 text-[0.95rem] font-medium text-[#12100e] transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#ffc489]"
+              className="inline-flex min-h-[44px] items-center rounded-full bg-[#f4f1ea] px-7 text-[0.95rem] font-medium text-[#080704] transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#ffc489]"
             >
               Pre-order
             </a>
           </div>
 
           <p className="mt-16 max-w-xl text-sm leading-relaxed text-[#8d887e]">
-            Unfold is not a real product. It exists so this page has something
-            honest to describe: the lamp is drawn in CSS and lit in the browser,
-            the slider changes the light rather than a picture of it, and the
-            hinge figure is read off the same value that turns the arm.
+            Unfold is not a real product and none of it is for sale. The lamp
+            was generated; the page is the point. One photograph unfolds as you
+            scroll, the stills on either side of it are the same shot in a
+            different state, and the slider relights the picture rather than
+            swapping to a second one.
           </p>
         </div>
       </section>
@@ -458,7 +507,7 @@ function TopBar({ onDark }: { onDark: MotionValue<number> }) {
   return (
     <motion.header
       id="top"
-      className="fixed inset-x-0 top-0 z-20 border-b backdrop-blur-none"
+      className="fixed inset-x-0 top-0 z-20 border-b"
       style={{ borderColor: border }}
     >
       <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-6 sm:px-12">
@@ -491,7 +540,7 @@ function Readout({
   onDark,
   className = "",
 }: {
-  items: string[];
+  items: ReactNode[];
   onDark: MotionValue<number>;
   className?: string;
 }) {
@@ -508,7 +557,7 @@ function Readout({
       style={{ color: colour }}
     >
       {items.map((item, i) => (
-        <li key={item} className="flex items-center gap-3">
+        <li key={i} className="flex items-center gap-3">
           {i > 0 && (
             <motion.span
               aria-hidden
@@ -524,10 +573,34 @@ function Readout({
 }
 
 /**
+ * How far open the picture in front of you is, written straight into the DOM.
+ *
+ * The obvious version holds this in React state, and that is what broke the
+ * page: a `setState` on every scroll tick re-rendered the whole demo, and each
+ * re-render restarted the opacity animations on the three stacked photographs,
+ * so two of them sat half-visible at once. A motion value written to
+ * `textContent` never re-renders anything.
+ *
+ * It reports a percentage rather than an angle because frame index over frame
+ * count is exactly true, while degrees would be a guess: the clip's motion is
+ * eased and nobody measured the arm in each frame.
+ */
+function OpenPercent({ scrub }: { scrub: MotionValue<number> }) {
+  const node = useRef<HTMLSpanElement>(null);
+
+  useMotionValueEvent(scrub, "change", (value) => {
+    const percent = Math.round(Math.min(1, Math.max(0, value)) * 100);
+    if (node.current) node.current.textContent = `open ${percent}%`;
+  });
+
+  return <span ref={node}>open 0%</span>;
+}
+
+/**
  * The track carries the range it controls: warm at one end, daylight at the
  * other, so the control shows its own scale without a legend. The thumb takes
- * the lamp's current colour, which makes it the third place on screen showing
- * the same value.
+ * the current colour, which makes it the third place on screen showing the
+ * same value.
  */
 const RANGE_CSS = `
 .unfold-range { -webkit-appearance: none; appearance: none; }
@@ -542,12 +615,12 @@ const RANGE_CSS = `
 .unfold-range::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 22px; height: 22px; margin-top: -10px; border-radius: 999px;
-  background: var(--unfold-thumb); border: 2px solid #12100e;
+  background: var(--unfold-thumb); border: 2px solid #080704;
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35), 0 0 18px var(--unfold-thumb);
 }
 .unfold-range::-moz-range-thumb {
   width: 22px; height: 22px; border-radius: 999px;
-  background: var(--unfold-thumb); border: 2px solid #12100e;
+  background: var(--unfold-thumb); border: 2px solid #080704;
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35), 0 0 18px var(--unfold-thumb);
 }
 /* the default ring lands on the input box, not on the thumb the eye follows */
@@ -562,8 +635,8 @@ const RANGE_CSS = `
 
 /**
  * The page's one control. A real range input: it takes keyboard focus, reports
- * its value to assistive technology, and the number beside it is the value
- * the lamp is actually emitting rather than a label.
+ * its value to assistive technology, and the number beside it is the value the
+ * photograph is being relit with rather than a label.
  */
 function TemperatureControl({
   kelvin,
@@ -606,11 +679,7 @@ function TemperatureControl({
         onChange={(event) => onChange(Number(event.target.value))}
         aria-label="Colour temperature in kelvin"
         className="unfold-range mt-4 h-11 w-full cursor-pointer bg-transparent"
-        style={
-          {
-            "--unfold-thumb": light,
-          } as CSSProperties
-        }
+        style={{ "--unfold-thumb": light } as CSSProperties}
       />
 
       <div className="mt-1 flex justify-between font-mono text-[0.6875rem] tracking-[0.06em] text-[#8d887e] uppercase">
@@ -621,61 +690,68 @@ function TemperatureControl({
   );
 }
 
+const RULE = "rgba(244,241,234,0.55)";
+
 /**
- * Measurements drawn onto the object in the last act, positioned against the
- * same constants the lamp is built from.
- *
- * The labels are sized in rem rather than in the lamp's own em: at 390px the
- * lamp's em is about 10px, and a label scaled with it came out at 7px.
+ * Measurements drawn over the photograph in the last act. Positions are
+ * fractions of the frame, matched to where the lamp sits in the shot. Labels
+ * are sized in rem rather than against the frame, so they stay legible at
+ * 390px where the picture is a third of its desktop width.
  */
 function DimensionLines({ opacity }: { opacity: MotionValue<number> }) {
-  const rule = "rgba(244,241,234,0.5)";
-
   return (
     <motion.div
       aria-hidden
       className="pointer-events-none absolute inset-0"
       style={{ opacity }}
     >
-      {/* folded length, bracketed under the base */}
+      {/* the folded length, bracketed under the base */}
       <div
         className="absolute flex items-center justify-center"
         style={{
-          left: 0,
-          width: `${LAMP.baseW}em`,
-          bottom: "-3.4em",
-          height: "0.9em",
-          borderLeft: `1px solid ${rule}`,
-          borderRight: `1px solid ${rule}`,
-          borderBottom: `1px solid ${rule}`,
+          left: "9%",
+          width: "46%",
+          top: "83%",
+          height: "5%",
+          borderLeft: `1px solid ${RULE}`,
+          borderRight: `1px solid ${RULE}`,
+          borderBottom: `1px solid ${RULE}`,
         }}
       >
         <span
-          className="absolute font-mono text-xs tracking-[0.08em] whitespace-nowrap"
-          style={{ color: "#d8d3ca", background: PAGE_DARK, padding: "0 0.5rem" }}
+          className="absolute font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap"
+          style={{
+            color: "#e6e1d8",
+            background: PAGE_DARK,
+            padding: "0 0.4rem",
+          }}
         >
-          {DIMENSIONS.folded} mm
+          320 mm
         </span>
       </div>
 
-      {/* open height, bracketed up the right-hand side */}
+      {/* the open height, bracketed up the right-hand side */}
       <div
         className="absolute flex items-center justify-center"
         style={{
-          right: "-2.6em",
-          width: "0.9em",
-          bottom: 0,
-          height: `${LAMP.baseH + LAMP.armL * Math.sin((LAMP.openAngle * Math.PI) / 180)}em`,
-          borderTop: `1px solid ${rule}`,
-          borderRight: `1px solid ${rule}`,
-          borderBottom: `1px solid ${rule}`,
+          right: "5%",
+          width: "4%",
+          top: "10%",
+          height: "75%",
+          borderTop: `1px solid ${RULE}`,
+          borderRight: `1px solid ${RULE}`,
+          borderBottom: `1px solid ${RULE}`,
         }}
       >
         <span
-          className="absolute left-full font-mono text-xs tracking-[0.08em] whitespace-nowrap"
-          style={{ color: "#d8d3ca", paddingLeft: "0.5rem" }}
+          className="absolute right-full font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap"
+          style={{
+            color: "#e6e1d8",
+            background: PAGE_DARK,
+            padding: "0 0.4rem",
+          }}
         >
-          {DIMENSIONS.openHeight} mm
+          280 mm
         </span>
       </div>
     </motion.div>

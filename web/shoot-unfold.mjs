@@ -52,9 +52,9 @@ for (const [label, width, height] of [
   );
   const hinge = await page.evaluate(() => {
     const hit = [...document.querySelectorAll("li")].find((n) =>
-      /hinge/i.test(n.textContent ?? "")
+      /open \d/i.test(n.textContent ?? "")
     );
-    return hit?.textContent?.trim() ?? "(no hinge readout found)";
+    return hit?.textContent?.trim() ?? "(no open readout found)";
   });
 
   console.log(

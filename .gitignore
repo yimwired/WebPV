@@ -25,3 +25,4 @@ screenshots/
 
 # local state written by `wrangler dev`
 .wrangler/
+FASTWORK-ABOUT-BRIEF.md

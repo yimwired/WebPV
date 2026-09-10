@@ -63,8 +63,10 @@ async function openStage(context) {
 
   const sample = () =>
     page.evaluate(() => {
-      const led = document.querySelector('[data-lamp="led"]');
-      return led ? getComputedStyle(led).backgroundColor : null;
+      const overlay = document.querySelector('[style*="mix-blend-mode: color"]');
+      if (!overlay) return null;
+      const style = getComputedStyle(overlay);
+      return `${style.backgroundColor} @ ${(+style.opacity).toFixed(2)}`;
     });
 
   // Driven with the keyboard rather than by assigning `value`: React installs
@@ -110,30 +112,39 @@ async function openStage(context) {
     `${blurred.length} vs ${focused.length} bytes`
   );
 
-  // hinge readout vs. the arm's real matrix. The label is React state written
-  // from the same motion value, so it commits a frame behind the transform:
-  // sample only once the page has stopped moving, or the test measures the lag.
-  await seek(0.24);
-  await page.evaluate(
-    () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
-  );
-  await page.waitForTimeout(400);
-  const { label, degrees } = await page.evaluate(() => {
-    const li = [...document.querySelectorAll("li")].find((n) =>
-      /hinge/i.test(n.textContent ?? "")
+  // Exactly one of the three stacked photographs may be visible at a time.
+  // Two of them sat half-lit for a while because `useTransform(v, [a, b],
+  // [c, d], { clamp: true })` is misread with a two-stop range, so this is a
+  // regression guard and not a formality.
+  for (const at of [0.06, 0.3, 0.5, 0.68, 0.9]) {
+    await seek(at);
+    const layers = await page.evaluate(() => {
+      const box = document.querySelector('[style*="aspect-ratio"]');
+      return [...box.children].map((el) => +(+getComputedStyle(el).opacity).toFixed(3));
+    });
+    const lit = layers.filter((o) => o > 0.02);
+    check(
+      `one layer only at ${at}`,
+      lit.length === 1 && lit[0] > 0.98,
+      layers.join(" / ")
     );
-    const arm = document.querySelector('[data-lamp="arm"]');
-    const m = new DOMMatrix(getComputedStyle(arm).transform);
-    return {
-      label: li?.textContent?.trim() ?? "",
-      degrees: Math.round((Math.atan2(m.b, m.a) * 180) / Math.PI),
-    };
+  }
+
+  // The open figure is read off the same value that picks the frame.
+  await seek(0.28);
+  await page.waitForTimeout(400);
+  const open = await page.evaluate(() => {
+    const li = [...document.querySelectorAll("li")].find((n) =>
+      /open \d/i.test(n.textContent ?? "")
+    );
+    return li?.textContent?.trim() ?? "";
   });
-  const claimed = Number(label.match(/\d+/)?.[0] ?? -1);
+  const claimed = Number(open.match(/\d+/)?.[0] ?? -1);
+  const expected = Math.round(((0.28 - 0.14) / (0.42 - 0.14)) * 100);
   check(
-    "hinge readout is measured, not written",
-    Math.abs(claimed + degrees) <= 1,
-    `${label} vs arm ${degrees}°`
+    "open figure tracks the frame it is showing",
+    Math.abs(claimed - expected) <= 2,
+    `${open} vs expected ${expected}%`
   );
 
   // Contrast for every act, measured off the pixels behind the text at the
@@ -142,10 +153,10 @@ async function openStage(context) {
   const SAMPLES = [
     [0.06, "A desk light"],
     [0.06, "Unfold"],
-    [0.24, "One hinge"],
-    [0.5, "2,200 lumens"],
-    [0.68, "Move the slider"],
-    [0.9, "Folded it is"],
+    [0.28, "One hinge"],
+    [0.52, "2,200 lumens"],
+    [0.7, "Move the slider"],
+    [0.9, "Open, the head sits"],
   ];
 
   for (const [at, needle] of SAMPLES) {
@@ -158,6 +169,9 @@ async function openStage(context) {
       const box = node.getBoundingClientRect();
       const behind = document
         .elementsFromPoint(box.left + 4, box.top + box.height / 2)
+        // an invisible layer still reports its background colour, and the
+        // relight overlay sits over everything at opacity 0 most of the time
+        .filter((el) => +getComputedStyle(el).opacity > 0.02)
         .map((el) => getComputedStyle(el).backgroundColor)
         .find((c) => c && c !== "rgba(0, 0, 0, 0)");
       return { colour: getComputedStyle(node).color, behind };
@@ -183,27 +197,28 @@ async function openStage(context) {
   });
   const { page, seek } = await openStage(context);
 
-  const armAngle = () =>
+  const openFigure = () =>
     page.evaluate(() => {
-      const arm = document.querySelector('[data-lamp="arm"]');
-      const m = new DOMMatrix(getComputedStyle(arm).transform);
-      return Math.round((Math.atan2(m.b, m.a) * 180) / Math.PI);
+      const li = [...document.querySelectorAll("li")].find((n) =>
+        /open \d/i.test(n.textContent ?? "")
+      );
+      return Number(li?.textContent?.match(/\d+/)?.[0] ?? -1);
     });
 
   await seek(0.05);
-  const closed = await armAngle();
+  const closedAt = await openFigure();
   await seek(0.5);
-  const open = await armAngle();
+  const openAt = await openFigure();
   check(
     "reduced motion still opens the lamp",
-    closed === 0 && open === -72,
-    `${closed}° -> ${open}°`
+    closedAt === 0 && openAt === 100,
+    `${closedAt}% -> ${openAt}%`
   );
 
   await seek(0.9);
   const drawingVisible = await page.evaluate(() => {
     const h = [...document.querySelectorAll("h2")].find((n) =>
-      /is a dimension/.test(n.textContent ?? "")
+      /320 mm bar/.test(n.textContent ?? "")
     );
     return Number(getComputedStyle(h.closest("div")).opacity);
   });
