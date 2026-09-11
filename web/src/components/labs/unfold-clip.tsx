@@ -2,19 +2,25 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { RotateCcw, Play } from "lucide-react";
+import { Play } from "lucide-react";
 
 /**
- * A clip that starts when it arrives and then stops, the way a hardware
- * launch page plays one.
+ * A clip that plays when it arrives and stops, the way a hardware launch page
+ * plays one.
  *
- * Nothing is fetched until the clip is nearly on screen: `preload="none"` and
- * the sources are attached by the observer, so a viewer who never scrolls this
- * far pays nothing for it. The poster is the same photograph as the clip's
- * first frame, so there is no flash when the video takes over.
+ * Nothing is fetched until it is nearly on screen: `preload="none"` and the
+ * sources are attached by the observer, so a viewer who never scrolls this far
+ * pays nothing for it. The poster is the same photograph as the first frame,
+ * so there is no flash when the video takes over.
  *
- * It plays once. Looping a product shot turns it into wallpaper, and motion
- * that repeats forever stops reporting anything.
+ * The observer is never disconnected. Staying on the section plays it once and
+ * leaves it on its last frame - looping a product shot turns it into wallpaper
+ * - but scrolling away and coming back is a new arrival, and it starts again.
+ * That is the behaviour without a control to press, which is why there is not
+ * one.
+ *
+ * Reduced motion is the exception: nothing starts on its own there, so the
+ * clip would be unreachable without a button, and it gets one.
  */
 
 interface Source {
@@ -35,18 +41,26 @@ export function UnfoldClip({
   className?: string;
 }) {
   const video = useRef<HTMLVideoElement>(null);
+  const loaded = useRef(false);
   const reduced = useReducedMotion() ?? false;
-  const [state, setState] = useState<"idle" | "playing" | "ended">("idle");
+  // Only the refusal is state. Whether reduced motion needs a button is a fact
+  // about the preference, not something to write during an effect.
+  const [refused, setRefused] = useState(false);
+  const showButton = reduced || refused;
 
   const start = useCallback(() => {
     const node = video.current;
     if (!node) return;
+    if (!loaded.current) {
+      node.load();
+      loaded.current = true;
+    }
     node.currentTime = 0;
     void node.play().then(
-      () => setState("playing"),
-      // autoplay can be refused whatever the attributes say; the control is
-      // already there, so the honest fallback is to leave it to the viewer
-      () => setState("idle")
+      () => setRefused(false),
+      // autoplay can be refused whatever the attributes say; falling back to a
+      // button is the only honest answer when it is
+      () => setRefused(true)
     );
   }, []);
 
@@ -54,25 +68,20 @@ export function UnfoldClip({
     const node = video.current;
     if (!node) return;
 
-    // Reduced motion gets the poster and a button. The clip is the substance
-    // of this section, so it stays reachable rather than being removed.
+    // Nothing starts on its own under reduced motion, so the button is the
+    // only way in and `showButton` already accounts for it.
     if (reduced) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        node.load();
-        start();
+        if (entry.isIntersecting) start();
       },
-      { threshold: 0.4 }
+      { threshold: 0.5 }
     );
 
     observer.observe(node);
     return () => observer.disconnect();
   }, [reduced, start]);
-
-  const idle = state !== "playing";
 
   return (
     <div className={`relative ${className}`}>
@@ -83,7 +92,6 @@ export function UnfoldClip({
         muted
         playsInline
         preload="none"
-        onEnded={() => setState("ended")}
         className="h-full w-full object-cover"
       >
         {sources.map((source) => (
@@ -91,25 +99,14 @@ export function UnfoldClip({
         ))}
       </video>
 
-      {/* One control, and it says which thing it will do. It is only in the
-          way while the clip is not running. */}
-      {idle && (
+      {showButton && (
         <button
           type="button"
           onClick={start}
-          className="absolute right-4 bottom-4 inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full bg-black/55 px-4 text-[0.8125rem] font-medium text-white backdrop-blur-none transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="absolute right-4 bottom-4 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-black/55 px-4 text-[0.8125rem] font-medium text-white transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
-          {state === "ended" ? (
-            <>
-              <RotateCcw className="h-4 w-4" aria-hidden />
-              Replay
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4" aria-hidden />
-              Play
-            </>
-          )}
+          <Play className="h-4 w-4" aria-hidden />
+          Play
         </button>
       )}
     </div>

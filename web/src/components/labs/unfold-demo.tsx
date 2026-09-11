@@ -28,7 +28,10 @@ import { kelvinToRgb } from "./unfold-light";
  * The product is fictional and nothing here is for sale. The page says so.
  */
 
-const PAPER = "#f2f1ec";
+// Sampled from the folded photograph's own corner, so the light section and
+// the picture standing on it are the same tone and the frame has no step in
+// brightness to announce itself with.
+const PAPER = "#f3f1ed";
 const ROOM = "#080704";
 
 /** Roughly the colour temperature the lit photograph was generated at. */
@@ -72,21 +75,31 @@ export function UnfoldDemo() {
         className="px-5 pt-28 pb-24 sm:px-8 sm:pt-36 sm:pb-32"
         style={{ background: PAPER }}
       >
-        <Rise className="mx-auto max-w-3xl text-center">
-          <h1 className="text-[clamp(3rem,11vw,7.5rem)] leading-[0.86] font-semibold tracking-[-0.045em] text-[#14130f]">
-            Unfold
-          </h1>
-          <p className="mx-auto mt-6 max-w-md text-lg leading-relaxed text-[#4c4941] text-balance">
-            A desk light that folds down to the size of a pencil case.
-          </p>
-          <Readout
-            tone="light"
-            className="mt-8 justify-center"
-            items={["320 mm closed", "340 g", "aluminium"]}
-          />
-        </Rise>
+        {/* The hero is on screen before anything has been scrolled, so it
+            animates on load rather than on arrival, one line behind the next.
+            `Rise` uses whileInView, which for this block would fire everything
+            at the same instant and read as no entrance at all. */}
+        <div className="mx-auto max-w-3xl text-center">
+          <Enter>
+            <h1 className="text-[clamp(3rem,11vw,7.5rem)] leading-[0.86] font-semibold tracking-[-0.045em] text-[#14130f]">
+              Unfold
+            </h1>
+          </Enter>
+          <Enter delay={0.14}>
+            <p className="mx-auto mt-6 max-w-md text-lg leading-relaxed text-[#4c4941] text-balance">
+              A desk light that folds down to the size of a pencil case.
+            </p>
+          </Enter>
+          <Enter delay={0.26}>
+            <Readout
+              tone="light"
+              className="mt-8 justify-center"
+              items={["320 mm closed", "340 g", "aluminium"]}
+            />
+          </Enter>
+        </div>
 
-        <Rise className="mx-auto mt-16 max-w-5xl" delay={0.1}>
+        <Enter className="mx-auto mt-16 max-w-5xl" delay={0.4} distance={26}>
           <Frame tone="light">
             <Image
               src="/lab-assets/unfold/folded-1100.webp"
@@ -97,7 +110,7 @@ export function UnfoldDemo() {
               className="w-full"
             />
           </Frame>
-        </Rise>
+        </Enter>
       </section>
 
       {/* ── 2. the unfold, as a clip that starts when it arrives ──────── */}
@@ -301,14 +314,51 @@ function Frame({
   tone: "light" | "dark";
   children: ReactNode;
 }) {
-  const ring = tone === "light" ? "ring-black/[0.06]" : "ring-white/10";
+  // On the light ground the picture's own background is within two units of
+  // the page's, so there is nothing to define and anything that tries draws
+  // the edge instead of dissolving it. An outline read as a box; a soft shadow
+  // was worse, because it darkened the page above the picture by four units
+  // and that step is exactly what the eye picks up as a line. The rounded
+  // corners alone say the picture is placed.
+  //
+  // On the dark ground the picture really is a different tone from the page,
+  // so a hairline there defines an edge that exists rather than inventing one.
+  const edge = tone === "light" ? "" : "ring-1 ring-white/10";
 
   return (
     <div
-      className={`overflow-hidden rounded-[1.25rem] ring-1 sm:rounded-[1.75rem] ${ring}`}
+      className={`overflow-hidden rounded-[1.25rem] sm:rounded-[1.75rem] ${edge}`}
     >
       {children}
     </div>
+  );
+}
+
+/**
+ * Enters on load, for the block that is already on screen when the page
+ * opens. Framer's MotionConfig turns it off for anyone who has asked for less
+ * motion, so nothing here is load-bearing.
+ */
+function Enter({
+  children,
+  className = "",
+  delay = 0,
+  distance = 18,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  distance?: number;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: distance }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.85, delay, ease }}
+    >
+      {children}
+    </motion.div>
   );
 }
 

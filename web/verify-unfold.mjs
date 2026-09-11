@@ -105,19 +105,41 @@ const browser = await chromium.launch();
   await page.waitForFunction(() => document.querySelector("video").ended, null, {
     timeout: 12000,
   });
-  const replay = page.getByRole("button", { name: /replay/i });
-  check("replay appears when it ends", await replay.isVisible());
 
-  await replay.click();
-  await page.waitForTimeout(700);
-  const restarted = await page.evaluate(() => {
+  // Staying put leaves it on its last frame. There is no control to press,
+  // so if it restarted here it would be looping by another name.
+  const settled = await page.evaluate(
+    () => document.querySelector("video").currentTime
+  );
+  await page.waitForTimeout(2500);
+  const stillSettled = await page.evaluate(() => {
     const v = document.querySelector("video");
     return { t: v.currentTime, paused: v.paused };
   });
   check(
-    "replay restarts it",
-    restarted.t < 2 && !restarted.paused,
-    `t=${restarted.t.toFixed(2)}s`
+    "staying on the section does not replay it",
+    stillSettled.paused && Math.abs(stillSettled.t - settled) < 0.1,
+    `t=${settled.toFixed(2)}s -> ${stillSettled.t.toFixed(2)}s`
+  );
+
+  check(
+    "no replay button to press",
+    (await page.getByRole("button", { name: /replay/i }).count()) === 0
+  );
+
+  // Leaving and coming back is a new arrival, and a new arrival plays.
+  await toHeading(page, "Unfold, in full");
+  await page.waitForTimeout(600);
+  await toHeading(page, "One hinge");
+  await page.waitForTimeout(1200);
+  const returned = await page.evaluate(() => {
+    const v = document.querySelector("video");
+    return { t: v.currentTime, paused: v.paused };
+  });
+  check(
+    "scrolling back to it plays it again",
+    !returned.paused && returned.t < settled - 0.5,
+    `t=${returned.t.toFixed(2)}s`
   );
 
   // ── the slider relights the photograph ──────────────────────────────
