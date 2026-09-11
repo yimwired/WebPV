@@ -7,7 +7,7 @@
 
 export const labCardVersions: Record<string, string> = {
   "contour": "953be926",
-  "unfold": "98a9e1b1",
+  "unfold": "28051282",
   "trine": "ac85a815",
   "sable": "422d2181",
   "meridian": "62b55d5b",
