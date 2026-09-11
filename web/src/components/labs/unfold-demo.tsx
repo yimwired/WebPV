@@ -34,7 +34,11 @@ import { kelvinToRgb } from "./unfold-light";
 /** Where each act starts and ends, as a fraction of the pinned scroll. */
 const ACTS = {
   closed: [0.0, 0.03, 0.11, 0.16],
-  unfold: [0.17, 0.21, 0.3, 0.36],
+  // Out before the room turns. Cross-fading ink and paper through mid-grey at
+  // the same time put this line at 2.39:1 against its own background halfway
+  // through the change, which no colour choice fixes: the two have to not
+  // overlap.
+  unfold: [0.17, 0.2, 0.25, 0.29],
   light: [0.44, 0.49, 0.56, 0.61],
   warmth: [0.63, 0.68, 0.76, 0.81],
   drawing: [0.83, 0.88, 0.96, 1.0],
@@ -43,8 +47,12 @@ const ACTS = {
 /** The sequence scrubs across this range: folded, room darkens, light on. */
 const SCRUB = [0.14, 0.42] as const;
 
-/** The room goes dark with the sequence, a beat ahead of the copy that needs it. */
-const DARKEN = [0.26, 0.4] as const;
+/**
+ * When the page follows the clip into the dark. The clip's own lights go down
+ * around its halfway mark, so this tracks that rather than running on past it:
+ * the background was still pale grey while the photograph was already black.
+ */
+const DARKEN = [0.28, 0.345] as const;
 
 /** Sampled from the corners of the two photographs, so no seam shows. */
 const PAGE_LIGHT = "#f2f1ec";
@@ -173,13 +181,13 @@ export function UnfoldDemo() {
     scrollYProgress,
     FRAME_AT,
     compact
-      ? ["-2%", "-2%", "-8%", "-48%", "-50%", "-30%"]
-      : ["4%", "4%", "0%", "0%", "0%", "2%"]
+      ? ["-2%", "-4%", "-18%", "-48%", "-50%", "-30%"]
+      : ["4%", "2%", "-9%", "0%", "0%", "2%"]
   );
   const sweptScale = useTransform(
     scrollYProgress,
     FRAME_AT,
-    compact ? [1, 1, 1, 1, 1, 0.94] : [0.96, 0.96, 1, 0.94, 0.88, 0.86]
+    compact ? [1, 1, 0.96, 1, 1, 0.94] : [0.96, 0.95, 0.9, 0.94, 0.88, 0.86]
   );
 
   const frameX = reduced ? restingOffset : sweptX;
@@ -355,15 +363,18 @@ export function UnfoldDemo() {
 
           {/* Act 2 - one line, and how far open the thing in front of you is. */}
           <motion.div
-            className="pointer-events-none absolute inset-x-0 bottom-[8%] px-6 text-center"
+            className="pointer-events-none absolute inset-x-0 bottom-[13%] px-6 text-center"
             style={{ opacity: unfoldOpacity }}
           >
-            <h2
+            {/* The room goes from a white studio to an unlit desk underneath
+                this line, so it cannot be one fixed colour: dark ink stayed
+                dark and vanished into the photograph halfway through. */}
+            <motion.h2
               className="mx-auto max-w-2xl text-[clamp(1.9rem,5.2vw,3.4rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-              style={{ color: "#14130f" }}
+              style={{ color: headingColour }}
             >
               One hinge, and it is already a lamp.
-            </h2>
+            </motion.h2>
             <Readout
               onDark={onDark}
               className="mt-6 justify-center"

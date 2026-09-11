@@ -18,6 +18,7 @@ await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch();
 
 for (const [label, width, height] of [
+  ["wide", 1920, 860],
   ["desktop", 1440, 900],
   ["phone", 390, 844],
 ]) {

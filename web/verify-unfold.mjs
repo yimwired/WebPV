@@ -131,7 +131,7 @@ async function openStage(context) {
   }
 
   // The open figure is read off the same value that picks the frame.
-  await seek(0.28);
+  await seek(0.23);
   await page.waitForTimeout(400);
   const open = await page.evaluate(() => {
     const li = [...document.querySelectorAll("li")].find((n) =>
@@ -140,7 +140,7 @@ async function openStage(context) {
     return li?.textContent?.trim() ?? "";
   });
   const claimed = Number(open.match(/\d+/)?.[0] ?? -1);
-  const expected = Math.round(((0.28 - 0.14) / (0.42 - 0.14)) * 100);
+  const expected = Math.round(((0.23 - 0.14) / (0.42 - 0.14)) * 100);
   check(
     "open figure tracks the frame it is showing",
     Math.abs(claimed - expected) <= 2,
@@ -153,7 +153,7 @@ async function openStage(context) {
   const SAMPLES = [
     [0.06, "A desk light"],
     [0.06, "Unfold"],
-    [0.28, "One hinge"],
+    [0.23, "One hinge"],
     [0.52, "2,200 lumens"],
     [0.7, "Move the slider"],
     [0.9, "Open, the head sits"],
