@@ -38,7 +38,7 @@ export const labs: Lab[] = [
     name: "Unfold",
     vibe: "Hardware launch, scroll-driven",
     description:
-      "One folding desk light on a page that plays as a single shot: scrolling opens the hinge, the room drops away as the light comes on, and the colour-temperature slider relights the photograph rather than swapping to a second one. The unfold is scrubbed off a frame sequence, so it runs at the speed of your finger and stops where you stop.",
+      "One folding desk light, sold the way a hardware launch page sells one: each section states a single thing and the media that proves it sits in a frame of its own. The clip of the lamp opening starts when you reach it and stops when it is done, and the colour-temperature slider relights the photograph rather than swapping to a second one.",
     accent: "#ffc489",
     preview: { from: "#191512", to: "#4a3524" },
     bestFor: "Launching one product: gadgets, appliances, anything with a spec sheet",

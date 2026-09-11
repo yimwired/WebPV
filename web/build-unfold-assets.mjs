@@ -7,18 +7,22 @@
 // at them with UNFOLD_FOLDED, UNFOLD_LIT and UNFOLD_CLIP, or drop them in
 // `unfold-src/` as folded.png, lit.png and clip.mp4.
 //
-// Three things this script exists to keep true, all of which were wrong the
-// first time they were done by hand:
+// Three things this keeps true, all of which were wrong when done by hand:
 //
-//   1. The clip carries a vendor watermark in its bottom-right corner. Cropping
-//      it off changes the clip's aspect ratio, so the two stills have to be
-//      cropped to the same ratio or the layers jump when they cross-fade.
-//   2. The clip's first frame is the folded still and its last frame is the lit
-//      still. That is what lets the page cross-fade between them invisibly, and
-//      it only holds while all three come from one generation run.
-//   3. Both a wide and a narrow set are written. A phone downloading 48 frames
-//      at 1100px wide is 536 KB for a picture it shows at a third of that.
-import { mkdir, readdir, rm, stat } from "node:fs/promises";
+//   1. The clip carries a vendor watermark in its bottom-right corner.
+//      Cropping it changes the clip's aspect ratio, so the stills are cropped
+//      to match rather than the other way round.
+//   2. The clip's first frame is the folded still and its last frame is the
+//      lit still. That is what lets the poster hand over to the video without
+//      a flash, and it only holds while all three come from one run.
+//   3. Both codecs are written. webm is roughly half the size of the mp4 and
+//      every browser that cannot take it falls through to the mp4.
+//
+// When regenerating the sources: ask for the product framed small in a large
+// empty field, at least 25% clean background on every side. The first set was
+// framed tight, which left nothing to crop when the page needed a different
+// shape.
+import { mkdir, stat } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { promisify } from "node:util";
@@ -28,106 +32,74 @@ const run = promisify(execFile);
 
 const SRC_DIR = "unfold-src";
 const OUT = "public/lab-assets/unfold";
-const TMP = "unfold-src/.frames";
 
 const FOLDED = process.env.UNFOLD_FOLDED ?? join(SRC_DIR, "folded.png");
 const LIT = process.env.UNFOLD_LIT ?? join(SRC_DIR, "lit.png");
 const CLIP = process.env.UNFOLD_CLIP ?? join(SRC_DIR, "clip.mp4");
 
-/** Frames in the scrubbed sequence. 48 over ~250vh is one frame per ~40px. */
-const FRAMES = 48;
-
 /** Height of the watermark strip to remove from the bottom of the clip. */
 const WATERMARK_PX = 68;
 
-const SETS = [
-  { dir: "seq-620", width: 620, height: 352, quality: 70, stillQuality: 78 },
-  { dir: "seq-1100", width: 1100, height: 624, quality: 72, stillQuality: 82 },
-];
+/** Width everything ships at. The frame renders about 1100 CSS px at most. */
+const WIDTH = 1200;
 
 const ffmpeg = (args) => run("ffmpeg", ["-y", "-loglevel", "error", ...args]);
-
-const probe = async (file, entries) => {
-  const { stdout } = await run("ffprobe", [
-    "-v", "error",
-    "-select_streams", "v:0",
-    "-show_entries", `stream=${entries}`,
-    "-of", "csv=p=0",
-    file,
-  ]);
-  return stdout.trim().split(",").map(Number);
-};
 
 for (const file of [FOLDED, LIT, CLIP]) {
   if (!existsSync(file)) {
     console.error(`missing source: ${file}`);
-    console.error("set UNFOLD_FOLDED / UNFOLD_LIT / UNFOLD_CLIP, or fill unfold-src/");
+    console.error(
+      "set UNFOLD_FOLDED / UNFOLD_LIT / UNFOLD_CLIP, or fill unfold-src/"
+    );
     process.exit(1);
   }
 }
 
-const [clipWidth, clipHeight, ...rest] = await probe(
+const { stdout } = await run("ffprobe", [
+  "-v", "error",
+  "-select_streams", "v:0",
+  "-show_entries", "stream=width,height",
+  "-of", "csv=p=0",
   CLIP,
-  "width,height,duration"
-);
-const duration = rest[0];
+]);
+const [clipWidth, clipHeight] = stdout.trim().split(",").map(Number);
 const cropHeight = clipHeight - WATERMARK_PX;
 const ratio = clipWidth / cropHeight;
+const crop = `crop=${clipWidth}:${cropHeight}:0:0`;
 
-console.log(`clip ${clipWidth}x${clipHeight}, ${duration}s`);
+console.log(`clip ${clipWidth}x${clipHeight}`);
 console.log(`cropping ${WATERMARK_PX}px of watermark -> ratio ${ratio.toFixed(4)}`);
 
 await mkdir(OUT, { recursive: true });
-await rm(TMP, { recursive: true, force: true });
-await mkdir(TMP, { recursive: true });
 
-// ── the sequence ─────────────────────────────────────────────────────────
+// ── the clip, in both codecs ─────────────────────────────────────────────
 await ffmpeg([
   "-i", CLIP,
-  "-vf", `crop=${clipWidth}:${cropHeight}:0:0,fps=${FRAMES}/${duration}`,
-  join(TMP, "f%03d.png"),
+  "-vf", `${crop},scale=${WIDTH}:-2`,
+  "-an",
+  "-c:v", "libx264", "-profile:v", "high", "-crf", "24", "-preset", "slow",
+  "-movflags", "+faststart", "-pix_fmt", "yuv420p",
+  join(OUT, "unfold.mp4"),
 ]);
-
-const extracted = (await readdir(TMP)).filter((f) => f.endsWith(".png")).sort();
-if (extracted.length < FRAMES) {
-  console.error(`expected ${FRAMES} frames, got ${extracted.length}`);
-  process.exit(1);
-}
-
-for (const set of SETS) {
-  await mkdir(join(OUT, set.dir), { recursive: true });
-  for (let i = 0; i < FRAMES; i += 1) {
-    await ffmpeg([
-      "-i", join(TMP, extracted[i]),
-      "-vf", `scale=${set.width}:${set.height}`,
-      "-quality", String(set.quality),
-      join(OUT, set.dir, `${String(i).padStart(2, "0")}.webp`),
-    ]);
-  }
-}
+await ffmpeg([
+  "-i", CLIP,
+  "-vf", `${crop},scale=${WIDTH}:-2`,
+  "-an",
+  "-c:v", "libvpx-vp9", "-crf", "36", "-b:v", "0", "-row-mt", "1",
+  join(OUT, "unfold.webm"),
+]);
 
 // ── the two stills, cropped to the clip's ratio so nothing jumps ─────────
 for (const [name, source] of [["folded", FOLDED], ["lit", LIT]]) {
-  for (const set of SETS) {
-    await ffmpeg([
-      "-i", source,
-      "-vf", `crop=iw:iw/${ratio}:0:0,scale=${set.width}:${set.height}`,
-      "-quality", String(set.stillQuality),
-      join(OUT, `${name}-${set.width}.webp`),
-    ]);
-  }
+  await ffmpeg([
+    "-i", source,
+    "-vf", `crop=iw:iw/${ratio}:0:0,scale=1100:624`,
+    "-quality", "82",
+    join(OUT, `${name}-1100.webp`),
+  ]);
 }
 
-await rm(TMP, { recursive: true, force: true });
-
-let total = 0;
-for (const entry of await readdir(OUT, { withFileTypes: true })) {
-  if (entry.isDirectory()) {
-    for (const file of await readdir(join(OUT, entry.name))) {
-      total += (await stat(join(OUT, entry.name, file))).size;
-    }
-  } else {
-    total += (await stat(join(OUT, entry.name))).size;
-  }
+for (const file of ["unfold.mp4", "unfold.webm", "folded-1100.webp", "lit-1100.webp"]) {
+  const { size } = await stat(join(OUT, file));
+  console.log(`  ${file}  ${(size / 1024).toFixed(0)} KB`);
 }
-console.log(`${OUT}: ${(total / 1024).toFixed(0)} KB`);

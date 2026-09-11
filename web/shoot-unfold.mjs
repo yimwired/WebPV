@@ -1,17 +1,22 @@
-// Walks /labs/unfold through every act at two widths and reports what the page
-// actually painted: console errors, horizontal overflow, and one frame per act.
+// Walks /labs/unfold at three widths and reports what the page actually
+// painted: console errors, horizontal overflow, and one frame per section.
+//
+// The page is normal flow now rather than a pinned stage, so sections are
+// found by their headings instead of by a scroll fraction.
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 
 const URL = process.env.SHOOT_URL ?? "http://localhost:3000";
 const OUT = process.env.OUT ?? "shots";
-const ACTS = [
-  ["1-closed", 0.06],
-  ["2-unfold", 0.26],
-  ["3-light", 0.47],
-  ["4-warmth", 0.68],
-  ["5-drawing", 0.9],
-  ["6-specs", 1.0],
+
+/** Matched against each section's first heading. */
+const SECTIONS = [
+  ["1-hero", "Unfold"],
+  ["2-unfold", "One hinge"],
+  ["3-light", "Then the room"],
+  ["4-warmth", "Warm to work"],
+  ["5-dimensions", "320 mm bar"],
+  ["6-specs", "Unfold, in full"],
 ];
 
 await mkdir(OUT, { recursive: true });
@@ -33,33 +38,29 @@ for (const [label, width, height] of [
   await page.goto(`${URL}/labs/unfold`, { waitUntil: "load" });
   await page.waitForTimeout(900);
 
-  const stage = await page.evaluate(() => {
-    const section = document.querySelector("section");
-    return section ? section.getBoundingClientRect().height : 0;
-  });
-
-  for (const [name, at] of ACTS) {
-    // the pinned section is the first <section>; scroll inside its own range
-    await page.evaluate(
-      ([h, frac]) => window.scrollTo(0, (h - window.innerHeight) * frac),
-      [stage, at]
-    );
-    await page.waitForTimeout(650);
+  for (const [name, heading] of SECTIONS) {
+    await page.evaluate((text) => {
+      const node = [...document.querySelectorAll("h1, h2")].find((n) =>
+        (n.textContent ?? "").includes(text)
+      );
+      node?.scrollIntoView({ block: "center", behavior: "instant" });
+    }, heading);
+    // entrances are 600ms, the clip needs a moment to start
+    await page.waitForTimeout(1400);
     await page.screenshot({ path: `${OUT}/${label}-${name}.png` });
   }
 
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth
   );
-  const hinge = await page.evaluate(() => {
-    const hit = [...document.querySelectorAll("li")].find((n) =>
-      /open \d/i.test(n.textContent ?? "")
-    );
-    return hit?.textContent?.trim() ?? "(no open readout found)";
+  const clip = await page.evaluate(() => {
+    const video = document.querySelector("video");
+    if (!video) return "(no clip)";
+    return `clip ${video.readyState >= 2 ? "loaded" : "not loaded"}, t=${video.currentTime.toFixed(1)}s`;
   });
 
   console.log(
-    `${label} ${width}px  overflow=${overflow}px  errors=${errors.length}  ${hinge}`
+    `${label} ${width}px  overflow=${overflow}px  errors=${errors.length}  ${clip}`
   );
   errors.slice(0, 4).forEach((e) => console.log("   " + e.slice(0, 160)));
   await page.close();
