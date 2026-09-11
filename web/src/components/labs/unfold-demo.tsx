@@ -314,25 +314,45 @@ function Frame({
   tone: "light" | "dark";
   children: ReactNode;
 }) {
-  // On the light ground the picture's own background is within two units of
-  // the page's, so there is nothing to define and anything that tries draws
-  // the edge instead of dissolving it. An outline read as a box; a soft shadow
-  // was worse, because it darkened the page above the picture by four units
-  // and that step is exactly what the eye picks up as a line. The rounded
-  // corners alone say the picture is placed.
+  // The light section is the one where the picture and the page are the same
+  // material. Measured across all four sides the step is 1 to 4 units out of
+  // 255, and it was still visible, because what the eye catches is a straight
+  // line a thousand pixels long rather than a difference in tone. Removing
+  // the outline and then the shadow lowered the step and kept the line.
   //
-  // On the dark ground the picture really is a different tone from the page,
-  // so a hairline there defines an edge that exists rather than inventing one.
-  const edge = tone === "light" ? "" : "ring-1 ring-white/10";
+  // So there is no line: the picture fades out over its last few per cent on
+  // every side. This is the treatment that drew a grey halo when it was tried
+  // against a mismatched ground and over a much longer fade. Against a ground
+  // this close, over this distance, and with only empty studio in the margin
+  // it has to eat, it dissolves. Rounded corners come off with it; a feathered
+  // edge and a drawn corner are two different claims about where the picture
+  // stops.
+  if (tone === "light") {
+    return (
+      <div
+        style={{
+          maskImage: LIGHT_FADE,
+          maskComposite: "intersect",
+          WebkitMaskImage: LIGHT_FADE,
+          WebkitMaskComposite: "source-in",
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
 
+  // On the dark ground the picture really is a different tone from the page,
+  // so a hairline defines an edge that exists rather than inventing one.
   return (
-    <div
-      className={`overflow-hidden rounded-[1.25rem] sm:rounded-[1.75rem] ${edge}`}
-    >
+    <div className="overflow-hidden rounded-[1.25rem] ring-1 ring-white/10 sm:rounded-[1.75rem]">
       {children}
     </div>
   );
 }
+
+const LIGHT_FADE =
+  "linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent)";
 
 /**
  * Enters on load, for the block that is already on screen when the page
