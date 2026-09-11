@@ -14,7 +14,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { AMBIENT, UnfoldSequence } from "./unfold-sequence";
+import { UnfoldSequence, type FrameSample } from "./unfold-sequence";
 import { kelvinToRgb } from "./unfold-light";
 
 /**
@@ -22,22 +22,25 @@ import { kelvinToRgb } from "./unfold-light";
  * use: a single continuous shot where scroll position moves the product and
  * the copy arrives when the product reaches the state it describes.
  *
- * Three views of the same lamp are stacked in one frame - folded, the unfold
- * as a scrubbed sequence, and lit on a desk - all made from one master image,
- * so the layers cross-fade without anything appearing to jump. The
- * colour-temperature control relights the photograph for real rather than
- * swapping to a second picture of it.
+ * The photograph fills the screen. Three earlier versions floated it in a box
+ * and tried to make the page around it disappear - matching the background to
+ * a corner pixel, feathering the edges, spreading a blurred copy behind it -
+ * and every one drew either a rectangle or a halo, because a photograph cannot
+ * dissolve into a flat colour. Full bleed has no edge to hide.
+ *
+ * What that costs is that the copy sits on the picture, and the picture goes
+ * from a white studio to an unlit desk partway through. So each block takes
+ * its ink from a reading of the region it is actually sitting on, and carries
+ * a soft wash in the opposite direction. Neither is tied to a scroll position,
+ * so neither can disagree with what is on screen.
  *
  * The product is fictional and nothing here is for sale. The page says so.
  */
 
 /** Where each act starts and ends, as a fraction of the pinned scroll. */
 const ACTS = {
-  closed: [0.0, 0.03, 0.11, 0.16],
-  // Out before the room turns. The clip's lights drop between frames 14 and
-  // 32, which is scroll 0.22 to 0.33, and cross the midpoint near 0.28: copy
-  // fading through grey at the same moment as its background measured 2.39:1.
-  unfold: [0.16, 0.19, 0.23, 0.27],
+  closed: [0.0, 0.03, 0.12, 0.17],
+  unfold: [0.18, 0.21, 0.3, 0.35],
   light: [0.44, 0.49, 0.56, 0.61],
   warmth: [0.63, 0.68, 0.76, 0.81],
   drawing: [0.83, 0.88, 0.96, 1.0],
@@ -46,29 +49,13 @@ const ACTS = {
 /** The sequence scrubs across this range: folded, room darkens, light on. */
 const SCRUB = [0.14, 0.42] as const;
 
-/** Sampled from the folded photograph's corner. Holds until the clip paints. */
-const PAGE_LIGHT = "#f3f1ed";
+/** Ink pairs: [on a light picture, on a dark one]. */
+const HEADING = ["#14130f", "#f6f4ef"] as const;
+const BODY = ["#4c4941", "#c3bdb2"] as const;
+const QUIET = ["#65615a", "#a8a29a"] as const;
 
-/** Relative luminance, for deciding whether copy over this needs light ink. */
-function luminance(r: number, g: number, b: number) {
-  const lin = [r, g, b].map((v) => {
-    const s = v / 255;
-    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-}
-
-const MEDIA = { width: 1100, height: 624 };
-
-/**
- * A soft edge on all four sides. This was tried once against a flat page
- * colour and drew a grey halo, because the picture was dissolving into
- * something that looked nothing like it. With the blurred backdrop behind it
- * the picture now dissolves into a blurred copy of itself, which is what makes
- * the rectangle disappear rather than merely soften.
- */
-const EDGE_MASK =
-  "linear-gradient(to right, transparent, #000 5%, #000 95%, transparent), linear-gradient(to bottom, transparent, #000 4%, #000 93%, transparent)";
+/** Until the first frame is decoded there is nothing to sample. */
+const PAGE_BASE = "#f3f1ed";
 
 /** Roughly the colour temperature the lit photograph was generated at. */
 const NATIVE_KELVIN = 3050;
@@ -85,16 +72,7 @@ const SPECS: ReadonlyArray<[string, string]> = [
   ["Warranty", "5 years"],
 ];
 
-/**
- * 0 below `from`, 1 above `to`, linear in between.
- *
- * Every scroll-linked ramp on this page goes through here rather than through
- * `useTransform(value, [a, b], [c, d], { clamp: true })`. That call is read
- * wrongly by this version of framer when the input range has only two stops:
- * it produced a value that rose across the whole remaining scroll instead of
- * finishing at `b`, which left two of the three stacked photographs visible
- * at once. Four-stop ranges are unaffected.
- */
+/** 0 below `from`, 1 above `to`, linear in between. */
 function ramp(value: number, from: number, to: number) {
   return Math.min(1, Math.max(0, (value - from) / (to - from)));
 }
@@ -102,6 +80,11 @@ function ramp(value: number, from: number, to: number) {
 /** Fades a block in over [a, b] and back out over [c, d]. */
 function useAct(progress: MotionValue<number>, act: readonly number[]) {
   return useTransform(progress, [...act], [0, 1, 1, 0]);
+}
+
+/** Picks one of a colour pair by how dark the picture under it is. */
+function useInk(dark: MotionValue<number>, pair: readonly [string, string]) {
+  return useTransform(dark, [0, 1], [pair[0], pair[1]]);
 }
 
 /** Tracks a media query, starting false so the server and first paint agree. */
@@ -123,7 +106,6 @@ export function UnfoldDemo() {
   const reduced = useReducedMotion() ?? false;
   const compact = useMediaQuery("(max-width: 639px)");
   const stage = useRef<HTMLElement>(null);
-  const ambient = useRef<HTMLCanvasElement>(null);
 
   // Measured against the pinned section alone: the spec sheet below it is not
   // part of the story, and including it would shift every act.
@@ -137,9 +119,9 @@ export function UnfoldDemo() {
   const light = kelvinToRgb(kelvin);
 
   // How hard to push the relight. The photograph was already lit at roughly
-  // NATIVE_KELVIN, so near that value the overlay should do almost nothing;
-  // a flat blend at full strength turned the graphite head gold and flattened
-  // the whole picture into one colour.
+  // NATIVE_KELVIN, so near that value the overlay should do almost nothing; a
+  // flat blend at full strength turned the graphite head gold and flattened
+  // the picture into one colour.
   const relight = (Math.abs(kelvin - NATIVE_KELVIN) / 1950) * 0.52;
 
   // ── the sequence ───────────────────────────────────────────────────────
@@ -165,66 +147,75 @@ export function UnfoldDemo() {
     ramp(p, 0.42, 0.46)
   );
 
-  // ── how the frame is composed, act by act ──────────────────────────────
-  // On a wide screen the product slides sideways to make room for a column of
-  // copy. On a phone there is no sideways to slide to, so it climbs instead
-  // and the copy takes the bottom of the screen.
-  const FRAME_AT = [0, 0.16, 0.36, 0.5, 0.68, 0.84];
-  const restingOffset = useMotionValue<string>("0%");
-  const restingScale = useMotionValue(0.9);
+  // ── ink, read off the region each block is sitting on ──────────────────
+  const inkTop = useMotionValue(0);
+  const inkBottom = useMotionValue(0);
+  const inkLeft = useMotionValue(0);
+  const inkRight = useMotionValue(0);
+  const pageBase = useMotionValue(PAGE_BASE);
 
-  const sweptX = useTransform(
-    scrollYProgress,
-    FRAME_AT,
-    compact
-      ? ["0%", "0%", "0%", "0%", "0%", "0%"]
-      : ["0%", "0%", "0%", "15%", "-17%", "0%"]
+  const takeSample = useCallback(
+    (sample: FrameSample) => {
+      // A fast flip rather than a fade. Ink crossing the midpoint at the same
+      // moment as the picture under it measured 2.39:1 at the crossover, and
+      // no choice of endpoint colours fixes that.
+      inkTop.set(1 - ramp(sample.top.luma, 0.22, 0.42));
+      inkBottom.set(1 - ramp(sample.bottom.luma, 0.22, 0.42));
+      inkLeft.set(1 - ramp(sample.left.luma, 0.22, 0.42));
+      inkRight.set(1 - ramp(sample.right.luma, 0.22, 0.42));
+
+      // Only the phone shows page beside the picture, and only below it, so
+      // the bottom of the frame is the colour that has to continue.
+      const [r, g, b] = sample.bottom.rgb;
+      pageBase.set(`rgb(${r} ${g} ${b})`);
+    },
+    [inkTop, inkBottom, inkLeft, inkRight, pageBase]
   );
-  const sweptY = useTransform(
-    scrollYProgress,
-    FRAME_AT,
-    compact
-      ? ["-2%", "-4%", "-18%", "-48%", "-50%", "-30%"]
-      : ["4%", "2%", "-9%", "0%", "0%", "2%"]
+
+  const headingTop = useInk(inkTop, HEADING);
+  const bodyTop = useInk(inkTop, BODY);
+  const headingBottom = useInk(inkBottom, HEADING);
+  const headingLeft = useInk(inkLeft, HEADING);
+  const bodyLeft = useInk(inkLeft, BODY);
+  const headingRight = useInk(inkRight, HEADING);
+  const bodyRight = useInk(inkRight, BODY);
+
+  const phoneFade = useTransform(
+    pageBase,
+    (c) => `linear-gradient(to bottom, transparent, ${c})`
   );
+
+  // ── how the frame is composed, act by act ──────────────────────────────
+  // Scale never drops below 1: the picture covers the stage, and anything
+  // smaller would put an edge back on screen.
+  const FRAME_AT = [0, 0.16, 0.36, 0.5, 0.68, 0.84];
+  const restingScale = useMotionValue(1);
   const sweptScale = useTransform(
     scrollYProgress,
     FRAME_AT,
-    compact ? [1, 1, 0.96, 1, 1, 0.94] : [0.96, 0.95, 0.9, 0.94, 0.88, 0.86]
+    compact ? [1, 1, 1, 1, 1, 1] : [1, 1, 1, 1.02, 1.05, 1.02]
   );
-
-  const frameX = reduced ? restingOffset : sweptX;
-  const frameY = reduced ? restingOffset : sweptY;
   const frameScale = reduced ? restingScale : sweptScale;
 
-  // ── the room, and the copy that has to stay legible in it ──────────────
-  // Both read off the photograph rather than off a scroll range. Hand-set
-  // timing had the page still pale grey around an already-black picture, and
-  // the mask that was papering over that seam drew a blurred grey halo round
-  // all four sides instead.
-  const pageBackground = useMotionValue(PAGE_LIGHT);
-  const onDark = useMotionValue(0);
-
-  const takeEdge = useCallback(
-    ([r, g, b]: [number, number, number]) => {
-      pageBackground.set(`rgb(${r} ${g} ${b})`);
-      // A fast flip, not a fade: copy crossing the midpoint at the same time
-      // as its background measured 2.39:1 at the crossover.
-      onDark.set(1 - ramp(luminance(r, g, b), 0.3, 0.5));
-    },
-    [pageBackground, onDark]
+  // Covering a screen this wide with a 16:9 frame crops top and bottom, and
+  // which part gets cropped is the only framing control left. Act one pulls
+  // the folded lamp down out from under the headline; the later acts sit the
+  // desk lower so the copy has the dark upper half of the room to itself.
+  const restingPosition = useMotionValue("50% 45%");
+  const sweptPosition = useTransform(
+    scrollYProgress,
+    FRAME_AT,
+    compact
+      ? ["50% 50%", "50% 50%", "50% 50%", "50% 50%", "50% 50%", "50% 50%"]
+      : ["50% 4%", "50% 10%", "50% 40%", "50% 62%", "50% 66%", "50% 52%"]
   );
-  const bodyColour = useTransform(onDark, [0, 1], ["#57544d", "#a49e93"]);
-  const headingColour = useTransform(onDark, [0, 1], ["#14130f", "#f4f1ea"]);
+  const framePosition = reduced ? restingPosition : sweptPosition;
 
   const closedOpacity = useAct(scrollYProgress, ACTS.closed);
   const unfoldOpacity = useAct(scrollYProgress, ACTS.unfold);
   const lightOpacity = useAct(scrollYProgress, ACTS.light);
   const warmthOpacity = useAct(scrollYProgress, ACTS.warmth);
   const drawingOpacity = useAct(scrollYProgress, ACTS.drawing);
-
-  // The relight only exists while its act is on screen, and only as far as
-  // the slider has been moved away from the photograph's own temperature.
   const relightOpacity = useTransform(warmthOpacity, (v) => v * relight);
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
@@ -242,118 +233,106 @@ export function UnfoldDemo() {
     };
   }, []);
 
+  /** On a phone the picture takes the top of the screen, not all of it. */
+  const mediaClass = compact
+    ? "absolute inset-x-0 top-0 h-[58%]"
+    : "absolute inset-0";
+
   return (
-    // The darkening lives on the element the copy sits inside, not on a fixed
-    // layer behind it. Anything that resolves a text colour by walking up to
-    // the nearest painted background - the project's own audit script, and
-    // some assistive tooling - cannot see a sibling, and read the headline as
-    // 1.07:1 while the rendered pixels were fine.
-    <motion.div className="relative" style={{ background: pageBackground }}>
-      <TopBar onDark={onDark} />
+    <motion.div className="relative" style={{ background: pageBase }}>
+      <TopBar ink={inkTop} />
 
       {/* ─── the pinned stage: five acts on one continuous shot ─── */}
       <section ref={stage} className="relative h-[600vh]">
-        <div className="sticky top-0 flex h-dvh items-center justify-center overflow-hidden">
-          {/* The same frame, 48px wide, stretched over the whole stage and
-              blurred away. It is what removes the photograph's rectangle: the
-              surround is now the picture itself rather than a flat colour that
-              can only ever match one pixel of it. */}
-          <canvas
-            ref={ambient}
-            aria-hidden
-            width={AMBIENT.width}
-            height={AMBIENT.height}
-            className="absolute inset-0 h-full w-full scale-125 object-cover"
-            style={{ filter: "blur(90px) saturate(1.2)", opacity: 0.9 }}
-          />
-          {/* The three layers share one box and one framing, so cross-fading
-              between them reads as the same photograph changing state. */}
+        <div className="sticky top-0 h-dvh overflow-hidden">
+          {/* The three layers share one frame, so cross-fading between them
+              reads as the same photograph changing state. On a phone the shot
+              is too wide to cover a portrait screen without cutting the lamp
+              in half, so it takes the top and hands the rest to the copy. */}
           <motion.div
-            className="absolute w-full max-w-[68rem] sm:px-8"
-            style={{ x: frameX, y: frameY, scale: frameScale }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            data-unfold="frame"
+            className={mediaClass}
+            style={{ scale: frameScale }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.9, ease: [0.21, 0.47, 0.32, 0.98] }}
           >
-            <div
-              className="relative w-full"
-              style={{
-                // A wide product shot on a portrait phone comes out tiny. The
-                // phone gets a squarer window onto the same picture instead,
-                // cropping margin the shots have plenty of, which buys about a
-                // third more height for the lamp.
-                aspectRatio: compact ? "4 / 3" : `${MEDIA.width} / ${MEDIA.height}`,
-                // The photographs are not a flat colour to their edges, so a
-                // hard boundary drew a visible rectangle on the page even with
-                // the background sampled off their corners. Feather all four.
-                maskImage: EDGE_MASK,
-                maskComposite: "intersect",
-                WebkitMaskImage: EDGE_MASK,
-                WebkitMaskComposite: "source-in",
-              }}
+            <motion.div
+              className="absolute inset-0"
+              style={{ opacity: foldedOpacity }}
             >
-              <motion.div
-                className="absolute inset-0"
-                style={{ opacity: foldedOpacity }}
-              >
-                <Image
-                  src="/lab-assets/unfold/folded-1100.webp"
-                  alt="The lamp folded flat: a slim aluminium bar with the graphite head lying along it."
-                  fill
-                  sizes="(min-width: 640px) 68rem, 100vw"
-                  priority
-                  className={compact ? "object-cover" : "object-contain"}
-                />
-              </motion.div>
+              <Image
+                src="/lab-assets/unfold/folded-1100.webp"
+                alt="The lamp folded flat: a slim aluminium bar with the graphite head lying along it."
+                fill
+                sizes="100vw"
+                priority
+                className="object-cover"
+                style={{ objectPosition: framePosition as unknown as string }}
+              />
+            </motion.div>
 
-              <motion.div
-                className="absolute inset-0"
-                style={{ opacity: sequenceOpacity }}
-              >
-                <UnfoldSequence
-                  progress={scrub}
-                  ambient={ambient}
-                  onEdge={takeEdge}
-                  className={`h-full w-full ${compact ? "object-cover" : "object-contain"}`}
-                />
-              </motion.div>
+            <motion.div
+              className="absolute inset-0"
+              style={{ opacity: sequenceOpacity }}
+            >
+              <UnfoldSequence
+                progress={scrub}
+                onSample={takeSample}
+                position={framePosition}
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
 
+            <motion.div
+              className="absolute inset-0"
+              style={{ opacity: litOpacity }}
+            >
+              <Image
+                src="/lab-assets/unfold/lit-1100.webp"
+                alt="The lamp open on a dark walnut desk, its strip lit and throwing a warm pool of light."
+                fill
+                sizes="100vw"
+                className="object-cover"
+                style={{ objectPosition: framePosition as unknown as string }}
+              />
+              {/* Hue and saturation come from this layer, luminosity from the
+                  photograph underneath, so moving the slider relights the
+                  whole picture instead of tinting a rectangle over it. */}
               <motion.div
+                aria-hidden
                 className="absolute inset-0"
-                style={{ opacity: litOpacity }}
-              >
-                <Image
-                  src="/lab-assets/unfold/lit-1100.webp"
-                  alt="The lamp open on a dark walnut desk, its strip lit and throwing a warm pool of light."
-                  fill
-                  sizes="(min-width: 640px) 68rem, 100vw"
-                  className={compact ? "object-cover" : "object-contain"}
-                />
-                {/* Hue and saturation come from this layer, luminosity from the
-                    photograph underneath, so moving the slider relights the
-                    whole picture instead of tinting a rectangle over it. */}
-                <motion.div
-                  aria-hidden
-                  className="absolute inset-0"
-                  style={{
-                    background: light,
-                    mixBlendMode: "color",
-                    opacity: relightOpacity,
-                  }}
-                />
-                <DimensionLines opacity={drawingOpacity} />
-              </motion.div>
-            </div>
+                style={{
+                  background: light,
+                  mixBlendMode: "color",
+                  opacity: relightOpacity,
+                }}
+              />
+              <DimensionLines opacity={drawingOpacity} ink={inkRight} />
+            </motion.div>
+
+            {/* Where the picture meets the copy on a phone it continues into
+                the page rather than stopping at a line. The colour it fades to
+                is read off the bottom of the frame, so it is the same colour
+                and not an approximation of it. */}
+            {compact && (
+              <motion.div
+                aria-hidden
+                className="absolute inset-x-0 bottom-0 h-[24%]"
+                style={{ backgroundImage: phoneFade }}
+              />
+            )}
           </motion.div>
 
           {/* Act 1 - the object, closed. */}
           <motion.div
-            className="pointer-events-none absolute inset-x-0 top-[10%] px-6 text-center"
+            className="pointer-events-none absolute inset-x-0 top-[7%] px-6 text-center sm:top-[9%]"
             style={{ opacity: closedOpacity }}
           >
+            <Scrim ink={inkTop} from="top" />
             <motion.h1
-              className="text-[clamp(3.2rem,13vw,9rem)] leading-[0.86] font-semibold tracking-[-0.045em]"
-              style={{ color: headingColour }}
+              className="relative text-[clamp(3rem,12vw,8.5rem)] leading-[0.86] font-semibold tracking-[-0.045em]"
+              style={{ color: headingTop }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -365,8 +344,8 @@ export function UnfoldDemo() {
               Unfold
             </motion.h1>
             <motion.p
-              className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-balance"
-              style={{ color: bodyColour }}
+              className="relative mx-auto mt-5 max-w-md text-lg leading-relaxed text-balance"
+              style={{ color: bodyTop }}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -378,54 +357,58 @@ export function UnfoldDemo() {
               A desk light that folds down to the size of a pencil case.
             </motion.p>
             <Readout
-              onDark={onDark}
-              className="mt-7 justify-center"
-              items={["320 mm closed", "340 g", "aluminium"]}
+              ink={inkTop}
+              className="relative mt-7 justify-center"
+              // two, not three: at 1920 the third ran onto the lamp, which
+              // fills the right half of the frame at this crop
+              items={["320 mm closed", "340 g"]}
             />
           </motion.div>
 
           {/* Act 2 - one line, and how far open the thing in front of you is. */}
           <motion.div
-            className="pointer-events-none absolute inset-x-0 bottom-[13%] px-6 text-center"
+            className="pointer-events-none absolute inset-x-0 bottom-[11%] px-6 text-center"
             style={{ opacity: unfoldOpacity }}
           >
-            {/* The room goes from a white studio to an unlit desk underneath
-                this line, so it cannot be one fixed colour: dark ink stayed
-                dark and vanished into the photograph halfway through. */}
+            <Scrim ink={inkBottom} from="bottom" />
             <motion.h2
-              className="mx-auto max-w-2xl text-[clamp(1.9rem,5.2vw,3.4rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-              style={{ color: headingColour }}
+              className="relative mx-auto max-w-2xl text-[clamp(1.8rem,5vw,3.2rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
+              style={{ color: headingBottom }}
             >
               One hinge, and it is already a lamp.
             </motion.h2>
             <Readout
-              onDark={onDark}
-              className="mt-6 justify-center"
-              items={[<OpenPercent key="open" scrub={scrub} />, "one moving part"]}
+              ink={inkBottom}
+              className="relative mt-6 justify-center"
+              items={[
+                <OpenPercent key="open" scrub={scrub} />,
+                "one moving part",
+              ]}
             />
           </motion.div>
 
           {/* Act 3 - the room has changed, so the copy moves off centre. */}
           <motion.div
-            className="pointer-events-none absolute inset-0 flex items-end px-6 pb-28 sm:items-center sm:px-12 sm:pb-0"
+            className="pointer-events-none absolute inset-0 flex items-end px-6 pb-[8%] sm:items-center sm:px-12 sm:pb-0"
             style={{ opacity: lightOpacity }}
           >
-            <div className="w-full sm:max-w-md">
-              <h2
-                className="text-[clamp(1.9rem,5vw,3.2rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-                style={{ color: "#f4f1ea" }}
+            <Scrim ink={inkLeft} from={compact ? "bottom" : "left"} />
+            <div className="relative w-full sm:max-w-md">
+              <motion.h2
+                className="text-[clamp(1.8rem,4.8vw,3rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
+                style={{ color: headingLeft }}
               >
                 Then the room changes.
-              </h2>
-              <p
+              </motion.h2>
+              <motion.p
                 className="mt-5 max-w-sm leading-relaxed"
-                style={{ color: "#a49e93" }}
+                style={{ color: bodyLeft }}
               >
                 2,200 lumens off a single strip, aimed at the desk and nowhere
                 else. Nobody sitting opposite you gets it in the eyes.
-              </p>
+              </motion.p>
               <Readout
-                onDark={onDark}
+                ink={inkLeft}
                 className="mt-7"
                 items={["2200 lm", "CRI 97", "no flicker"]}
               />
@@ -434,27 +417,32 @@ export function UnfoldDemo() {
 
           {/* Act 4 - the only thing on the page you touch. */}
           <motion.div
-            className="absolute inset-0 flex items-end justify-end px-6 pb-24 sm:items-center sm:px-12 sm:pb-0"
+            className="absolute inset-0 flex items-end justify-end px-6 pb-[7%] sm:items-center sm:px-12 sm:pb-0"
             style={{ opacity: warmthOpacity, pointerEvents: "none" }}
           >
+            <Scrim ink={inkRight} from={compact ? "bottom" : "right"} />
             <div
-              className="w-full sm:max-w-sm"
+              className="relative w-full sm:max-w-sm"
               style={{ pointerEvents: "auto" }}
             >
-              <h2
-                className="text-[clamp(1.9rem,5vw,3.2rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
-                style={{ color: "#f4f1ea" }}
+              <motion.h2
+                className="text-[clamp(1.8rem,4.8vw,3rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance"
+                style={{ color: headingRight }}
               >
                 Warm to work by. Cool to read by.
-              </h2>
-              <p className="mt-5 leading-relaxed" style={{ color: "#a49e93" }}>
+              </motion.h2>
+              <motion.p
+                className="mt-5 leading-relaxed"
+                style={{ color: bodyRight }}
+              >
                 Move the slider. The light changes, and so does everything it
                 lands on.
-              </p>
+              </motion.p>
               <TemperatureControl
                 kelvin={kelvin}
                 onChange={setKelvin}
                 light={light}
+                ink={inkRight}
               />
             </div>
           </motion.div>
@@ -464,29 +452,30 @@ export function UnfoldDemo() {
             className="pointer-events-none absolute inset-x-0 top-[8%] px-6 text-center"
             style={{ opacity: drawingOpacity }}
           >
-            <h2
-              className="mx-auto max-w-xl text-[clamp(1.7rem,4.4vw,2.8rem)] leading-[1.1] font-medium tracking-[-0.03em] text-balance"
-              style={{ color: "#f4f1ea" }}
+            <Scrim ink={inkTop} from="top" />
+            <motion.h2
+              className="relative mx-auto max-w-xl text-[clamp(1.6rem,4.2vw,2.6rem)] leading-[1.1] font-medium tracking-[-0.03em] text-balance"
+              style={{ color: headingTop }}
             >
               Folded, it is a 320 mm bar.
-            </h2>
-            <p
-              className="mx-auto mt-5 max-w-md leading-relaxed"
-              style={{ color: "#a49e93" }}
+            </motion.h2>
+            <motion.p
+              className="relative mx-auto mt-5 max-w-md leading-relaxed"
+              style={{ color: bodyTop }}
             >
               Open, the head sits 280 mm above the desk and stays there on
               friction, with no knob to tighten.
-            </p>
+            </motion.p>
           </motion.div>
 
-          <ScrollHint hidden={scrolled} />
+          <ScrollHint hidden={scrolled} ink={inkBottom} />
         </div>
       </section>
 
       {/* ─── after the pin: a plain list, because a spec sheet is a list ─── */}
-      <section className="relative px-6 pt-24 pb-28 sm:px-12 sm:pt-32">
+      <section className="relative bg-[#080704] px-6 pt-24 pb-28 sm:px-12 sm:pt-32">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-[clamp(1.7rem,4.4vw,2.6rem)] leading-[1.1] font-medium tracking-[-0.03em] text-[#f4f1ea]">
+          <h2 className="text-[clamp(1.7rem,4.4vw,2.6rem)] leading-[1.1] font-medium tracking-[-0.03em] text-[#f6f4ef]">
             Unfold, in full
           </h2>
 
@@ -496,21 +485,21 @@ export function UnfoldDemo() {
                 key={label}
                 className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[14rem_1fr] sm:gap-6"
               >
-                <dt className="font-mono text-[0.6875rem] tracking-[0.04em] text-[#a49e93] uppercase">
+                <dt className="font-mono text-[0.6875rem] tracking-[0.04em] text-[#a8a29a] uppercase">
                   {label}
                 </dt>
-                <dd className="text-[#f4f1ea]">{value}</dd>
+                <dd className="text-[#f6f4ef]">{value}</dd>
               </div>
             ))}
           </dl>
 
           <div className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-5">
-            <p className="text-[2rem] font-medium tracking-[-0.02em] text-[#f4f1ea]">
+            <p className="text-[2rem] font-medium tracking-[-0.02em] text-[#f6f4ef]">
               THB 6,900
             </p>
             <a
               href="#top"
-              className="inline-flex min-h-[44px] items-center rounded-full bg-[#f4f1ea] px-7 text-[0.95rem] font-medium text-[#080704] transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#ffc489]"
+              className="inline-flex min-h-[44px] items-center rounded-full bg-[#f6f4ef] px-7 text-[0.95rem] font-medium text-[#080704] transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#ffc489]"
             >
               Pre-order
             </a>
@@ -529,13 +518,52 @@ export function UnfoldDemo() {
   );
 }
 
+/**
+ * A soft wash under a block of copy, running in the opposite direction to its
+ * ink.
+ *
+ * Picking the right ink for the picture is not always enough on its own: the
+ * lit shot has a bright pool of light in it, and a block that lands on the
+ * pool needs help no colour choice provides. The gradient has no edge and no
+ * box, so it reads as the room falling off rather than as a panel.
+ */
+function Scrim({
+  ink,
+  from,
+}: {
+  ink: MotionValue<number>;
+  from: "top" | "bottom" | "left" | "right";
+}) {
+  const direction = {
+    top: "to bottom",
+    bottom: "to top",
+    left: "to right",
+    right: "to left",
+  }[from];
+
+  const wash = useTransform(ink, (dark) => {
+    const base = dark > 0.5 ? "0 0 0" : "255 255 255";
+    return `linear-gradient(${direction}, rgb(${base} / 0.6), rgb(${base} / 0.26) 45%, transparent 78%)`;
+  });
+
+  // Stretched well past the copy so the fade finishes off screen rather than
+  // ending somewhere a viewer can see it end.
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none absolute -inset-x-[14%] -inset-y-[55%] -z-10"
+      style={{ backgroundImage: wash }}
+    />
+  );
+}
+
 /** Back to the gallery, plus the wordmark, in the manner of a product page. */
-function TopBar({ onDark }: { onDark: MotionValue<number> }) {
-  const colour = useTransform(onDark, [0, 1], ["#57544d", "#a49e93"]);
+function TopBar({ ink }: { ink: MotionValue<number> }) {
+  const colour = useInk(ink, QUIET);
   const border = useTransform(
-    onDark,
+    ink,
     [0, 1],
-    ["rgba(20,19,15,0.10)", "rgba(244,241,234,0.12)"]
+    ["rgba(20,19,15,0.12)", "rgba(246,244,239,0.14)"]
   );
 
   return (
@@ -571,18 +599,18 @@ function TopBar({ onDark }: { onDark: MotionValue<number> }) {
 /** A row of measured values. Monospaced, because these are readings. */
 function Readout({
   items,
-  onDark,
+  ink,
   className = "",
 }: {
   items: ReactNode[];
-  onDark: MotionValue<number>;
+  ink: MotionValue<number>;
   className?: string;
 }) {
-  const colour = useTransform(onDark, [0, 1], ["#6b675f", "#98928a"]);
+  const colour = useInk(ink, QUIET);
   const rule = useTransform(
-    onDark,
+    ink,
     [0, 1],
-    ["rgba(20,19,15,0.18)", "rgba(244,241,234,0.2)"]
+    ["rgba(20,19,15,0.22)", "rgba(246,244,239,0.24)"]
   );
 
   return (
@@ -610,14 +638,12 @@ function Readout({
  * How far open the picture in front of you is, written straight into the DOM.
  *
  * The obvious version holds this in React state, and that is what broke the
- * page: a `setState` on every scroll tick re-rendered the whole demo, and each
- * re-render restarted the opacity animations on the three stacked photographs,
- * so two of them sat half-visible at once. A motion value written to
- * `textContent` never re-renders anything.
+ * page once already: a `setState` on every scroll tick re-rendered the whole
+ * demo, and each re-render restarted the opacity animations on the three
+ * stacked photographs, so two of them sat half-visible at once.
  *
  * It reports a percentage rather than an angle because frame index over frame
- * count is exactly true, while degrees would be a guess: the clip's motion is
- * eased and nobody measured the arm in each frame.
+ * count is exactly true, while degrees would be a guess.
  */
 function OpenPercent({ scrub }: { scrub: MotionValue<number> }) {
   const node = useRef<HTMLSpanElement>(null);
@@ -660,10 +686,10 @@ const RANGE_CSS = `
 /* the default ring lands on the input box, not on the thumb the eye follows */
 .unfold-range:focus-visible { outline: none; }
 .unfold-range:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px #f4f1ea, 0 0 18px var(--unfold-thumb);
+  box-shadow: 0 0 0 3px #f6f4ef, 0 0 18px var(--unfold-thumb);
 }
 .unfold-range:focus-visible::-moz-range-thumb {
-  box-shadow: 0 0 0 3px #f4f1ea, 0 0 18px var(--unfold-thumb);
+  box-shadow: 0 0 0 3px #f6f4ef, 0 0 18px var(--unfold-thumb);
 }
 `;
 
@@ -676,11 +702,15 @@ function TemperatureControl({
   kelvin,
   onChange,
   light,
+  ink,
 }: {
   kelvin: number;
   onChange: (value: number) => void;
   light: string;
+  ink: MotionValue<number>;
 }) {
+  const label = useInk(ink, QUIET);
+
   return (
     <div className="mt-9">
       {/* Scoped to the lab. The site's globals.css is its design system and a
@@ -688,12 +718,13 @@ function TemperatureControl({
       <style>{RANGE_CSS}</style>
 
       <div className="flex items-baseline justify-between">
-        <label
+        <motion.label
           htmlFor="unfold-kelvin"
-          className="font-mono text-[0.6875rem] tracking-[0.06em] text-[#98928a] uppercase"
+          className="font-mono text-[0.6875rem] tracking-[0.06em] uppercase"
+          style={{ color: label }}
         >
           Colour temperature
-        </label>
+        </motion.label>
         <output
           htmlFor="unfold-kelvin"
           className="font-mono text-2xl tabular-nums"
@@ -716,87 +747,106 @@ function TemperatureControl({
         style={{ "--unfold-thumb": light } as CSSProperties}
       />
 
-      <div className="mt-1 flex justify-between font-mono text-[0.6875rem] tracking-[0.06em] text-[#8d887e] uppercase">
+      <motion.div
+        className="mt-1 flex justify-between font-mono text-[0.6875rem] tracking-[0.06em] uppercase"
+        style={{ color: label }}
+      >
         <span>2700 K warm</span>
         <span>5000 K daylight</span>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
-const RULE = "rgba(244,241,234,0.55)";
-
-/** Sits behind the dimension figures so the bracket does not run through them. */
-const LABEL_CHIP = "#080704";
-
 /**
  * Measurements drawn over the photograph in the last act. Positions are
- * fractions of the frame, matched to where the lamp sits in the shot. Labels
- * are sized in rem rather than against the frame, so they stay legible at
- * 390px where the picture is a third of its desktop width.
+ * fractions of the frame, matched to where the lamp sits in the shot. Hidden
+ * on a phone, where the frame is cropped and the brackets would point at the
+ * wrong part of the lamp.
  */
-function DimensionLines({ opacity }: { opacity: MotionValue<number> }) {
+function DimensionLines({
+  opacity,
+  ink,
+}: {
+  opacity: MotionValue<number>;
+  ink: MotionValue<number>;
+}) {
+  const rule = useTransform(
+    ink,
+    [0, 1],
+    ["rgba(20,19,15,0.5)", "rgba(246,244,239,0.5)"]
+  );
+  const label = useInk(ink, ["#14130f", "#e6e1d8"]);
+
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none absolute inset-0"
+      className="pointer-events-none absolute inset-0 hidden sm:block"
       style={{ opacity }}
     >
-      {/* the folded length, bracketed under the base */}
-      <div
-        className="absolute flex items-center justify-center"
-        style={{
-          left: "9%",
-          width: "46%",
-          top: "83%",
-          height: "5%",
-          borderLeft: `1px solid ${RULE}`,
-          borderRight: `1px solid ${RULE}`,
-          borderBottom: `1px solid ${RULE}`,
-        }}
-      >
-        <span
-          className="absolute font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap"
-          style={{
-            color: "#e6e1d8",
-            background: LABEL_CHIP,
-            padding: "0 0.4rem",
-          }}
-        >
-          320 mm
-        </span>
-      </div>
+      <Bracket
+        rule={rule}
+        label={label}
+        text="320 mm"
+        sides="horizontal"
+        style={{ left: "16%", width: "34%", top: "76%", height: "5%" }}
+      />
+      <Bracket
+        rule={rule}
+        label={label}
+        text="280 mm"
+        sides="vertical"
+        style={{ right: "12%", width: "4%", top: "18%", height: "60%" }}
+      />
+    </motion.div>
+  );
+}
 
-      {/* the open height, bracketed up the right-hand side */}
-      <div
-        className="absolute flex items-center justify-center"
-        style={{
-          right: "5%",
-          width: "4%",
-          top: "10%",
-          height: "75%",
-          borderTop: `1px solid ${RULE}`,
-          borderRight: `1px solid ${RULE}`,
-          borderBottom: `1px solid ${RULE}`,
-        }}
+function Bracket({
+  rule,
+  label,
+  text,
+  style,
+  sides,
+}: {
+  rule: MotionValue<string>;
+  label: MotionValue<string>;
+  text: string;
+  style: CSSProperties;
+  sides: "horizontal" | "vertical";
+}) {
+  const edges =
+    sides === "horizontal"
+      ? { borderLeftWidth: 1, borderRightWidth: 1, borderBottomWidth: 1 }
+      : { borderTopWidth: 1, borderRightWidth: 1, borderBottomWidth: 1 };
+
+  return (
+    <motion.div
+      className="absolute flex items-center justify-center"
+      style={{ ...style, ...edges, borderStyle: "solid", borderColor: rule }}
+    >
+      <motion.span
+        className={`absolute font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap ${
+          sides === "vertical" ? "right-full pr-2" : "px-2"
+        }`}
+        style={{ color: label }}
       >
-        <span
-          className="absolute right-full font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap"
-          style={{
-            color: "#e6e1d8",
-            background: LABEL_CHIP,
-            padding: "0 0.4rem",
-          }}
-        >
-          280 mm
-        </span>
-      </div>
+        {text}
+      </motion.span>
     </motion.div>
   );
 }
 
 /** Present until the first scroll, then gone for good. */
-function ScrollHint({ hidden }: { hidden: boolean }) {
+function ScrollHint({
+  hidden,
+  ink,
+}: {
+  hidden: boolean;
+  ink: MotionValue<number>;
+}) {
+  const colour = useInk(ink, QUIET);
+
   return (
     <motion.div
       aria-hidden
@@ -805,9 +855,12 @@ function ScrollHint({ hidden }: { hidden: boolean }) {
       animate={{ opacity: hidden ? 0 : 1 }}
       transition={{ duration: 0.5, delay: hidden ? 0 : 1.4 }}
     >
-      <span className="font-mono text-[0.6875rem] tracking-[0.14em] text-[#6b675f] uppercase">
+      <motion.span
+        className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
+        style={{ color: colour }}
+      >
         Scroll
-      </span>
+      </motion.span>
     </motion.div>
   );
 }

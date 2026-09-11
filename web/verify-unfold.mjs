@@ -145,8 +145,10 @@ async function openStage(context) {
   for (const at of [0.06, 0.3, 0.5, 0.68, 0.9]) {
     await seek(at);
     const layers = await page.evaluate(() => {
-      const box = document.querySelector('[style*="aspect-ratio"]');
-      return [...box.children].map((el) => +(+getComputedStyle(el).opacity).toFixed(3));
+      const frame = document.querySelector('[data-unfold="frame"]');
+      return [...frame.children]
+        .filter((el) => el.querySelector("img, canvas"))
+        .map((el) => +(+getComputedStyle(el).opacity).toFixed(3));
     });
     const lit = layers.filter((o) => o > 0.02);
     check(

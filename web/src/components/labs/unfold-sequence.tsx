@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
-import { useMotionValueEvent, type MotionValue } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, useMotionValueEvent, type MotionValue } from "framer-motion";
 
 /**
  * The unfold, scrubbed off a frame sequence rather than played.
@@ -34,55 +34,105 @@ function pickSet(): FrameSet {
   return SETS.find((set) => devicePx <= set.maxDevicePx) ?? LARGEST;
 }
 
+/** Mean colour of a rectangle of the probe, given in 0..1 coordinates. */
+function average(
+  data: Uint8ClampedArray,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number
+): Patch {
+  const left = Math.floor(x0 * PROBE.width);
+  const right = Math.max(left + 1, Math.ceil(x1 * PROBE.width));
+  const top = Math.floor(y0 * PROBE.height);
+  const bottom = Math.max(top + 1, Math.ceil(y1 * PROBE.height));
+
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let n = 0;
+  for (let y = top; y < bottom; y += 1) {
+    for (let x = left; x < right; x += 1) {
+      const i = (y * PROBE.width + x) * 4;
+      r += data[i];
+      g += data[i + 1];
+      b += data[i + 2];
+      n += 1;
+    }
+  }
+  r = Math.round(r / n);
+  g = Math.round(g / n);
+  b = Math.round(b / n);
+
+  const lin = [r, g, b].map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+
+  return {
+    rgb: [r, g, b],
+    luma: 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2],
+  };
+}
+
 const frameUrl = (dir: string, index: number) =>
   `/lab-assets/unfold/${dir}/${String(index).padStart(2, "0")}.webp`;
 
 /**
- * Size of the blurred backdrop canvas. Tiny on purpose, and 48x27 was still
- * too big: stretched to 1920 the lamp survived as a recognisable dark smear
- * across a white studio. At this size it averages into a field of colour,
- * which is all the backdrop is for.
+ * Resolution of the off-screen probe the frame is sampled through. Reading the
+ * full 1100x624 surface would be 2.7 MB of pixel data per frame; this is 144
+ * pixels and carries everything the page asks of it, which is how bright each
+ * corner of the picture is.
  */
-export const AMBIENT = { width: 14, height: 8 };
+const PROBE = { width: 16, height: 9 };
+
+/** Average colour of a region of the picture, 0..1 coordinates. */
+export interface Patch {
+  rgb: [number, number, number];
+  /** relative luminance, for choosing ink that sits on top of it */
+  luma: number;
+}
+
+export interface FrameSample {
+  top: Patch;
+  bottom: Patch;
+  left: Patch;
+  right: Patch;
+}
 
 export function UnfoldSequence({
   progress,
   className,
-  ambient,
-  onEdge,
+  position,
+  onSample,
 }: {
   /** 0 folded, 1 open and lit. Values outside the range are clamped. */
   progress: MotionValue<number>;
   className?: string;
+  /** `object-position`, so the canvas crops the same way the stills do. */
+  position?: MotionValue<string>;
   /**
-   * A canvas the caller places behind everything, full-bleed. Each frame is
-   * also drawn into it at AMBIENT size, and the caller blurs it. A photograph
-   * on a flat page always shows its own rectangle; spreading a blurred copy of
-   * it behind means the surround is an extension of the picture and there is
-   * no edge left to hide. It belongs to the caller because it has to live in a
-   * different part of the tree from the sharp one.
+   * How bright each quarter of the frame is, reported after every paint.
+   *
+   * The copy sits on the photograph, and the photograph goes from a white
+   * studio to an unlit desk partway through. Which ink each block needs is
+   * therefore a property of the picture under that block, not of the scroll
+   * position: the clip's lights drop between frames 14 and 32, and any
+   * hand-set timing for that stops being right the moment the clip changes.
    */
-  ambient?: RefObject<HTMLCanvasElement | null>;
-  /**
-   * The colour of the frame's top-left corner, reported after every paint.
-   * The page paints its own background with it, which is the only way the
-   * picture and the page around it can go dark together: the clip's lights
-   * drop between frames 14 and 32, and any hand-set timing for that is a
-   * guess that stops being right the moment the clip is regenerated.
-   */
-  onEdge?: (rgb: [number, number, number]) => void;
+  onSample?: (sample: FrameSample) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const paint = useRef<(at: number) => void>(() => {});
   const queued = useRef(0);
-  const edgeCallback = useRef(onEdge);
+  const sampleCallback = useRef(onSample);
 
   // Kept in a ref so a new callback identity never re-runs the loader and
   // re-downloads 48 frames; assigned in an effect because assigning during
   // render is not allowed.
   useEffect(() => {
-    edgeCallback.current = onEdge;
-  }, [onEdge]);
+    sampleCallback.current = onSample;
+  }, [onSample]);
 
   useEffect(() => {
     // Chosen once, on mount. Re-picking on resize would re-download 48 files
@@ -93,6 +143,11 @@ export function UnfoldSequence({
       sharp.width = set.width;
       sharp.height = set.height;
     }
+
+    const probe = document.createElement("canvas");
+    probe.width = PROBE.width;
+    probe.height = PROBE.height;
+    const probeContext = probe.getContext("2d", { willReadFrequently: true });
 
     const frames: HTMLImageElement[] = [];
     let shown = -1;
@@ -122,20 +177,16 @@ export function UnfoldSequence({
       context.drawImage(frames[index], 0, 0, set.width, set.height);
       shown = index;
 
-      const backdrop = ambient?.current;
-      const backdropContext = backdrop?.getContext("2d");
-      if (backdrop && backdropContext) {
-        backdropContext.drawImage(
-          frames[index],
-          0,
-          0,
-          backdrop.width,
-          backdrop.height
-        );
+      if (probeContext && sampleCallback.current) {
+        probeContext.drawImage(frames[index], 0, 0, PROBE.width, PROBE.height);
+        const { data } = probeContext.getImageData(0, 0, PROBE.width, PROBE.height);
+        sampleCallback.current({
+          top: average(data, 0.2, 0.0, 0.8, 0.3),
+          bottom: average(data, 0.2, 0.7, 0.8, 1.0),
+          left: average(data, 0.0, 0.25, 0.4, 0.85),
+          right: average(data, 0.6, 0.25, 1.0, 0.85),
+        });
       }
-
-      const [r, g, b] = context.getImageData(4, 4, 1, 1).data;
-      edgeCallback.current?.([r, g, b]);
     };
 
     // Sequential and in order, so the frames a viewer reaches first are the
@@ -160,7 +211,7 @@ export function UnfoldSequence({
     return () => {
       cancelled = true;
     };
-  }, [ambient]);
+  }, []);
 
   useMotionValueEvent(progress, "change", (value) => {
     if (queued.current) cancelAnimationFrame(queued.current);
@@ -171,9 +222,10 @@ export function UnfoldSequence({
   });
 
   return (
-    <canvas
+    <motion.canvas
       ref={canvas}
       className={className}
+      style={{ objectPosition: position }}
       width={LARGEST.width}
       height={LARGEST.height}
       aria-hidden
