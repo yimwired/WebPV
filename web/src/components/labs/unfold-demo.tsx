@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { UnfoldSequence } from "./unfold-sequence";
+import { AMBIENT, UnfoldSequence } from "./unfold-sequence";
 import { kelvinToRgb } from "./unfold-light";
 
 /**
@@ -34,11 +34,10 @@ import { kelvinToRgb } from "./unfold-light";
 /** Where each act starts and ends, as a fraction of the pinned scroll. */
 const ACTS = {
   closed: [0.0, 0.03, 0.11, 0.16],
-  // Out before the room turns. Cross-fading ink and paper through mid-grey at
-  // the same time put this line at 2.39:1 against its own background halfway
-  // through the change, which no colour choice fixes: the two have to not
-  // overlap.
-  unfold: [0.17, 0.2, 0.25, 0.29],
+  // Out before the room turns. The clip's lights drop between frames 14 and
+  // 32, which is scroll 0.22 to 0.33, and cross the midpoint near 0.28: copy
+  // fading through grey at the same moment as its background measured 2.39:1.
+  unfold: [0.16, 0.19, 0.23, 0.27],
   light: [0.44, 0.49, 0.56, 0.61],
   warmth: [0.63, 0.68, 0.76, 0.81],
   drawing: [0.83, 0.88, 0.96, 1.0],
@@ -47,26 +46,29 @@ const ACTS = {
 /** The sequence scrubs across this range: folded, room darkens, light on. */
 const SCRUB = [0.14, 0.42] as const;
 
-/**
- * When the page follows the clip into the dark. The clip's own lights go down
- * around its halfway mark, so this tracks that rather than running on past it:
- * the background was still pale grey while the photograph was already black.
- */
-const DARKEN = [0.28, 0.345] as const;
+/** Sampled from the folded photograph's corner. Holds until the clip paints. */
+const PAGE_LIGHT = "#f3f1ed";
 
-/** Sampled from the corners of the two photographs, so no seam shows. */
-const PAGE_LIGHT = "#f2f1ec";
-const PAGE_DARK = "#080704";
+/** Relative luminance, for deciding whether copy over this needs light ink. */
+function luminance(r: number, g: number, b: number) {
+  const lin = [r, g, b].map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+}
 
 const MEDIA = { width: 1100, height: 624 };
 
 /**
- * The photographs are not a flat colour out to their edges, so a hard boundary
- * drew a visible rectangle on the page even with the background sampled off
- * their corners. Feathering all four sides dissolves it.
+ * A soft edge on all four sides. This was tried once against a flat page
+ * colour and drew a grey halo, because the picture was dissolving into
+ * something that looked nothing like it. With the blurred backdrop behind it
+ * the picture now dissolves into a blurred copy of itself, which is what makes
+ * the rectangle disappear rather than merely soften.
  */
 const EDGE_MASK =
-  "linear-gradient(to right, transparent, #000 7%, #000 93%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 88%, transparent)";
+  "linear-gradient(to right, transparent, #000 5%, #000 95%, transparent), linear-gradient(to bottom, transparent, #000 4%, #000 93%, transparent)";
 
 /** Roughly the colour temperature the lit photograph was generated at. */
 const NATIVE_KELVIN = 3050;
@@ -121,6 +123,7 @@ export function UnfoldDemo() {
   const reduced = useReducedMotion() ?? false;
   const compact = useMediaQuery("(max-width: 639px)");
   const stage = useRef<HTMLElement>(null);
+  const ambient = useRef<HTMLCanvasElement>(null);
 
   // Measured against the pinned section alone: the spec sheet below it is not
   // part of the story, and including it would shift every act.
@@ -195,15 +198,21 @@ export function UnfoldDemo() {
   const frameScale = reduced ? restingScale : sweptScale;
 
   // ── the room, and the copy that has to stay legible in it ──────────────
-  // Derived from `onDark` rather than from scroll directly, so the room and
-  // the colours it forces are one value and cannot drift apart.
-  const onDark = useTransform(scrollYProgress, (p): number =>
-    ramp(p, DARKEN[0], DARKEN[1])
-  );
-  const pageBackground = useTransform(
-    onDark,
-    [0, 1],
-    [PAGE_LIGHT, PAGE_DARK]
+  // Both read off the photograph rather than off a scroll range. Hand-set
+  // timing had the page still pale grey around an already-black picture, and
+  // the mask that was papering over that seam drew a blurred grey halo round
+  // all four sides instead.
+  const pageBackground = useMotionValue(PAGE_LIGHT);
+  const onDark = useMotionValue(0);
+
+  const takeEdge = useCallback(
+    ([r, g, b]: [number, number, number]) => {
+      pageBackground.set(`rgb(${r} ${g} ${b})`);
+      // A fast flip, not a fade: copy crossing the midpoint at the same time
+      // as its background measured 2.39:1 at the crossover.
+      onDark.set(1 - ramp(luminance(r, g, b), 0.3, 0.5));
+    },
+    [pageBackground, onDark]
   );
   const bodyColour = useTransform(onDark, [0, 1], ["#57544d", "#a49e93"]);
   const headingColour = useTransform(onDark, [0, 1], ["#14130f", "#f4f1ea"]);
@@ -245,6 +254,18 @@ export function UnfoldDemo() {
       {/* ─── the pinned stage: five acts on one continuous shot ─── */}
       <section ref={stage} className="relative h-[600vh]">
         <div className="sticky top-0 flex h-dvh items-center justify-center overflow-hidden">
+          {/* The same frame, 48px wide, stretched over the whole stage and
+              blurred away. It is what removes the photograph's rectangle: the
+              surround is now the picture itself rather than a flat colour that
+              can only ever match one pixel of it. */}
+          <canvas
+            ref={ambient}
+            aria-hidden
+            width={AMBIENT.width}
+            height={AMBIENT.height}
+            className="absolute inset-0 h-full w-full scale-125 object-cover"
+            style={{ filter: "blur(90px) saturate(1.2)", opacity: 0.9 }}
+          />
           {/* The three layers share one box and one framing, so cross-fading
               between them reads as the same photograph changing state. */}
           <motion.div
@@ -291,6 +312,8 @@ export function UnfoldDemo() {
               >
                 <UnfoldSequence
                   progress={scrub}
+                  ambient={ambient}
+                  onEdge={takeEdge}
                   className={`h-full w-full ${compact ? "object-cover" : "object-contain"}`}
                 />
               </motion.div>
@@ -703,6 +726,9 @@ function TemperatureControl({
 
 const RULE = "rgba(244,241,234,0.55)";
 
+/** Sits behind the dimension figures so the bracket does not run through them. */
+const LABEL_CHIP = "#080704";
+
 /**
  * Measurements drawn over the photograph in the last act. Positions are
  * fractions of the frame, matched to where the lamp sits in the shot. Labels
@@ -733,7 +759,7 @@ function DimensionLines({ opacity }: { opacity: MotionValue<number> }) {
           className="absolute font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap"
           style={{
             color: "#e6e1d8",
-            background: PAGE_DARK,
+            background: LABEL_CHIP,
             padding: "0 0.4rem",
           }}
         >
@@ -758,7 +784,7 @@ function DimensionLines({ opacity }: { opacity: MotionValue<number> }) {
           className="absolute right-full font-mono text-[0.7rem] tracking-[0.08em] whitespace-nowrap"
           style={{
             color: "#e6e1d8",
-            background: PAGE_DARK,
+            background: LABEL_CHIP,
             padding: "0 0.4rem",
           }}
         >

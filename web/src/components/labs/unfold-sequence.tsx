@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { useMotionValueEvent, type MotionValue } from "framer-motion";
 
 /**
@@ -37,26 +37,61 @@ function pickSet(): FrameSet {
 const frameUrl = (dir: string, index: number) =>
   `/lab-assets/unfold/${dir}/${String(index).padStart(2, "0")}.webp`;
 
+/**
+ * Size of the blurred backdrop canvas. Tiny on purpose, and 48x27 was still
+ * too big: stretched to 1920 the lamp survived as a recognisable dark smear
+ * across a white studio. At this size it averages into a field of colour,
+ * which is all the backdrop is for.
+ */
+export const AMBIENT = { width: 14, height: 8 };
+
 export function UnfoldSequence({
   progress,
   className,
+  ambient,
+  onEdge,
 }: {
   /** 0 folded, 1 open and lit. Values outside the range are clamped. */
   progress: MotionValue<number>;
   className?: string;
+  /**
+   * A canvas the caller places behind everything, full-bleed. Each frame is
+   * also drawn into it at AMBIENT size, and the caller blurs it. A photograph
+   * on a flat page always shows its own rectangle; spreading a blurred copy of
+   * it behind means the surround is an extension of the picture and there is
+   * no edge left to hide. It belongs to the caller because it has to live in a
+   * different part of the tree from the sharp one.
+   */
+  ambient?: RefObject<HTMLCanvasElement | null>;
+  /**
+   * The colour of the frame's top-left corner, reported after every paint.
+   * The page paints its own background with it, which is the only way the
+   * picture and the page around it can go dark together: the clip's lights
+   * drop between frames 14 and 32, and any hand-set timing for that is a
+   * guess that stops being right the moment the clip is regenerated.
+   */
+  onEdge?: (rgb: [number, number, number]) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const paint = useRef<(at: number) => void>(() => {});
   const queued = useRef(0);
+  const edgeCallback = useRef(onEdge);
+
+  // Kept in a ref so a new callback identity never re-runs the loader and
+  // re-downloads 48 frames; assigned in an effect because assigning during
+  // render is not allowed.
+  useEffect(() => {
+    edgeCallback.current = onEdge;
+  }, [onEdge]);
 
   useEffect(() => {
     // Chosen once, on mount. Re-picking on resize would re-download 48 files
     // because someone dragged a window wider.
     const set = pickSet();
-    const surface = canvas.current;
-    if (surface) {
-      surface.width = set.width;
-      surface.height = set.height;
+    const sharp = canvas.current;
+    if (sharp) {
+      sharp.width = set.width;
+      sharp.height = set.height;
     }
 
     const frames: HTMLImageElement[] = [];
@@ -66,7 +101,12 @@ export function UnfoldSequence({
 
     paint.current = (at: number) => {
       wanted = at;
-      const context = canvas.current?.getContext("2d");
+      // `willReadFrequently` because every paint is followed by a one-pixel
+      // read; without it the browser keeps the surface on the GPU and each
+      // readback stalls.
+      const context = canvas.current?.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (!context) return;
 
       const target = Math.min(
@@ -81,6 +121,21 @@ export function UnfoldSequence({
 
       context.drawImage(frames[index], 0, 0, set.width, set.height);
       shown = index;
+
+      const backdrop = ambient?.current;
+      const backdropContext = backdrop?.getContext("2d");
+      if (backdrop && backdropContext) {
+        backdropContext.drawImage(
+          frames[index],
+          0,
+          0,
+          backdrop.width,
+          backdrop.height
+        );
+      }
+
+      const [r, g, b] = context.getImageData(4, 4, 1, 1).data;
+      edgeCallback.current?.([r, g, b]);
     };
 
     // Sequential and in order, so the frames a viewer reaches first are the
@@ -105,7 +160,7 @@ export function UnfoldSequence({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [ambient]);
 
   useMotionValueEvent(progress, "change", (value) => {
     if (queued.current) cancelAnimationFrame(queued.current);

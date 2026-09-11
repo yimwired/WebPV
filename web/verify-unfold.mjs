@@ -8,6 +8,32 @@
 //
 // From `web/`, with the site served: `node verify-unfold.mjs`
 import { chromium } from "playwright";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+const run = promisify(execFile);
+const scratch = await mkdtemp(join(tmpdir(), "unfold-"));
+
+/**
+ * Average colour of a screenshot region, straight out of ffmpeg.
+ *
+ * Reading `backgroundColor` off the elements under a point cannot see what a
+ * canvas painted, and the backdrop behind the copy on this page is a canvas.
+ * The only honest number comes from the pixels.
+ */
+async function paintedColour(page, clip) {
+  const file = join(scratch, `patch-${Date.now()}.png`);
+  await page.screenshot({ path: file, clip });
+  const { stdout } = await run("ffmpeg", [
+    "-v", "error", "-i", file,
+    "-vf", "scale=1:1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-",
+  ], { encoding: "buffer" });
+  const [r, g, b] = stdout;
+  return `rgb(${r}, ${g}, ${b})`;
+}
 
 const URL = process.env.SHOOT_URL ?? "http://localhost:3000";
 const results = [];
@@ -140,7 +166,14 @@ async function openStage(context) {
     return li?.textContent?.trim() ?? "";
   });
   const claimed = Number(open.match(/\d+/)?.[0] ?? -1);
-  const expected = Math.round(((0.23 - 0.14) / (0.42 - 0.14)) * 100);
+  // Expected is computed from where the page actually ended up, not from the
+  // fraction asked for: scrollTo lands on a whole pixel, which is worth a
+  // couple of points on a 600vh stage.
+  const landed = await page.evaluate(() => {
+    const section = document.querySelector("section");
+    return window.scrollY / (section.getBoundingClientRect().height - innerHeight);
+  });
+  const expected = Math.round(((landed - 0.14) / (0.42 - 0.14)) * 100);
   check(
     "open figure tracks the frame it is showing",
     Math.abs(claimed - expected) <= 2,
@@ -161,27 +194,30 @@ async function openStage(context) {
 
   for (const [at, needle] of SAMPLES) {
     await seek(at);
-    const measured = await page.evaluate((text) => {
+    const spot = await page.evaluate((text) => {
       const node = [...document.querySelectorAll("h1, h2, p")].find((n) =>
         (n.textContent ?? "").includes(text)
       );
       if (!node) return null;
       const box = node.getBoundingClientRect();
-      const behind = document
-        .elementsFromPoint(box.left + 4, box.top + box.height / 2)
-        // an invisible layer still reports its background colour, and the
-        // relight overlay sits over everything at opacity 0 most of the time
-        .filter((el) => +getComputedStyle(el).opacity > 0.02)
-        .map((el) => getComputedStyle(el).backgroundColor)
-        .find((c) => c && c !== "rgba(0, 0, 0, 0)");
-      return { colour: getComputedStyle(node).color, behind };
+      return {
+        colour: getComputedStyle(node).color,
+        // a few pixels to the left of the first glyph: same backdrop, no text
+        clip: {
+          x: Math.max(0, Math.round(box.left) - 10),
+          y: Math.round(box.top + box.height / 2) - 3,
+          width: 6,
+          height: 6,
+        },
+      };
     }, needle);
 
-    const ratio = measured ? contrast(measured.colour, measured.behind) : 0;
+    const behind = spot ? await paintedColour(page, spot.clip) : null;
+    const ratio = spot && behind ? contrast(spot.colour, behind) : 0;
     check(
       `contrast: "${needle}"`,
       ratio >= 4.5,
-      `${ratio.toFixed(2)}:1  ${measured?.colour} on ${measured?.behind}`
+      `${ratio.toFixed(2)}:1  ${spot?.colour} on ${behind}`
     );
   }
 
@@ -232,6 +268,7 @@ async function openStage(context) {
 }
 
 await browser.close();
+await rm(scratch, { recursive: true, force: true });
 
 const failed = results.filter((r) => !r.pass).length;
 console.log(`\n${results.length - failed}/${results.length} passed`);
