@@ -377,6 +377,9 @@ const en = {
     ctaButton: "Ask for a quote",
     ctaSecondary: "See the styles",
     proof: "{projects} projects you can read the build of, {labs} styles you can click through.",
+    fastworkNote:
+      "Prefer not to transfer money to someone you have not met? The same packages are listed on Fastwork, where the platform holds the payment until the work is handed over.",
+    fastworkLink: "See the listing on Fastwork",
   },
   // Chrome shared by every case-study page.
   caseStudy: {
@@ -973,6 +976,9 @@ const th: typeof en = {
     ctaButton: "ขอใบเสนอราคา",
     ctaSecondary: "ดูสไตล์ทั้งหมด",
     proof: "ผลงาน {projects} ชิ้นที่อ่านเบื้องหลังได้ กับ {labs} สไตล์ที่กดเล่นได้เลย",
+    fastworkNote:
+      "ถ้ายังไม่สบายใจที่จะโอนตรงให้คนที่ไม่เคยเจอกัน แพ็กเกจเดียวกันนี้ลงไว้บน Fastwork ด้วย ระบบจะถือเงินไว้จนกว่างานจะส่งมอบ",
+    fastworkLink: "ดูร้านบน Fastwork",
   },
   caseStudy: {
     back: "กลับหน้าแรก",

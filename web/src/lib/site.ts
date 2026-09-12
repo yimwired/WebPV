@@ -14,6 +14,15 @@ export const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
 /** Contact address. The footer, the schema and llms.txt all read this one. */
 export const CONTACT_EMAIL = "yimwired@gmail.com";
 
+/**
+ * The Fastwork listing. Same packages, same prices as /pricing: the
+ * platform is there for clients who would rather pay into escrow than
+ * transfer to a stranger, and it takes 18% for that.
+ * ลิงก์ร้านบน Fastwork ราคาเท่ากับ /pricing เป๊ะ
+ */
+export const FASTWORK_URL =
+  "https://fastwork.co/user/yimwired/web-development-95050179";
+
 /** Profiles that prove the same person owns this site elsewhere. */
 export const PROFILES = [
   { label: "GitHub", href: "https://github.com/yimwired" },

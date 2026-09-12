@@ -11,6 +11,7 @@ import {
   type CarePlan,
   type PricingTier,
 } from "@/lib/pricing";
+import { FASTWORK_URL } from "@/lib/site";
 import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./reveal";
@@ -134,6 +135,22 @@ export function Pricing() {
         </div>
         <p className="text-muted-foreground mt-5 text-sm">
           {withCounts(p.proof)}
+        </p>
+
+        {/* Escrow is the objection this answers: a stranger's bank transfer is
+            the riskiest-feeling step of hiring online. Kept as a line of text
+            rather than a third button so it never competes with the quote CTA. */}
+        <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-relaxed">
+          {p.fastworkNote}{" "}
+          <a
+            href={FASTWORK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand inline-flex items-center gap-1 font-medium hover:underline"
+          >
+            {p.fastworkLink}
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
         </p>
       </Reveal>
     </section>
