@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "prism",
+    name: "Prism",
+    vibe: "OS surface, real glass",
+    description:
+      "Glass built the way a lens behaves rather than the way a blur filter does: the backdrop bends hardest at the rim, each colour channel bends by a different amount so the edge carries a fringe, and the sheet flips dark or light on its own to keep its text readable over whatever photograph is behind it. Every layer has a switch, so the claim is something you check rather than something the page says.",
+    accent: "#7fd4ff",
+    preview: { from: "#0b1620", to: "#08090c" },
+    bestFor: "Apps, dashboards, anything with a lot of controls on screen at once",
+    buildTime: "About a week, the readable-over-anything part is the work",
+  },
+  {
     slug: "ember",
     name: "Ember",
     vibe: "Food chain, full volume",

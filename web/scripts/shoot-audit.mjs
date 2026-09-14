@@ -55,12 +55,31 @@ const probe = (page) =>
       const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
       return (hi + 0.05) / (lo + 0.05);
     };
+    // Walk up to the first opaque background, then composite every translucent
+    // sheet passed on the way back down onto it.
+    //
+    // Skipping those sheets was wrong, and quietly: a glass panel at 0.64 alpha
+    // is most of what its text sits on, so ignoring it reported dark text on a
+    // pale sheet over a dark page as 1:1 and buried real findings under the
+    // noise. Still blind to images and canvas, which is what
+    // shoot-contrast.mjs exists to measure.
     const opaqueBg = (el) => {
+      const sheets = [];
+      let base = null;
       for (let n = el; n; n = n.parentElement) {
         const rgba = getComputedStyle(n).backgroundColor.match(/[\d.]+/g)?.map(Number) ?? [];
-        if (rgba.length < 4 || rgba[3] > 0.9) return toRgb(getComputedStyle(n).backgroundColor);
+        if (rgba.length < 4 || rgba[3] > 0.9) {
+          base = toRgb(getComputedStyle(n).backgroundColor);
+          break;
+        }
+        if (rgba[3] > 0.02) sheets.push(rgba);
       }
-      return toRgb(getComputedStyle(document.body).backgroundColor);
+      if (!base) base = toRgb(getComputedStyle(document.body).backgroundColor);
+      for (let i = sheets.length - 1; i >= 0; i -= 1) {
+        const [r, g, b, a] = sheets[i];
+        base = [r, g, b].map((c, k) => a * c + (1 - a) * base[k]);
+      }
+      return base;
     };
     const label = (el) => (el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 40);
 
