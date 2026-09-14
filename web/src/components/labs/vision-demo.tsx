@@ -113,7 +113,7 @@ export function VisionDemo() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
-          className="absolute bottom-10 text-xs tracking-[0.3em] text-white/40 uppercase"
+          className="absolute bottom-10 text-xs tracking-[0.3em] text-white/50 uppercase"
         >
           scroll to enter
         </motion.div>
@@ -226,7 +226,7 @@ export function VisionDemo() {
           </div>
         </motion.div>
 
-        <p className="absolute bottom-10 text-xs text-white/30">
+        <p className="absolute bottom-10 text-xs text-white/50">
           A style study. No headsets were harmed.
         </p>
       </section>

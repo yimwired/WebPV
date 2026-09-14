@@ -39,13 +39,19 @@ const probe = (page) =>
   page.evaluate(() => {
     const cv = document.createElement("canvas");
     const ctx = cv.getContext("2d", { willReadFrequently: true });
-    const toRgb = (color) => {
+    // clearRect first, every time. Without it the canvas still holds the last
+    // colour drawn, so any colour carrying alpha composited onto whatever
+    // element happened to be measured before it, and the reading depended on
+    // document order.
+    const toRgba = (color) => {
+      ctx.clearRect(0, 0, 1, 1);
       ctx.fillStyle = "#000";
       ctx.fillStyle = color;
       ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-      return [r, g, b];
+      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+      return [r, g, b, a / 255];
     };
+    const toRgb = (color) => toRgba(color).slice(0, 3);
     const lum = ([r, g, b]) =>
       [r, g, b]
         .map((v) => v / 255)
@@ -84,13 +90,53 @@ const probe = (page) =>
     const label = (el) => (el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 40);
 
     const contrast = [];
+    // Text this probe cannot judge, kept apart from text it judged and failed.
+    // Mixing them buried real findings: /labs/vision reported five failures and
+    // two of them were only the probe being blind.
+    const unmeasurable = [];
+
     for (const el of document.querySelectorAll("body *")) {
       if (!el.textContent?.trim() || el.children.length) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden" || cs.display === "none" || !el.getClientRects().length) continue;
+
       const size = parseFloat(cs.fontSize);
       const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
-      const r = ratio(toRgb(cs.color), opaqueBg(el));
+      const plate = opaqueBg(el);
+
+      // Text painted through the element's background, the bg-clip-text
+      // gradient trick. `color` is transparent, so there is nothing to measure
+      // against: the ink is whatever the gradient puts there.
+      const [cr, cg, cb, ca] = toRgba(cs.color);
+      if (ca === 0) {
+        unmeasurable.push({ text: label(el), size, why: "color is transparent, painted by a gradient" });
+        continue;
+      }
+
+      // Anything still faded in is skipped rather than measured, the same rule
+      // shoot-contrast uses: a scroll reveal that has not fired sits at opacity
+      // 0, and compositing that against its own plate returns 1:1 for every
+      // element below the fold. Not a finding, just a thing not on screen yet.
+      let shown = 1;
+      for (let n = el; n; n = n.parentElement) shown *= Number(getComputedStyle(n).opacity);
+      if (shown < 0.95) continue;
+
+      // Semi-transparent ink lands on the plate rather than replacing it.
+      const ink = ca >= 0.999
+        ? [cr, cg, cb]
+        : [cr, cg, cb].map((c, i) => ca * c + (1 - ca) * plate[i]);
+
+      const r = ratio(ink, plate);
+
+      // Exactly 1.00 means the ink and the plate resolved to the same colour,
+      // which nobody writes on purpose. It means the real plate is something
+      // this probe cannot see: a sibling laid over the text, a canvas, an
+      // image. shoot-contrast.mjs reads the painted pixels instead.
+      if (r < 1.005) {
+        unmeasurable.push({ text: label(el), size, why: "plate matches the ink, so the real backdrop is not in the DOM" });
+        continue;
+      }
+
       if (r < (large ? 3 : 4.5)) contrast.push({ text: label(el), size, ratio: +r.toFixed(2) });
     }
 
@@ -122,6 +168,7 @@ const probe = (page) =>
     return {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       contrast,
+      unmeasurable,
       targets,
       wrapped,
       unnamed,
@@ -164,6 +211,8 @@ for (const [key, r] of Object.entries(report)) {
   if (r.errors.length) issues.push(`errors ${JSON.stringify(r.errors.slice(0, 4))}`);
   if (r.overflow > 0) issues.push(`overflow ${r.overflow}px`);
   if (r.contrast.length) issues.push(`contrast ${JSON.stringify(r.contrast)}`);
+  if (r.unmeasurable.length)
+    issues.push(`not measurable here, use shoot-contrast ${JSON.stringify(r.unmeasurable)}`);
   if (r.targets.length) issues.push(`small targets ${JSON.stringify(r.targets)}`);
   if (r.wrapped.length) issues.push(`wrapped CTA ${JSON.stringify(r.wrapped)}`);
   if (r.unnamed.length) issues.push(`unnamed controls ${JSON.stringify(r.unnamed)}`);
