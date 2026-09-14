@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "slab",
+    name: "Slab",
+    vibe: "Neo-brutalism, loud and flat",
+    description:
+      "Hard borders, flat offset shadows with no blur in them anywhere, and controls that travel onto their own shadow when you press them. The palette belongs to the product rather than the page: pick a different course from the top bar and the whole site repaints, which is the part a client actually wants to see before committing to a colour this loud.",
+    accent: "#ffe14d",
+    preview: { from: "#fffdf5", to: "#ffe14d" },
+    bestFor: "Courses, startups, agencies, anything that would rather be seen than trusted quietly",
+    buildTime: "Three to four days, and no photography at all",
+  },
+  {
     slug: "prism",
     name: "Prism",
     vibe: "OS surface, real glass",
