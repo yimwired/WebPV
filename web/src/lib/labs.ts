@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "ember",
+    name: "Ember",
+    vibe: "Food chain, full volume",
+    description:
+      "A charcoal grill buffet sold the way Thai food brands actually sell: cream and one chilli red, type at full volume, stickers, and product cards that lift off the page. Press a set or a branch and the panel grows out of the card you pressed, with the page behind it frozen until it closes.",
+    accent: "#d81f14",
+    preview: { from: "#fbf1de", to: "#a8140c" },
+    bestFor: "Restaurant chains, street food brands, anywhere with branches and a menu",
+    buildTime: "About a week once the food is photographed",
+  },
+  {
     slug: "contour",
     name: "Contour",
     vibe: "Packaging, real-time 3D",
