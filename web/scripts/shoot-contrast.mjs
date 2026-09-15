@@ -33,7 +33,20 @@ for (let y = 0; y < height; y += STEP) {
     for (const el of document.querySelectorAll("body *")) {
       if (el.children.length || !el.textContent?.trim()) continue;
       const r = el.getBoundingClientRect();
-      if (r.width < 4 || r.height < 4 || r.top < 0 || r.bottom > window.innerHeight) continue;
+      // The lab switcher is fixed over the bottom ~66px of every demo, and it
+      // is part of The Lab rather than part of the page being measured. Text
+      // underneath it was being sampled against the switcher's near-black pill,
+      // which produced a different set of failures on every scroll step: at
+      // STEP 260 ten, at 400 five, at 550 three, never the same elements. Each
+      // one is measured properly on another pass, when it is not behind the bar.
+      const SWITCHER = 84;
+      if (
+        r.width < 4 ||
+        r.height < 4 ||
+        r.top < 0 ||
+        r.bottom > window.innerHeight - SWITCHER
+      )
+        continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden") continue;
 

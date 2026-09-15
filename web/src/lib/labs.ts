@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "paste",
+    name: "Paste",
+    vibe: "Scrapbook, taped down",
+    description:
+      "A wedding invitation built out of instant photos taped to ruled paper, overlapping the way a real page does rather than sitting in a grid. It also does the job the printed card cannot: type your name and it gives you your table, your side and the line the couple wrote for you. The Lab sells weddings twice on purpose, and this is the opposite register to Maison.",
+    accent: "#b23a26",
+    preview: { from: "#f7f2e8", to: "#e3d2b6" },
+    bestFor: "Weddings, parties, reunions, anything with a guest list",
+    buildTime: "Three days, and the guest list is the only real work",
+  },
+  {
     slug: "kiln",
     name: "Kiln",
     vibe: "Wabi-sabi, one-off goods",
