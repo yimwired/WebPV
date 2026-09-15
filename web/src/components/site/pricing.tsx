@@ -146,7 +146,7 @@ export function Pricing() {
             href={FASTWORK_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand inline-flex items-center gap-1 font-medium hover:underline"
+            className="text-brand -my-2 inline-flex items-center gap-1 py-2 font-medium hover:underline"
           >
             {p.fastworkLink}
             <ArrowUpRight className="h-3.5 w-3.5" />
@@ -253,7 +253,7 @@ function TierCard({ tier, wide }: { tier: PricingTier; wide?: boolean }) {
         {tier.demoHref && (
           <Link
             href={tier.demoHref}
-            className="text-brand inline-flex items-center gap-1 text-sm font-medium hover:underline"
+            className="text-brand -my-2 inline-flex items-center gap-1 rounded-md py-2 text-sm font-medium hover:underline"
           >
             {p.seeDemo}
             <ArrowUpRight className="h-3.5 w-3.5" />
