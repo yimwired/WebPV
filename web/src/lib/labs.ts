@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "kiln",
+    name: "Kiln",
+    vibe: "Wabi-sabi, one-off goods",
+    description:
+      "A studio that sells ceramics no two of which are alike, so the page points at what is wrong with each piece instead of finding a flattering angle. The marks are plotted on the photograph itself and each one says what caused it. The quietest page here: no shadows, no borders past a hairline, and hierarchy carried by space rather than weight.",
+    accent: "#7a4c30",
+    preview: { from: "#f4efe5", to: "#d9cdb8" },
+    bestFor: "Makers, ceramics, coffee, anything sold one piece at a time",
+    buildTime: "Four days once the pieces are photographed",
+  },
+  {
     slug: "slab",
     name: "Slab",
     vibe: "Neo-brutalism, loud and flat",

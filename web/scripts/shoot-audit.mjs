@@ -100,6 +100,13 @@ const probe = (page) =>
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden" || cs.display === "none" || !el.getClientRects().length) continue;
 
+      // Visually hidden text. Tailwind's sr-only leaves a 1x1 box that is still
+      // "visible" to getComputedStyle, so it was being measured and reported
+      // like anything else. It is read aloud, never looked at. Same floor
+      // shoot-contrast uses.
+      const box = el.getBoundingClientRect();
+      if (box.width < 4 || box.height < 4) continue;
+
       const size = parseFloat(cs.fontSize);
       const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
       const plate = opaqueBg(el);
@@ -147,6 +154,9 @@ const probe = (page) =>
       const rects = el.getClientRects();
       if (!rects.length) continue;
       const { width, height } = rects[0];
+      // A skip link is 1x1 until it takes focus, which is the correct shape for
+      // one. Anything this small is hidden on purpose, not an undersized target.
+      if (width < 4 || height < 4) continue;
       if (height > 0 && height < 24 && el.closest("nav, header, footer, main")) {
         targets.push({ tag: el.tagName, text: label(el), w: +width.toFixed(0), h: +height.toFixed(0) });
       }
