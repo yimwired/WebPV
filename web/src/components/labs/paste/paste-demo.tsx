@@ -6,7 +6,7 @@ import { COUPLE, NOTES, SCHEDULE, SNAPSHOTS } from "./data";
 import { ONCE, reveal, revealTransition, stagger } from "./motion";
 import { Polaroid } from "./polaroid";
 import { SeatFinder } from "./seat-finder";
-import { COLOR, handStyle, RULED, sansStyle, TAPE, Z } from "./theme";
+import { bodyStyle, COLOR, handStyle, LINE_HEIGHT, ruled, TAPE, Z } from "./theme";
 
 /**
  * Paste: scrapbook, for an invented wedding.
@@ -19,10 +19,10 @@ import { COLOR, handStyle, RULED, sansStyle, TAPE, Z } from "./theme";
  */
 export function PasteDemo() {
   return (
-    <div id="top" style={{ background: COLOR.paper, ...RULED }}>
+    <div id="top" style={{ background: COLOR.paper }}>
       <header
         className="sticky top-0 border-b"
-        style={{ background: COLOR.paper, borderColor: COLOR.ink, zIndex: Z.bar }}
+        style={{ background: COLOR.paper, borderColor: COLOR.edge, zIndex: Z.bar }}
       >
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-5 sm:px-8">
           <a
@@ -34,13 +34,13 @@ export function PasteDemo() {
           </a>
           <a
             href="#seat"
-            className="flex items-center border px-4 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="flex items-center px-4 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{
               background: TAPE[0],
-              borderColor: COLOR.ink,
               color: COLOR.ink,
               outlineColor: COLOR.ink,
-              ...sansStyle,
+              transform: "rotate(-1deg)",
+              ...bodyStyle,
             }}
           >
             หาโต๊ะของฉัน
@@ -60,7 +60,7 @@ export function PasteDemo() {
               variants={reveal}
               transition={revealTransition}
               className="text-sm uppercase tracking-[0.2em]"
-              style={{ color: COLOR.stamp, ...sansStyle }}
+              style={{ color: COLOR.stamp, ...bodyStyle }}
             >
               เราจะแต่งงานกันแล้ว
             </motion.p>
@@ -68,10 +68,7 @@ export function PasteDemo() {
             <motion.h1
               variants={reveal}
               transition={revealTransition}
-              // 1.05 is a Latin display leading. Thai stacks tone marks above
-              // the letters, so at this size the marks on "ฟ้า" climbed into
-              // the eyebrow line above it.
-              className="mt-7 text-[clamp(2.6rem,11vw,5.5rem)] leading-[1.22]"
+              className="mt-7 text-[clamp(2.6rem,11vw,5.5rem)]"
               style={{ color: COLOR.ink, ...handStyle }}
             >
               {COUPLE.bride} & {COUPLE.groom}
@@ -81,7 +78,7 @@ export function PasteDemo() {
               variants={reveal}
               transition={revealTransition}
               className="mt-5 text-base sm:text-lg"
-              style={{ color: COLOR.ink, ...sansStyle }}
+              style={{ color: COLOR.ink, lineHeight: `${LINE_HEIGHT}px`, ...bodyStyle }}
             >
               {COUPLE.date}
               <span className="mx-2" aria-hidden>
@@ -139,7 +136,7 @@ export function PasteDemo() {
               viewport={ONCE}
               variants={stagger(0.07, 0.05)}
               className="mt-8 space-y-6"
-              style={sansStyle}
+              style={bodyStyle}
             >
               {SCHEDULE.map((item) => (
                 <motion.li
@@ -158,7 +155,10 @@ export function PasteDemo() {
                     <span className="block text-base font-semibold" style={{ color: COLOR.ink }}>
                       {item.title}
                     </span>
-                    <span className="mt-0.5 block text-sm" style={{ color: COLOR.inkMuted }}>
+                    <span
+                      className="mt-0.5 block text-sm"
+                      style={{ color: COLOR.inkMuted, lineHeight: `${LINE_HEIGHT}px` }}
+                    >
                       {item.detail}
                     </span>
                   </span>
@@ -172,8 +172,12 @@ export function PasteDemo() {
               viewport={ONCE}
               variants={reveal}
               transition={revealTransition}
-              className="relative mt-14 border p-6"
-              style={{ background: COLOR.card, borderColor: COLOR.ink }}
+              className="relative mt-14 border p-7"
+              style={{
+                background: COLOR.card,
+                borderColor: COLOR.edge,
+                boxShadow: "0 2px 12px rgba(28, 43, 63, 0.07)",
+              }}
             >
               <span
                 aria-hidden
@@ -183,9 +187,16 @@ export function PasteDemo() {
               <h3 className="text-xl" style={{ color: COLOR.ink, ...handStyle }}>
                 อยากบอกไว้ตรงนี้เลย
               </h3>
-              <ul className="mt-4 space-y-2.5" style={sansStyle}>
+              {/* The other ruled surface. A list of short lines is exactly what
+                  ruled paper is for, and the rules repeat at the same 28px the
+                  lines are set on, so they land under the words rather than
+                  drifting across them. */}
+              <ul
+                className="mt-5 text-sm"
+                style={{ ...ruled(-5), lineHeight: `${LINE_HEIGHT}px`, ...bodyStyle }}
+              >
                 {NOTES.map((note) => (
-                  <li key={note} className="flex gap-2.5 text-sm leading-relaxed" style={{ color: COLOR.ink }}>
+                  <li key={note} className="flex gap-2.5" style={{ color: COLOR.ink }}>
                     <span aria-hidden style={{ color: COLOR.stamp }}>
                       ✦
                     </span>
@@ -198,15 +209,18 @@ export function PasteDemo() {
         </section>
       </main>
 
-      <footer className="border-t px-5 pb-28 pt-10 sm:px-8" style={{ borderColor: COLOR.ink }}>
+      <footer className="border-t px-5 pb-28 pt-10 sm:px-8" style={{ borderColor: COLOR.edge }}>
         <div className="mx-auto max-w-4xl">
-          <p className="max-w-2xl text-sm leading-relaxed" style={{ color: COLOR.inkMuted, ...sansStyle }}>
+          <p
+            className="max-w-2xl text-sm"
+            style={{ color: COLOR.inkMuted, lineHeight: `${LINE_HEIGHT}px`, ...bodyStyle }}
+          >
             ฟ้าและต้นเป็นคู่สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของ Film
             ชื่อแขก โต๊ะ และกำหนดการแต่งขึ้นมาทั้งหมด รูปเป็นภาพสต็อกของคนที่ไม่เกี่ยวกับงานนี้
             และช่องค้นชื่อไม่ได้ต่อกับฐานข้อมูลจริง
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2" style={sansStyle}>
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2" style={bodyStyle}>
             <Link
               href="/labs"
               className="inline-flex items-center py-1.5 text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"

@@ -42,7 +42,9 @@ export function Polaroid({ snap, size = 260, priority = false }: PolaroidProps) 
         // spills past the chin and over the photograph, which is what the
         // longest of these did before it was cut back.
         paddingBottom: Math.round(pad * 3.9),
-        boxShadow: "0 3px 10px rgba(28, 43, 63, 0.16)",
+        // softened from 0 3px 10px at 16%. Tape holds a photo flat, so the
+        // shadow is a contact shadow, not a card hovering over a page.
+        boxShadow: "0 2px 8px rgba(28, 43, 63, 0.10)",
         zIndex: Z.photo,
       }}
     >
@@ -76,9 +78,9 @@ export function Polaroid({ snap, size = 260, priority = false }: PolaroidProps) 
           height: 26,
           marginLeft: Math.round(size * -0.21),
           background: TAPE[snap.tape],
-          opacity: 0.85,
+          opacity: 0.9,
           transform: `rotate(${snap.tilt * -2.2}deg)`,
-          boxShadow: "0 1px 2px rgba(28, 43, 63, 0.12)",
+          boxShadow: "0 1px 2px rgba(28, 43, 63, 0.08)",
           zIndex: Z.tape,
         }}
       />

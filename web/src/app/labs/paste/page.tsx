@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Charm, Sarabun } from "next/font/google";
+import { Charm, Maitree } from "next/font/google";
 import { PasteDemo } from "@/components/labs/paste/paste-demo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Charm is a Thai hand that is still legible at a heading size, which is the
 // hard part: the more convincing handwriting faces stop being readable as soon
-// as a sentence gets long. So Charm carries names, times and captions, and
-// Sarabun carries anything a guest has to actually read.
+// as a sentence gets long. So Charm carries names, times and captions, and the
+// body face carries anything a guest has to actually read.
 const hand = Charm({
   subsets: ["thai", "latin"],
   weight: ["400", "700"],
@@ -14,10 +14,13 @@ const hand = Charm({
   display: "swap",
 });
 
-const sans = Sarabun({
+// Maitree, not Sarabun. Sarabun is a workplace face: correct, even, and
+// completely flat beside handwriting. A soft Thai serif sits with the hand
+// instead of arguing with it.
+const body = Maitree({
   subsets: ["thai", "latin"],
-  weight: ["400", "600"],
-  variable: "--font-paste-sans",
+  weight: ["300", "400", "500"],
+  variable: "--font-paste-body",
   display: "swap",
 });
 
@@ -29,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function PastePage() {
   return (
-    <div className={`${hand.variable} ${sans.variable}`}>
+    <div className={`${hand.variable} ${body.variable}`}>
       <PasteDemo />
       <LabSwitcher />
     </div>
