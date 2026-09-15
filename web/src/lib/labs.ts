@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "meeple",
+    name: "Meeple",
+    vibe: "Pixel art, drawn by hand",
+    description:
+      "A board game cafe where the shelf answers the question the staff answer forty times a shift: how many of you, how long have you got, and have you played before. Every box that does not fit stays on the shelf and says which of the three it failed, and when nothing fits the page names the one that came closest. No icon set and no photography: every picture on it is sixteen pixels square, and the only easing curve in the code is steps.",
+    accent: "#e8705a",
+    preview: { from: "#f2e9d8", to: "#eaa93c" },
+    bestFor: "Cafes, clubs, game shops, anywhere the choice is the hard part",
+    buildTime: "About a week, and the sprites are most of it",
+  },
+  {
     slug: "kiln",
     name: "Kiln",
     vibe: "Wabi-sabi, one-off goods",
