@@ -18,7 +18,7 @@ export function PiecesSection({ piece, onPick }: PiecesSectionProps) {
   return (
     <section
       id="pieces"
-      className="scroll-mt-16 px-5 py-24 sm:px-8 lg:px-12"
+      className="scroll-mt-20 px-5 py-24 sm:px-8 lg:px-12"
       style={{ background: COLOR.paper }}
     >
       <div className="mx-auto max-w-5xl">

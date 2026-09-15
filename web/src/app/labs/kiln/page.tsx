@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, IBM_Plex_Sans_Thai } from "next/font/google";
+import { IBM_Plex_Sans_Thai, Maitree } from "next/font/google";
 import { KilnDemo } from "@/components/labs/kiln/kiln-demo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
-// Two faces doing different jobs. The serif carries the headings and the
-// numerals, where the page wants the weight of print; Plex Sans Thai carries
-// everything that has to be read rather than looked at. Cormorant has no Thai
-// glyphs, so the Thai headings fall to Plex through the stack and the pairing
-// only shows on the Latin.
-const serif = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400"],
+// Maitree, not Cormorant Garamond, which is what this shipped with first.
+// Cormorant has no Thai glyphs, so every Thai heading on the page fell through
+// to the sans and the serif/sans pairing showed up on nothing but the prices.
+// Maitree is a Thai serif with a Latin of its own, so the contrast the page is
+// built on is finally visible in the language the page is written in.
+const serif = Maitree({
+  subsets: ["thai", "latin"],
+  weight: ["300", "400", "600"],
   variable: "--font-kiln-serif",
   display: "swap",
 });

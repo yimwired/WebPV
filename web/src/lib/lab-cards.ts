@@ -6,7 +6,7 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const labCardVersions: Record<string, string> = {
-  "kiln": "21c49c39",
+  "kiln": "46a5f8d0",
   "slab": "83a94b72",
   "prism": "ca92aac2",
   "ember": "451faf74",

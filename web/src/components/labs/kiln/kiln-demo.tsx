@@ -28,13 +28,29 @@ export function KilnDemo() {
         className="sticky top-0 border-b"
         style={{ background: COLOR.paper, borderColor: COLOR.hair, zIndex: Z.bar }}
       >
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 sm:px-8 lg:px-12">
+        <div className="mx-auto flex h-20 max-w-5xl items-center justify-between px-5 sm:px-8 lg:px-12">
+          {/* The wordmark was text-lg and disappeared into the whitespace. On a
+              page with this little on it, the one fixed name has to hold the
+              corner or the header reads as empty. Bigger, heavier, and sitting
+              on a clay rule, which "ดินเผา" can carry because none of its
+              letters drop below the baseline. */}
           <a
             href="#top"
-            className="flex items-center py-2 text-lg tracking-wide focus-visible:outline-2 focus-visible:outline-offset-4"
-            style={{ color: COLOR.ink, outlineColor: COLOR.clay, ...serifStyle }}
+            className="flex items-center py-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+            style={{ outlineColor: COLOR.clay }}
           >
-            ดินเผา
+            <span
+              className="text-2xl leading-none sm:text-[1.7rem]"
+              style={{
+                color: COLOR.ink,
+                fontWeight: 600,
+                borderBottom: `1px solid ${COLOR.clay}`,
+                paddingBottom: 3,
+                ...serifStyle,
+              }}
+            >
+              ดินเผา
+            </span>
           </a>
           <nav className="flex items-center gap-6" style={sansStyle}>
             <a
@@ -122,7 +138,7 @@ export function KilnDemo() {
             thing that keeps a three-step section from reading as a pitch. */}
         <section
           id="process"
-          className="scroll-mt-16 px-5 py-24 sm:px-8 lg:px-12"
+          className="scroll-mt-20 px-5 py-24 sm:px-8 lg:px-12"
           style={{ background: COLOR.paperDeep }}
         >
           <motion.div
@@ -196,7 +212,10 @@ export function KilnDemo() {
         style={{ background: COLOR.ink, ...sansStyle }}
       >
         <div className="mx-auto max-w-5xl">
-          <p className="text-2xl" style={{ color: COLOR.paper, ...serifStyle }}>
+          <p
+            className="text-4xl sm:text-5xl"
+            style={{ color: COLOR.paper, fontWeight: 300, ...serifStyle }}
+          >
             ดินเผา
           </p>
           <p className="mt-6 max-w-xl text-sm leading-relaxed" style={{ color: COLOR.onInkMuted }}>

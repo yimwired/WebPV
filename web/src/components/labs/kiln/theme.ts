@@ -47,12 +47,8 @@ export const MARKER = {
 export const FONT = {
   /** IBM Plex Sans Thai, loaded by the route */
   sans: "var(--font-kiln-sans), system-ui, sans-serif",
-  /**
-   * Cormorant Garamond for the Latin. It has no Thai glyphs, so Plex Sans Thai
-   * sits next in the stack rather than leaving Thai headings to whatever serif
-   * the device happens to have, which on Windows is a fallback nobody chose.
-   */
-  serif: "var(--font-kiln-serif), var(--font-kiln-sans), Georgia, serif",
+  /** Maitree. A Thai serif, so the headings are serif in both scripts */
+  serif: "var(--font-kiln-serif), Georgia, serif",
 } as const;
 
 export const sansStyle = { fontFamily: FONT.sans } as const;
