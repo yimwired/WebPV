@@ -114,6 +114,19 @@ export function PixelPanel({
   );
 }
 
+/**
+ * The look of a control, shared by `Press` and by the radio labels in the
+ * finder. Those cannot be buttons - they are `<label>`s over real radios, so a
+ * keyboard gets arrow-key selection - but they have to be the same object on
+ * screen, and two copies of a bevel is how they stop being one.
+ */
+export const pressStyle = (background: string, color: string, held = false): CSSProperties => ({
+  background,
+  color,
+  boxShadow: `${pixelFrame(COLOR.ink)}, ${pixelBevel(held)}`,
+  ...(held ? { transform: `translate(${UNIT / 2}px, ${UNIT / 2}px)` } : null),
+});
+
 interface PressProps {
   children: ReactNode;
   /** the fill; pair it with the `on` colour the theme measured for it */
@@ -146,13 +159,7 @@ export function Press({
   className = "",
   style,
 }: PressProps) {
-  const shared: CSSProperties = {
-    background,
-    color,
-    boxShadow: `${pixelFrame(COLOR.ink)}, ${pixelBevel(held)}`,
-    ...(held ? { transform: `translate(${UNIT / 2}px, ${UNIT / 2}px)` } : null),
-    ...style,
-  };
+  const shared: CSSProperties = { ...pressStyle(background, color, held), ...style };
   const classes = `mpl-press inline-flex items-center justify-center gap-2 ${className}`;
 
   if (href) {

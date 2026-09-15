@@ -2,12 +2,12 @@
 
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { PixelPanel, Sprite } from "./pixel";
+import { PixelPanel, Sprite, pressStyle } from "./pixel";
 import { CROSS, COVERS, SHELVED, TICK } from "./sprites";
 import { ONCE, reveal, revealTransition, stagger } from "./motion";
 import { EXPERIENCE, GAMES, PARTY_SIZES, TIME_BUDGETS, type Weight } from "./data";
 import { findGames, type Verdict } from "./finder";
-import { ACCENT, COLOR, UNIT, dither, pixelBevel, pixelFrame, thaiStyle } from "./theme";
+import { ACCENT, COLOR, UNIT, dither, pixelFrame, thaiStyle } from "./theme";
 
 const WEIGHTS: Weight[] = ["เบา", "กลาง", "หนัก"];
 
@@ -55,13 +55,12 @@ function OptionGroup({ legend, hint, options, value, onChange, accent }: OptionG
                 className="sr-only"
               />
               <span
-                className="mpl-press h-11 min-w-11 px-4 text-base font-bold"
-                style={{
-                  background: active ? accent.value : COLOR.panel,
-                  color: active ? accent.on : COLOR.ink,
-                  boxShadow: `${pixelFrame(COLOR.ink)}, ${pixelBevel(active)}`,
-                  ...(active ? { transform: `translate(${UNIT / 2}px, ${UNIT / 2}px)` } : null),
-                }}
+                className="mpl-press inline-flex h-11 min-w-11 items-center justify-center px-4 text-base font-bold"
+                style={pressStyle(
+                  active ? accent.value : COLOR.panel,
+                  active ? accent.on : COLOR.ink,
+                  active,
+                )}
               >
                 {option.label}
               </span>
