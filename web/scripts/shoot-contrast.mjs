@@ -61,12 +61,18 @@ for (let y = 0; y < height; y += STEP) {
         color: cs.color,
         size: parseFloat(cs.fontSize),
         weight: cs.fontWeight,
-        // Padded by the ring the reader samples for the plate colour.
+        // The element's own box plus two pixels. The reader used to sample a
+        // 6px ring *outside* the box instead, which only works when the plate
+        // is larger than the text. On a pill, a badge or a button it is not:
+        // the ring landed on the page behind the control, and the navbar CTA
+        // and the active language label both reported 1.01:1 when they are
+        // ~19:1. Two pixels is enough to give a tiny box some plate to count
+        // without letting the page behind a small control outvote its fill.
         rect: {
-          x: Math.max(0, r.x - 6),
-          y: Math.max(0, r.y - 6),
-          width: Math.min(r.width + 12, 600),
-          height: r.height + 12,
+          x: Math.max(0, r.x - 2),
+          y: Math.max(0, r.y - 2),
+          width: Math.min(r.width + 4, 600),
+          height: r.height + 4,
         },
       });
     }
@@ -94,33 +100,56 @@ for (let y = 0; y < height; y += STEP) {
         ctx2.drawImage(img, 0, 0);
         const px = ctx2.getImageData(0, 0, cv.width, cv.height).data;
 
-        // Only the margin ring around the glyphs: inside the text box the most
-        // common colour can be the type itself, which would score 1:1.
-        const counts = new Map();
-        const ring = 6;
-        for (let y = 0; y < cv.height; y++) {
-          for (let x = 0; x < cv.width; x++) {
-            const inside =
-              x >= ring && x < cv.width - ring && y >= ring && y < cv.height - ring;
-            if (inside) continue;
-            const i = (y * cv.width + x) * 4;
-            const key = `${px[i] >> 3},${px[i + 1] >> 3},${px[i + 2] >> 3}`;
-            counts.set(key, (counts.get(key) ?? 0) + 1);
-          }
-        }
-        const [modeKey] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-        const plate = modeKey.split(",").map((v) => (Number(v) << 3) + 4);
-
-        // Text colours here carry alpha (oklab(... / 0.55)), so paint them over
-        // the plate rather than over whatever the canvas started as.
-        const toRgb = (c) => {
+        // The plate is the most common colour inside the text box once the
+        // glyphs are taken out of the histogram. Both halves matter: sampling
+        // the interior is what lets a pill, a badge or a button be measured
+        // against its own fill rather than the page behind it, and dropping the
+        // glyph pixels is what stops heavy display type from being counted as
+        // its own background, which is the reason the ring existed.
+        const paintOver = (base, c) => {
           ctx2.clearRect(0, 0, 1, 1);
-          ctx2.fillStyle = `rgb(${plate.join(",")})`;
+          ctx2.fillStyle = `rgb(${base.join(",")})`;
           ctx2.fillRect(0, 0, 1, 1);
           ctx2.fillStyle = c;
           ctx2.fillRect(0, 0, 1, 1);
           return [...ctx2.getImageData(0, 0, 1, 1).data].slice(0, 3);
         };
+
+        const total = px.length / 4;
+        const mode = (exclude) => {
+          const counts = new Map();
+          let kept = 0;
+          for (let i = 0; i < px.length; i += 4) {
+            if (exclude?.(px[i], px[i + 1], px[i + 2])) continue;
+            kept += 1;
+            const key = `${px[i] >> 3},${px[i + 1] >> 3},${px[i + 2] >> 3}`;
+            counts.set(key, (counts.get(key) ?? 0) + 1);
+          }
+          if (!kept) return null;
+          const [key] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+          return { rgb: key.split(",").map((v) => (Number(v) << 3) + 4), kept };
+        };
+
+        // Two passes. The first is only accurate enough to resolve a text
+        // colour that carries alpha; the second uses that to drop the glyphs.
+        const first = mode(null);
+        const ink = paintOver(first.rgb, color);
+        // Antialiased edges sit between the ink and the plate, so the cut has
+        // to be wide enough to take them along. If almost nothing survives it,
+        // the plate really is the same colour as the ink and the first pass is
+        // the honest answer: a genuine failure, reported as one. Heavy display
+        // type at a small size can cover more than half its own box, which is
+        // the case this second pass exists for.
+        const NEAR = 90;
+        const withoutInk = mode(
+          (r, g, b) => (r - ink[0]) ** 2 + (g - ink[1]) ** 2 + (b - ink[2]) ** 2 < NEAR ** 2,
+        );
+        const plate =
+          withoutInk && withoutInk.kept > total * 0.1 ? withoutInk.rgb : first.rgb;
+
+        // Text colours here carry alpha (oklab(... / 0.55)), so paint them over
+        // the plate rather than over whatever the canvas started as.
+        const toRgb = (c) => paintOver(plate, c);
         const lum = ([r, g, b]) =>
           [r, g, b]
             .map((v) => v / 255)

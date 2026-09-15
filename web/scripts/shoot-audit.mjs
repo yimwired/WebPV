@@ -165,10 +165,38 @@ const probe = (page) =>
       }
     }
 
-    // An accessible name is required on every control.
+    // An accessible name is required on every control. A form control never has
+    // text of its own, so reading only textContent reported every labelled
+    // input on the contact form as unnamed. Follow the same order the accname
+    // spec does for the sources a page like this actually uses.
+    const accessibleName = (el) => {
+      const byIds = (el.getAttribute("aria-labelledby") || "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((id) => document.getElementById(id)?.textContent?.trim() || "")
+        .join(" ");
+      if (byIds.trim()) return byIds.trim();
+      if (el.getAttribute("aria-label")?.trim()) return el.getAttribute("aria-label").trim();
+
+      if (el.matches("input, select, textarea")) {
+        // Both associations count: `for=` pointing at the id, and a `<label>`
+        // the control is nested inside.
+        const explicit = el.id ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`) : null;
+        const implicit = el.closest("label");
+        const labelText = (explicit || implicit)?.textContent?.trim();
+        if (labelText) return labelText;
+        if (el.getAttribute("title")?.trim()) return el.getAttribute("title").trim();
+        // A placeholder is a fallback name, not a label, but it does leave the
+        // control named. Anything without one is genuinely anonymous.
+        return el.getAttribute("placeholder")?.trim() || "";
+      }
+
+      return el.textContent?.trim() || el.getAttribute("title")?.trim() || "";
+    };
+
     const unnamed = [...document.querySelectorAll("a, button, input, select, textarea")]
       .filter((el) => el.getClientRects().length)
-      .filter((el) => !(el.textContent?.trim() || el.getAttribute("aria-label") || el.getAttribute("title")))
+      .filter((el) => !accessibleName(el))
       .map((el) => el.tagName + (el.className ? `.${String(el.className).slice(0, 40)}` : ""));
 
     const images = [...document.querySelectorAll("img")]
@@ -197,7 +225,15 @@ for (const route of ROUTES) {
     const errors = [];
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
     page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text().slice(0, 160)}`));
-    page.on("requestfailed", (r) => errors.push(`requestfailed: ${r.url().slice(0, 120)}`));
+    // A cancelled request is not a failed one. The router starts a full-route
+    // fetch alongside its segment prefetches and aborts whichever it no longer
+    // needs, so ERR_ABORTED is the normal path and reporting it buried the
+    // 404s that actually mattered.
+    page.on("requestfailed", (r) => {
+      const reason = r.failure()?.errorText ?? "";
+      if (reason === "net::ERR_ABORTED") return;
+      errors.push(`requestfailed: ${r.url().slice(0, 120)} (${reason})`);
+    });
 
     const res = await page.goto(BASE + route, { waitUntil: "load" });
     await page.waitForTimeout(800);
