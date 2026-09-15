@@ -144,6 +144,34 @@ const probe = (page) =>
         continue;
       }
 
+      // The ancestor walk only sees the element's own box tree, and on the
+      // scene pages the thing the text sits on is a sibling: a stack of
+      // full-bleed gradient layers, or a canvas, painted under the text but
+      // beside it in the DOM. `elementsFromPoint` is the paint stack as the
+      // browser actually assembled it, so if anything between this element and
+      // the ancestor the walk settled on paints a gradient, an image or a
+      // canvas, the plate above is fiction. /labs/contour's wordmark is the
+      // case: it reads the page's near-black root while the gradient sweep two
+      // siblings up is what is behind the letters.
+      if (r < (large ? 3 : 4.5)) {
+        const behind = document.elementsFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+        const painter = behind.slice(behind.indexOf(el) + 1).find((n) => {
+          if (n.tagName === "CANVAS" || n.tagName === "IMG" || n.tagName === "VIDEO") return true;
+          const bg = getComputedStyle(n);
+          if (bg.backgroundImage !== "none") return true;
+          const rgba = bg.backgroundColor.match(/[\d.]+/g)?.map(Number) ?? [];
+          return rgba.length >= 4 && rgba[3] > 0.02;
+        });
+        if (painter && !el.contains(painter) && !painter.contains(el)) {
+          unmeasurable.push({
+            text: label(el),
+            size,
+            why: `sits over a ${painter.tagName.toLowerCase()} painted beside it, not above it in the tree`,
+          });
+          continue;
+        }
+      }
+
       if (r < (large ? 3 : 4.5)) contrast.push({ text: label(el), size, ratio: +r.toFixed(2) });
     }
 

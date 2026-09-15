@@ -18,6 +18,34 @@ await page.goto(BASE + ROUTE, { waitUntil: "load" });
 // the base page colour as its plate.
 await page.waitForTimeout(4000);
 
+/**
+ * Wait until the scroll-driven opacities stop moving.
+ *
+ * A fixed wait is not enough on the heavy pages. `/labs/contour` drives four
+ * acts and two grounds off scroll progress while a WebGL scene renders every
+ * frame, so a frame can land well after a 900ms pause: the act wrapper still
+ * read fully opaque from the previous step while the ground behind it had
+ * already changed, and the same run reported 3, then 0, then 2 failures.
+ * Watching every inline opacity until three frames agree costs a few frames on
+ * a still page and makes the moving ones repeatable.
+ */
+const settle = async (target, frames = 60) => {
+  await target.evaluate(async (limit) => {
+    const snapshot = () =>
+      [...document.querySelectorAll("[style*='opacity']")]
+        .map((el) => getComputedStyle(el).opacity)
+        .join(",");
+    let last = snapshot();
+    let stable = 0;
+    for (let i = 0; i < limit && stable < 3; i += 1) {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+      const now = snapshot();
+      stable = now === last ? stable + 1 : 0;
+      last = now;
+    }
+  }, frames);
+};
+
 // Walk the page in viewport-sized steps so scroll-driven acts settle before
 // their text is measured.
 const results = [];
@@ -27,6 +55,7 @@ const STEP = Number(process.env.STEP ?? 400);
 for (let y = 0; y < height; y += STEP) {
   await page.evaluate((top) => window.scrollTo(0, top), y);
   await page.waitForTimeout(900);
+  await settle(page);
 
   const candidates = await page.evaluate(() => {
     const out = [];
@@ -79,26 +108,65 @@ for (let y = 0; y < height; y += STEP) {
     return out;
   });
 
-  for (const c of candidates) {
-    if (results.some((r) => r.text === c.text)) continue;
-    const shot = await page
-      .screenshot({ clip: c.rect, type: "png" })
-      .then((b) => b.toString("base64"))
-      .catch(() => null);
-    if (!shot) continue;
+  const fresh = candidates.filter((c) => !results.some((r) => r.text === c.text));
+  if (!fresh.length) continue;
 
-    // Text pixels are the extreme end of the histogram; the mode is the plate.
-    const measured = await reader.evaluate(
-      async ({ data, color }) => {
-        const img = new Image();
-        img.src = `data:image/png;base64,${data}`;
-        await img.decode();
-        const cv = document.createElement("canvas");
-        cv.width = img.width;
-        cv.height = img.height;
-        const ctx2 = cv.getContext("2d", { willReadFrequently: true });
-        ctx2.drawImage(img, 0, 0);
-        const px = ctx2.getImageData(0, 0, cv.width, cv.height).data;
+  /**
+   * One frame for the whole step, cropped per element in the reader.
+   *
+   * This used to take a screenshot per candidate, and on a page whose ground
+   * crossfades between acts that meant each element was measured against a
+   * different frame from the one whose opacity it was gated on. `/labs/contour`
+   * reported 3, then 0, then 2 failures across three identical runs, once with
+   * a plate of `rgb(12,12,12)` - the bare page colour, with none of the grounds
+   * painted. Gating and measuring on the same image makes the run repeatable.
+   */
+  const frame = await page
+    .screenshot({ type: "png" })
+    .then((b) => b.toString("base64"))
+    .catch(() => null);
+  if (!frame) continue;
+
+  // Text pixels are the extreme end of the histogram; the mode is the plate.
+  const measured = await reader.evaluate(
+    async ({ data, items }) => {
+      const img = new Image();
+      img.src = `data:image/png;base64,${data}`;
+      await img.decode();
+      const cv = document.createElement("canvas");
+      cv.width = img.width;
+      cv.height = img.height;
+      const ctx2 = cv.getContext("2d", { willReadFrequently: true });
+      ctx2.drawImage(img, 0, 0);
+
+      // A separate one-pixel canvas for resolving colours: compositing them on
+      // the frame canvas would paint over the top left of the page.
+      const swatch = document.createElement("canvas");
+      swatch.width = 1;
+      swatch.height = 1;
+      const swatchCtx = swatch.getContext("2d", { willReadFrequently: true });
+      const paintOver = (base, colour) => {
+        swatchCtx.clearRect(0, 0, 1, 1);
+        swatchCtx.fillStyle = `rgb(${base.join(",")})`;
+        swatchCtx.fillRect(0, 0, 1, 1);
+        swatchCtx.fillStyle = colour;
+        swatchCtx.fillRect(0, 0, 1, 1);
+        return [...swatchCtx.getImageData(0, 0, 1, 1).data].slice(0, 3);
+      };
+
+      const lum = ([r, g, b]) =>
+        [r, g, b]
+          .map((v) => v / 255)
+          .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+          .reduce((acc, v, i) => acc + v * [0.2126, 0.7152, 0.0722][i], 0);
+
+      return items.map(({ rect, color }) => {
+        const x = Math.max(0, Math.round(rect.x));
+        const y = Math.max(0, Math.round(rect.y));
+        const w = Math.min(Math.round(rect.width), cv.width - x);
+        const h = Math.min(Math.round(rect.height), cv.height - y);
+        if (w < 1 || h < 1) return null;
+        const px = ctx2.getImageData(x, y, w, h).data;
 
         // The plate is the most common colour inside the text box once the
         // glyphs are taken out of the histogram. Both halves matter: sampling
@@ -106,15 +174,6 @@ for (let y = 0; y < height; y += STEP) {
         // against its own fill rather than the page behind it, and dropping the
         // glyph pixels is what stops heavy display type from being counted as
         // its own background, which is the reason the ring existed.
-        const paintOver = (base, c) => {
-          ctx2.clearRect(0, 0, 1, 1);
-          ctx2.fillStyle = `rgb(${base.join(",")})`;
-          ctx2.fillRect(0, 0, 1, 1);
-          ctx2.fillStyle = c;
-          ctx2.fillRect(0, 0, 1, 1);
-          return [...ctx2.getImageData(0, 0, 1, 1).data].slice(0, 3);
-        };
-
         const total = px.length / 4;
         const mode = (exclude) => {
           const counts = new Map();
@@ -133,13 +192,13 @@ for (let y = 0; y < height; y += STEP) {
         // Two passes. The first is only accurate enough to resolve a text
         // colour that carries alpha; the second uses that to drop the glyphs.
         const first = mode(null);
-        const ink = paintOver(first.rgb, color);
         // Antialiased edges sit between the ink and the plate, so the cut has
         // to be wide enough to take them along. If almost nothing survives it,
         // the plate really is the same colour as the ink and the first pass is
         // the honest answer: a genuine failure, reported as one. Heavy display
         // type at a small size can cover more than half its own box, which is
         // the case this second pass exists for.
+        const ink = paintOver(first.rgb, color);
         const NEAR = 90;
         const withoutInk = mode(
           (r, g, b) => (r - ink[0]) ** 2 + (g - ink[1]) ** 2 + (b - ink[2]) ** 2 < NEAR ** 2,
@@ -149,21 +208,18 @@ for (let y = 0; y < height; y += STEP) {
 
         // Text colours here carry alpha (oklab(... / 0.55)), so paint them over
         // the plate rather than over whatever the canvas started as.
-        const toRgb = (c) => paintOver(plate, c);
-        const lum = ([r, g, b]) =>
-          [r, g, b]
-            .map((v) => v / 255)
-            .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
-            .reduce((acc, v, i) => acc + v * [0.2126, 0.7152, 0.0722][i], 0);
-        const [hi, lo] = [lum(toRgb(color)), lum(plate)].sort((a, b) => b - a);
+        const [hi, lo] = [lum(paintOver(plate, color)), lum(plate)].sort((a, b) => b - a);
         return { plate, ratio: +((hi + 0.05) / (lo + 0.05)).toFixed(2) };
-      },
-      { data: shot, color: c.color },
-    );
+      });
+    },
+    { data: frame, items: fresh.map((c) => ({ rect: c.rect, color: c.color })) },
+  );
 
+  fresh.forEach((c, i) => {
+    if (!measured[i]) return;
     const large = c.size >= 24 || (c.size >= 18.66 && Number(c.weight) >= 700);
-    results.push({ ...c, ...measured, floor: large ? 3 : 4.5 });
-  }
+    results.push({ ...c, ...measured[i], floor: large ? 3 : 4.5 });
+  });
 }
 
 const failures = results.filter((r) => r.ratio < r.floor);
