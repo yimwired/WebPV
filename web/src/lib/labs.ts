@@ -46,18 +46,6 @@ export const labs: Lab[] = [
     buildTime: "Three to four days, and no photography at all",
   },
   {
-    slug: "prism",
-    name: "Prism",
-    vibe: "OS surface, real glass",
-    description:
-      "Glass built the way a lens behaves rather than the way a blur filter does: the backdrop bends hardest at the rim, each colour channel bends by a different amount so the edge carries a fringe, and the sheet flips dark or light on its own to keep its text readable over whatever photograph is behind it. Every layer has a switch, so the claim is something you check rather than something the page says.",
-    accent: "#7fd4ff",
-    preview: { from: "#0b1620", to: "#08090c" },
-    bestFor:
-      "Apps, dashboards, anything with a lot of controls on screen at once",
-    buildTime: "About a week, the readable-over-anything part is the work",
-  },
-  {
     slug: "ember",
     name: "Ember",
     vibe: "Food chain, full volume",
@@ -93,15 +81,15 @@ export const labs: Lab[] = [
     buildTime: "Two weeks, the 3D object is the work",
   },
   {
-    slug: "meridian",
-    name: "Meridian",
-    vibe: "Machined hardware",
+    slug: "cart",
+    name: "Cart",
+    vibe: "One product, one page",
     description:
-      "A milled aluminium control deck: keycaps on translateZ, a knurled encoder, a scroll-pinned walkthrough and a configurator that recolours every deck on the page at once.",
-    accent: "#f7a445",
-    preview: { from: "#101012", to: "#2a2723" },
-    bestFor: "Hardware, devices, engineering-led products",
-    buildTime: "About a week",
+      "The single product page, in the register the genre actually works in. Off-black with one acid accent that only ever means buy, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it. The scarcity theatre is left out on purpose.",
+    accent: "#c8f04a",
+    preview: { from: "#141416", to: "#0b0b0c" },
+    bestFor: "One hero product, dropshipping, a launch, a pre-order",
+    buildTime: "Four days once the product photos exist",
   },
   {
     slug: "counter",
@@ -124,6 +112,17 @@ export const labs: Lab[] = [
     preview: { from: "#0e262a", to: "#07191c" },
     bestFor: "Tours, boat charters, dive shops, anything sold by the seat",
     buildTime: "Three to five weeks with a booking back end",
+  },
+  {
+    slug: "stall",
+    name: "Stall",
+    vibe: "Marketplace, sign in and list",
+    description:
+      "Accounts, listings, search and filters: the plain marketplace people keep asking for. Buyers message the seller directly and the site never holds the money, which is the version worth building.",
+    accent: "#facc15",
+    preview: { from: "#171a20", to: "#0e1013" },
+    bestFor: "Classifieds, second-hand goods, in-game accounts and items",
+    buildTime: "Two to three weeks, the accounts are the work",
   },
   {
     slug: "minimal",
@@ -159,6 +158,18 @@ export const archivedLabs: Lab[] = [
     buildTime: "Four days once the pieces are photographed",
   },
   {
+    slug: "prism",
+    name: "Prism",
+    vibe: "OS surface, real glass",
+    description:
+      "Glass built the way a lens behaves rather than the way a blur filter does: the backdrop bends hardest at the rim, each colour channel bends by a different amount so the edge carries a fringe, and the sheet flips dark or light on its own to keep its text readable over whatever photograph is behind it. Every layer has a switch, so the claim is something you check rather than something the page says.",
+    accent: "#7fd4ff",
+    preview: { from: "#0b1620", to: "#08090c" },
+    bestFor:
+      "Apps, dashboards, anything with a lot of controls on screen at once",
+    buildTime: "About a week, the readable-over-anything part is the work",
+  },
+  {
     slug: "contour",
     name: "Contour",
     vibe: "Packaging, real-time 3D",
@@ -181,26 +192,15 @@ export const archivedLabs: Lab[] = [
     buildTime: "About a week",
   },
   {
-    slug: "cart",
-    name: "Cart",
-    vibe: "One product, one page",
+    slug: "meridian",
+    name: "Meridian",
+    vibe: "Machined hardware",
     description:
-      "The single product page, in the register the genre actually works in. Off-black with one acid accent that only ever means buy, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it. The scarcity theatre is left out on purpose.",
-    accent: "#c8f04a",
-    preview: { from: "#141416", to: "#0b0b0c" },
-    bestFor: "One hero product, dropshipping, a launch, a pre-order",
-    buildTime: "Four days once the product photos exist",
-  },
-  {
-    slug: "stall",
-    name: "Stall",
-    vibe: "Marketplace, sign in and list",
-    description:
-      "Accounts, listings, search and filters: the plain marketplace people keep asking for. Buyers message the seller directly and the site never holds the money, which is the version worth building.",
-    accent: "#facc15",
-    preview: { from: "#171a20", to: "#0e1013" },
-    bestFor: "Classifieds, second-hand goods, in-game accounts and items",
-    buildTime: "Two to three weeks, the accounts are the work",
+      "A milled aluminium control deck: keycaps on translateZ, a knurled encoder, a scroll-pinned walkthrough and a configurator that recolours every deck on the page at once.",
+    accent: "#f7a445",
+    preview: { from: "#101012", to: "#2a2723" },
+    bestFor: "Hardware, devices, engineering-led products",
+    buildTime: "About a week",
   },
   {
     slug: "playroom",
