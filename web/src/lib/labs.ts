@@ -34,17 +34,6 @@ export const labs: Lab[] = [
     buildTime: "About a week, and the sprites are most of it",
   },
   {
-    slug: "kiln",
-    name: "Kiln",
-    vibe: "Wabi-sabi, one-off goods",
-    description:
-      "A studio that sells ceramics no two of which are alike, so the page points at what is wrong with each piece instead of finding a flattering angle. The marks are plotted on the photograph itself and each one says what caused it. The quietest page here: no shadows, no borders past a hairline, and hierarchy carried by space rather than weight.",
-    accent: "#7a4c30",
-    preview: { from: "#f4efe5", to: "#d9cdb8" },
-    bestFor: "Makers, ceramics, coffee, anything sold one piece at a time",
-    buildTime: "Four days once the pieces are photographed",
-  },
-  {
     slug: "slab",
     name: "Slab",
     vibe: "Neo-brutalism, loud and flat",
@@ -52,19 +41,9 @@ export const labs: Lab[] = [
       "Hard borders, flat offset shadows with no blur in them anywhere, and controls that travel onto their own shadow when you press them. The palette belongs to the product rather than the page: pick a different course from the top bar and the whole site repaints, which is the part a client actually wants to see before committing to a colour this loud.",
     accent: "#ffe14d",
     preview: { from: "#fffdf5", to: "#ffe14d" },
-    bestFor: "Courses, startups, agencies, anything that would rather be seen than trusted quietly",
+    bestFor:
+      "Courses, startups, agencies, anything that would rather be seen than trusted quietly",
     buildTime: "Three to four days, and no photography at all",
-  },
-  {
-    slug: "prism",
-    name: "Prism",
-    vibe: "OS surface, real glass",
-    description:
-      "Glass built the way a lens behaves rather than the way a blur filter does: the backdrop bends hardest at the rim, each colour channel bends by a different amount so the edge carries a fringe, and the sheet flips dark or light on its own to keep its text readable over whatever photograph is behind it. Every layer has a switch, so the claim is something you check rather than something the page says.",
-    accent: "#7fd4ff",
-    preview: { from: "#0b1620", to: "#08090c" },
-    bestFor: "Apps, dashboards, anything with a lot of controls on screen at once",
-    buildTime: "About a week, the readable-over-anything part is the work",
   },
   {
     slug: "ember",
@@ -74,19 +53,9 @@ export const labs: Lab[] = [
       "A charcoal grill buffet sold the way Thai food brands actually sell: cream and one chilli red, type at full volume, stickers, and product cards that lift off the page. Press a set or a branch and the panel grows out of the card you pressed, with the page behind it frozen until it closes.",
     accent: "#d81f14",
     preview: { from: "#fbf1de", to: "#a8140c" },
-    bestFor: "Restaurant chains, street food brands, anywhere with branches and a menu",
+    bestFor:
+      "Restaurant chains, street food brands, anywhere with branches and a menu",
     buildTime: "About a week once the food is photographed",
-  },
-  {
-    slug: "contour",
-    name: "Contour",
-    vibe: "Packaging, real-time 3D",
-    description:
-      "One drink in three pack sizes, lathed in WebGL from published dimensions and wearing labels painted in the browser. Scroll and it plays out in four acts: the family, one pack filling the frame, the turn to the back panel, then the range to scale. An unofficial brand study.",
-    accent: "#f40009",
-    preview: { from: "#c11119", to: "#2c0104" },
-    bestFor: "Drinks, cosmetics, anything sold as a range of sizes",
-    buildTime: "Two weeks, the packaging models are the work",
   },
   {
     slug: "unfold",
@@ -96,7 +65,8 @@ export const labs: Lab[] = [
       "One folding desk light, sold the way a hardware launch page sells one: each section states a single thing and the media that proves it sits in a frame of its own. The clip of the lamp opening starts when you reach it and stops when it is done, and the colour-temperature slider relights the photograph rather than swapping to a second one.",
     accent: "#ffc489",
     preview: { from: "#191512", to: "#4a3524" },
-    bestFor: "Launching one product: gadgets, appliances, anything with a spec sheet",
+    bestFor:
+      "Launching one product: gadgets, appliances, anything with a spec sheet",
     buildTime: "About ten days, plus the product shots",
   },
   {
@@ -109,28 +79,6 @@ export const labs: Lab[] = [
     preview: { from: "#f4f2ef", to: "#dcd8d2" },
     bestFor: "Jewellery, watches, anything sold on one hero object",
     buildTime: "Two weeks, the 3D object is the work",
-  },
-  {
-    slug: "sable",
-    name: "Sable",
-    vibe: "Product, ink on paper",
-    description:
-      "A fictional e-ink writing slate, drawn entirely in CSS with one light source. The text field on the page drives the panel at the hardware's real 41 ms latency, full-refresh flicker included.",
-    accent: "#a8432b",
-    preview: { from: "#f6f5f2", to: "#e4e1da" },
-    bestFor: "Physical products, tools, anything you want to feel touchable",
-    buildTime: "About a week",
-  },
-  {
-    slug: "meridian",
-    name: "Meridian",
-    vibe: "Machined hardware",
-    description:
-      "A milled aluminium control deck: keycaps on translateZ, a knurled encoder, a scroll-pinned walkthrough and a configurator that recolours every deck on the page at once.",
-    accent: "#f7a445",
-    preview: { from: "#101012", to: "#2a2723" },
-    bestFor: "Hardware, devices, engineering-led products",
-    buildTime: "About a week",
   },
   {
     slug: "cart",
@@ -175,6 +123,84 @@ export const labs: Lab[] = [
     preview: { from: "#171a20", to: "#0e1013" },
     bestFor: "Classifieds, second-hand goods, in-game accounts and items",
     buildTime: "Two to three weeks, the accounts are the work",
+  },
+  {
+    slug: "minimal",
+    name: "Grid",
+    vibe: "Swiss minimal",
+    description:
+      "White space, a strict grid, one red accent. International-typographic-style discipline applied to a personal index page.",
+    accent: "#e11d48",
+    preview: { from: "#fafafa", to: "#e5e5e5" },
+    bestFor: "Consultants, writers and studios selling clarity",
+    buildTime: "Under a week",
+  },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  Retired from the gallery on 2026-09-16, kept for reference.
+//  Nothing imports this: these demos are off the gallery, the home
+//  strip, the switcher, the sitemap and llms.txt. Their routes still
+//  build and still answer on a direct URL, so a link can be handed out
+//  one at a time. Move an entry back into `labs` above to relist it.
+//  เก็บไว้ดูเอง ลูกค้าหาไม่เจอแต่เปิดตรงได้
+// ─────────────────────────────────────────────────────────────
+export const archivedLabs: Lab[] = [
+  {
+    slug: "kiln",
+    name: "Kiln",
+    vibe: "Wabi-sabi, one-off goods",
+    description:
+      "A studio that sells ceramics no two of which are alike, so the page points at what is wrong with each piece instead of finding a flattering angle. The marks are plotted on the photograph itself and each one says what caused it. The quietest page here: no shadows, no borders past a hairline, and hierarchy carried by space rather than weight.",
+    accent: "#7a4c30",
+    preview: { from: "#f4efe5", to: "#d9cdb8" },
+    bestFor: "Makers, ceramics, coffee, anything sold one piece at a time",
+    buildTime: "Four days once the pieces are photographed",
+  },
+  {
+    slug: "prism",
+    name: "Prism",
+    vibe: "OS surface, real glass",
+    description:
+      "Glass built the way a lens behaves rather than the way a blur filter does: the backdrop bends hardest at the rim, each colour channel bends by a different amount so the edge carries a fringe, and the sheet flips dark or light on its own to keep its text readable over whatever photograph is behind it. Every layer has a switch, so the claim is something you check rather than something the page says.",
+    accent: "#7fd4ff",
+    preview: { from: "#0b1620", to: "#08090c" },
+    bestFor:
+      "Apps, dashboards, anything with a lot of controls on screen at once",
+    buildTime: "About a week, the readable-over-anything part is the work",
+  },
+  {
+    slug: "contour",
+    name: "Contour",
+    vibe: "Packaging, real-time 3D",
+    description:
+      "One drink in three pack sizes, lathed in WebGL from published dimensions and wearing labels painted in the browser. Scroll and it plays out in four acts: the family, one pack filling the frame, the turn to the back panel, then the range to scale. An unofficial brand study.",
+    accent: "#f40009",
+    preview: { from: "#c11119", to: "#2c0104" },
+    bestFor: "Drinks, cosmetics, anything sold as a range of sizes",
+    buildTime: "Two weeks, the packaging models are the work",
+  },
+  {
+    slug: "sable",
+    name: "Sable",
+    vibe: "Product, ink on paper",
+    description:
+      "A fictional e-ink writing slate, drawn entirely in CSS with one light source. The text field on the page drives the panel at the hardware's real 41 ms latency, full-refresh flicker included.",
+    accent: "#a8432b",
+    preview: { from: "#f6f5f2", to: "#e4e1da" },
+    bestFor: "Physical products, tools, anything you want to feel touchable",
+    buildTime: "About a week",
+  },
+  {
+    slug: "meridian",
+    name: "Meridian",
+    vibe: "Machined hardware",
+    description:
+      "A milled aluminium control deck: keycaps on translateZ, a knurled encoder, a scroll-pinned walkthrough and a configurator that recolours every deck on the page at once.",
+    accent: "#f7a445",
+    preview: { from: "#101012", to: "#2a2723" },
+    bestFor: "Hardware, devices, engineering-led products",
+    buildTime: "About a week",
   },
   {
     slug: "playroom",
@@ -252,16 +278,5 @@ export const labs: Lab[] = [
     preview: { from: "#f5efe4", to: "#d9c8a3" },
     bestFor: "Restaurants, ateliers, weddings, quiet luxury",
     buildTime: "About a week",
-  },
-  {
-    slug: "minimal",
-    name: "Grid",
-    vibe: "Swiss minimal",
-    description:
-      "White space, a strict grid, one red accent. International-typographic-style discipline applied to a personal index page.",
-    accent: "#e11d48",
-    preview: { from: "#fafafa", to: "#e5e5e5" },
-    bestFor: "Consultants, writers and studios selling clarity",
-    buildTime: "Under a week",
   },
 ];
