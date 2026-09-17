@@ -23,29 +23,6 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
-    slug: "loom",
-    name: "Loom",
-    vibe: "Bohemian, warm and woven",
-    description:
-      "A three-room guesthouse that prices the same nights two ways. Pick your dates and the panel quotes the direct rate beside what an agent would list it at, because the 15 to 18 percent they take is the one number a listing can never show you and the owner's own site always can. The calendar says how many rooms are left on every night rather than only whether the house is full.",
-    accent: "#a8492a",
-    preview: { from: "#f4ece0", to: "#c99a6a" },
-    bestFor:
-      "Guesthouses, homestays, small resorts, anywhere fighting a booking site",
-    buildTime: "A week and a half once the rooms are photographed",
-  },
-  {
-    slug: "rack",
-    name: "Rack",
-    vibe: "Y2K, chrome and windows",
-    description:
-      "A second-hand clothing shop, where every piece is the only one of itself and the size on its label was printed in another country twenty years ago. So the rail asks for your own chest measurement instead, and answers with what fits, what does not, and by how many inches in which direction. Nothing on it is photographed: each garment is drawn from the numbers the shop measured, so the 26 inch piece really is wider on screen than the 17 inch one.",
-    accent: "#ff2d94",
-    preview: { from: "#99a6cf", to: "#4a5480" },
-    bestFor: "Vintage and second-hand, anywhere every item is one of one",
-    buildTime: "About a week, and the measurements are most of it",
-  },
-  {
     slug: "meeple",
     name: "Meeple",
     vibe: "Pixel art, drawn by hand",
@@ -169,6 +146,29 @@ export const labs: Lab[] = [
 //  เก็บไว้ดูเอง ลูกค้าหาไม่เจอแต่เปิดตรงได้
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
+  {
+    slug: "loom",
+    name: "Loom",
+    vibe: "Bohemian, warm and woven",
+    description:
+      "A three-room guesthouse that prices the same nights two ways. Pick your dates and the panel quotes the direct rate beside what an agent would list it at, because the 15 to 18 percent they take is the one number a listing can never show you and the owner's own site always can. The calendar says how many rooms are left on every night rather than only whether the house is full.",
+    accent: "#a8492a",
+    preview: { from: "#f4ece0", to: "#c99a6a" },
+    bestFor:
+      "Guesthouses, homestays, small resorts, anywhere fighting a booking site",
+    buildTime: "A week and a half once the rooms are photographed",
+  },
+  {
+    slug: "rack",
+    name: "Rack",
+    vibe: "Y2K, chrome and windows",
+    description:
+      "A second-hand clothing shop, where every piece is the only one of itself and the size on its label was printed in another country twenty years ago. So the rail asks for your own chest measurement instead, and answers with what fits, what does not, and by how many inches in which direction. Nothing on it is photographed: each garment is drawn from the numbers the shop measured, so the 26 inch piece really is wider on screen than the 17 inch one.",
+    accent: "#ff2d94",
+    preview: { from: "#99a6cf", to: "#4a5480" },
+    bestFor: "Vintage and second-hand, anywhere every item is one of one",
+    buildTime: "About a week, and the measurements are most of it",
+  },
   {
     slug: "kiln",
     name: "Kiln",
