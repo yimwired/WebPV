@@ -6,8 +6,7 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const labCardVersions: Record<string, string> = {
-  "loom": "e2f64a50",
-  "rack": "96446706",
+  "gaze": "d3f69857",
   "meeple": "08a29a94",
   "slab": "83a94b72",
   "ember": "451faf74",

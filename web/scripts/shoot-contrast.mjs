@@ -7,8 +7,13 @@ import { chromium } from "playwright";
 const BASE = process.env.SHOOT_URL || "http://127.0.0.1:8788";
 const ROUTE = process.env.ROUTE || "/labs/contour";
 
+// Defaults to desktop, where most of the labs put their hardest text. Pages
+// that only overlap text and artwork at one width take WIDTH/HEIGHT.
+const WIDTH = Number(process.env.WIDTH) || 1440;
+const HEIGHT = Number(process.env.HEIGHT) || 900;
+
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const ctx = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT } });
 const page = await ctx.newPage();
 const reader = await ctx.newPage();
 await reader.goto("about:blank");
