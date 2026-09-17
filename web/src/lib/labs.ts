@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "rack",
+    name: "Rack",
+    vibe: "Y2K, chrome and windows",
+    description:
+      "A second-hand clothing shop, where every piece is the only one of itself and the size on its label was printed in another country twenty years ago. So the rail asks for your own chest measurement instead, and answers with what fits, what does not, and by how many inches in which direction. Nothing on it is photographed: each garment is drawn from the numbers the shop measured, so the 26 inch piece really is wider on screen than the 17 inch one.",
+    accent: "#ff2d94",
+    preview: { from: "#99a6cf", to: "#4a5480" },
+    bestFor: "Vintage and second-hand, anywhere every item is one of one",
+    buildTime: "About a week, and the measurements are most of it",
+  },
+  {
     slug: "meeple",
     name: "Meeple",
     vibe: "Pixel art, drawn by hand",
