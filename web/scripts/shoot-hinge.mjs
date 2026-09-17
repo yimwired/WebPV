@@ -81,6 +81,18 @@ const sampleUntil = async (page, ready, timeout = 15000) => {
   return last;
 };
 
+/**
+ * The export presets, and the file each one has to produce. The three fixed
+ * frames exist so a shot needs no crop after it is saved, which only holds if
+ * the PNG is exactly the size on the button.
+ */
+const EXPORT_FRAMES = [
+  { label: "9:16", slug: "vertical", size: { width: 1080, height: 1920 } },
+  { label: "1:1", slug: "square", size: { width: 1440, height: 1440 } },
+  { label: "16:9", slug: "wide", size: { width: 1920, height: 1080 } },
+  { label: "Frame", slug: "frame", size: null },
+];
+
 /** A 600x400 PNG, red on the left half and blue on the right. */
 const splitImage = async (page) => {
   const encoded = await page.evaluate(() => {
@@ -196,7 +208,7 @@ for (const size of SIZES) {
     findings.push(`${size.name}: clearing the inner display left the artwork on it`);
   }
 
-  // 4. export has to produce a PNG larger than the frame on screen
+  // 4. every export frame has to come out at exactly the size it advertises
   await page.locator('input[type="file"]').first().setInputFiles({
     name: "split.png",
     mimeType: "image/png",
@@ -204,45 +216,85 @@ for (const size of SIZES) {
   });
   await sleep(900);
 
-  // The listener has to be attached before the click, but awaiting them
-  // together swallows which of the two actually failed.
-  const downloading = page.waitForEvent("download", { timeout: 90000 });
-  await page.getByRole("button", { name: /Export PNG/i }).click();
-  const download = await downloading.catch(async (error) => {
-    const said = await page.evaluate(() => {
-      const status = document.querySelector('[role="status"]');
-      const gl = document.querySelector("canvas")?.getContext("webgl2");
-      return {
-        status: status ? status.textContent : "(nothing said)",
-        contextLost: gl ? gl.isContextLost() : "no webgl2 handle",
-      };
+  const exportOnce = async () => {
+    // The listener has to be attached before the click, but awaiting them
+    // together swallows which of the two actually failed.
+    const downloading = page.waitForEvent("download", { timeout: 90000 });
+    await page.getByRole("button", { name: /Export PNG/i }).click();
+    const download = await downloading.catch(async (error) => {
+      const said = await page.evaluate(() => {
+        const status = document.querySelector('[role="status"]');
+        const gl = document.querySelector("canvas")?.getContext("webgl2");
+        return {
+          status: status ? status.textContent : "(nothing said)",
+          contextLost: gl ? gl.isContextLost() : "no webgl2 handle",
+        };
+      });
+      console.log(`  [${size.name}] export never downloaded:`, said, "console:", errors);
+      throw error;
     });
-    console.log(`  [${size.name}] export never downloaded:`, said, "console:", errors);
-    throw error;
-  });
+    const bytes = await readFile(await download.path());
+    return { bytes, ...pngSize(bytes), name: download.suggestedFilename() };
+  };
 
-  const saved = await download.path();
-  const bytes = await readFile(saved);
-  const exported = pngSize(bytes);
-  const canvasBox = await page.locator("canvas").first().boundingBox();
+  for (const preset of EXPORT_FRAMES) {
+    await page.getByRole("button", { name: preset.label, exact: true }).click();
+    await sleep(500);
 
-  if (bytes.length < 20_000) {
-    findings.push(`${size.name}: the exported PNG is only ${bytes.length} bytes`);
+    // The canvas is reshaped by the preset, so it has to be measured after the
+    // choice rather than once before the loop.
+    const canvasBox = await page.locator("canvas").first().boundingBox();
+    const ratio = canvasBox.width / canvasBox.height;
+    if (preset.size && Math.abs(ratio - preset.size.width / preset.size.height) > 0.02) {
+      findings.push(
+        `${size.name}: with ${preset.label} chosen the canvas is ${ratio.toFixed(3)} on screen, ` +
+          `not the ${(preset.size.width / preset.size.height).toFixed(3)} it exports at`,
+      );
+    }
+
+    const shot = await exportOnce();
+    const want = preset.size ?? {
+      width: Math.round(canvasBox.width * 3),
+      height: Math.round(canvasBox.height * 3),
+    };
+
+    if (shot.bytes.length < 20_000) {
+      findings.push(`${size.name}: the ${preset.label} export is only ${shot.bytes.length} bytes`);
+    }
+    // The canvas is measured in CSS pixels and can land on a half, so the
+    // "Frame" preset is allowed a pixel of rounding either way.
+    const slack = preset.size ? 0 : 3;
+    if (
+      Math.abs(shot.width - want.width) > slack ||
+      Math.abs(shot.height - want.height) > slack
+    ) {
+      findings.push(
+        `${size.name}: the ${preset.label} export came out ${shot.width}x${shot.height}, ` +
+          `not ${want.width}x${want.height}`,
+      );
+    }
+    if (preset.slug && !shot.name.includes(preset.slug)) {
+      findings.push(
+        `${size.name}: the ${preset.label} export was saved as "${shot.name}", ` +
+          `which does not say which frame it is`,
+      );
+    }
   }
-  if (exported.width < canvasBox.width * 2.5) {
-    findings.push(
-      `${size.name}: the export is ${exported.width}px wide for a ${Math.round(canvasBox.width)}px ` +
-        `frame, which is not the 3x it claims`,
-    );
-  }
 
-  // 5. the canvas has to come back to its own resolution afterwards
+  // back to the vertical frame for the rest of the pass
+  await page.getByRole("button", { name: "9:16", exact: true }).click();
+  await sleep(300);
+
+  // 5. an export renders the canvas at the file's size, so the element has to
+  // be back at its own afterwards or the page is left showing a scaled buffer
+  const beforeExport = await page.locator("canvas").first().boundingBox();
+  await exportOnce();
   await sleep(600);
   const afterExport = await page.locator("canvas").first().boundingBox();
-  if (Math.abs(afterExport.width - canvasBox.width) > 2) {
+  if (Math.abs(afterExport.width - beforeExport.width) > 2) {
     findings.push(
       `${size.name}: the canvas did not return to its own size after an export ` +
-        `(${Math.round(canvasBox.width)} then ${Math.round(afterExport.width)})`,
+        `(${Math.round(beforeExport.width)} then ${Math.round(afterExport.width)})`,
     );
   }
 

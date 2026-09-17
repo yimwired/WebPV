@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useReducedMotion } from "framer-motion";
 import { CanvasTexture, SRGBColorSpace, type Texture } from "three";
@@ -31,6 +31,27 @@ const FINISHES = [
   { id: "chalk", name: "Chalk", color: "#d8d6d1" },
   { id: "bronze", name: "Bronze", color: "#8a6a49" },
 ] as const;
+
+/**
+ * What an export comes out as. The three fixed frames are the sizes the shot
+ * is actually going into - a vertical post, a square tile, a slide - so the
+ * file needs no crop after it is saved. "Frame" keeps whatever shape the
+ * canvas happens to be and just renders it larger.
+ */
+const FRAMES = [
+  { id: "frame", name: "Frame", note: "the shape on screen, 3x" },
+  {
+    id: "vertical",
+    name: "9:16",
+    width: 1080,
+    height: 1920,
+    note: "1080 x 1920",
+  },
+  { id: "square", name: "1:1", width: 1440, height: 1440, note: "1440 x 1440" },
+  { id: "wide", name: "16:9", width: 1920, height: 1080, note: "1920 x 1080" },
+] as const;
+
+type FrameId = (typeof FRAMES)[number]["id"];
 
 /** Enough to stop a video file or a RAW dump being decoded into memory. */
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -164,9 +185,12 @@ export function HingeDemo() {
     inner: null,
     outer: null,
   });
+  const [frame, setFrame] = useState<FrameId>("vertical");
   const [problem, setProblem] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const stage = useRef<HTMLDivElement>(null);
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const capture = useRef<CaptureFn | null>(null);
   const onCaptureReady = useCallback((fn: CaptureFn) => {
     capture.current = fn;
@@ -178,6 +202,22 @@ export function HingeDemo() {
   // free the inner display's texture while it was still on screen. The last
   // pair does not need freeing by hand — the canvas goes with the page, and
   // the GPU allocation goes with the canvas.
+
+  // The stage is measured rather than sized in CSS: `container-type: size`
+  // reports zero on a phone, where the column takes its height from a
+  // min-height rather than from a parent that has one, and a canvas of zero
+  // never renders at all.
+  useEffect(() => {
+    const element = stage.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setStageSize({ width, height });
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   const loadPanel = async (panel: PanelId, file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -216,7 +256,18 @@ export function HingeDemo() {
 
     setSaving(true);
     try {
-      const blob = await capture.current(3);
+      const chosen = FRAMES.find((f) => f.id === frame) ?? FRAMES[0];
+      const box = stage.current
+        ?.querySelector("canvas")
+        ?.getBoundingClientRect();
+      const width =
+        "width" in chosen ? chosen.width : Math.round((box?.width ?? 1280) * 3);
+      const height =
+        "height" in chosen
+          ? chosen.height
+          : Math.round((box?.height ?? 720) * 3);
+
+      const blob = await capture.current(width, height);
       if (!blob) {
         setProblem("The renderer returned nothing. Try again.");
         return;
@@ -228,7 +279,7 @@ export function HingeDemo() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `hinge-${Date.now()}.png`;
+      link.download = `hinge-${frame}-${Date.now()}.png`;
       document.body.append(link);
       link.click();
       link.remove();
@@ -242,6 +293,18 @@ export function HingeDemo() {
 
   const body = FINISHES.find((f) => f.id === finish) ?? FINISHES[0];
   const degrees = Math.round(180 - fold * 180);
+
+  // Only the fixed frames crop; "Frame" is whatever shape the canvas already is.
+  const chosenFrame = FRAMES.find((f) => f.id === frame) ?? FRAMES[0];
+  const cropFrame = "width" in chosenFrame ? chosenFrame : null;
+
+  // Letterboxed inside the stage: as wide as it goes without getting taller.
+  const stageBox = (() => {
+    if (!cropFrame || stageSize.width === 0) return null;
+    const ratio = cropFrame.width / cropFrame.height;
+    const width = Math.min(stageSize.width, stageSize.height * ratio);
+    return { width, height: width / ratio };
+  })();
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-neutral-950 text-neutral-100">
@@ -324,6 +387,34 @@ export function HingeDemo() {
               </div>
             </fieldset>
 
+            <fieldset>
+              <legend className="text-sm text-neutral-300">Export frame</legend>
+              <div className="mt-2 grid grid-cols-4 gap-2">
+                {FRAMES.map((option) => {
+                  const active = option.id === frame;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setFrame(option.id)}
+                      aria-pressed={active}
+                      title={option.note}
+                      className={`rounded-lg border px-1 py-2 text-xs transition-colors ${
+                        active
+                          ? "border-amber-300/60 bg-amber-300/10 text-white"
+                          : "border-white/12 text-neutral-400 hover:border-white/25 hover:text-neutral-200"
+                      }`}
+                    >
+                      {option.name}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 font-mono text-[11px] text-neutral-500">
+                {(FRAMES.find((f) => f.id === frame) ?? FRAMES[0]).note}
+              </p>
+            </fieldset>
+
             <div className="space-y-2.5">
               {(Object.keys(PANELS) as PanelId[]).map((panel) => (
                 <DropZone
@@ -363,9 +454,10 @@ export function HingeDemo() {
             </div>
 
             <p className="text-[11px] leading-relaxed text-neutral-500">
-              Exports at three times the size of the frame on screen, on a
-              transparent background. Drag the device to turn it. An unofficial
-              study: this is not any manufacturer&rsquo;s artwork or branding.
+              The stage is the frame: what you see is the file, on a transparent
+              background, so the shot drops straight onto whatever it is going
+              into. Drag the device to turn it. An unofficial study: this is not
+              any manufacturer&rsquo;s artwork or branding.
             </p>
           </div>
         </div>
@@ -375,16 +467,36 @@ export function HingeDemo() {
           against an auto-height parent resolves to zero: without the absolute
           layer here the scene renders at the 350x150 a canvas defaults to.
         */}
-        <div className="relative min-h-[60vh] flex-1 lg:min-h-0">
-          <div className="absolute inset-0">
-            <HingeScene
-              fold={fold}
-              inner={artwork.inner}
-              outer={artwork.outer}
-              bodyColor={body.color}
-              damping={!reduced}
-              onCaptureReady={onCaptureReady}
-            />
+        {/*
+          The canvas is given the shape of the export, so what is on screen is
+          the file: no crop overlay to reconcile, and no reframing at capture
+          time that could disagree with the preview. Sizing is container query
+          units rather than a measured width in state, which is what "contain"
+          means in one line: as wide as the stage, but never taller than it.
+        */}
+        <div ref={stage} className="relative min-h-[60vh] flex-1 lg:min-h-0">
+          <div className="absolute inset-0 grid place-items-center">
+            <div
+              // The export is transparent, so without an outline the frame
+              // has no visible edge against the page behind it.
+              className={`relative overflow-hidden ${
+                stageBox ? "rounded-sm outline outline-1 outline-white/12" : ""
+              }`}
+              style={
+                stageBox
+                  ? { width: stageBox.width, height: stageBox.height }
+                  : { width: "100%", height: "100%" }
+              }
+            >
+              <HingeScene
+                fold={fold}
+                inner={artwork.inner}
+                outer={artwork.outer}
+                bodyColor={body.color}
+                damping={!reduced}
+                onCaptureReady={onCaptureReady}
+              />
+            </div>
           </div>
         </div>
       </div>
