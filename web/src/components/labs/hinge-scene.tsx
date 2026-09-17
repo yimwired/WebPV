@@ -10,6 +10,7 @@ import {
   Shape,
   SRGBColorSpace,
   Texture,
+  type PerspectiveCamera,
 } from "three";
 
 import { SceneCanvas } from "./scene-canvas";
@@ -57,6 +58,19 @@ const CORNER = 9;
 
 /** Lifted off the panel so the display never fights the body for the pixel. */
 const SCREEN_LIFT = 0.12;
+
+/** Vertical angle of the lens. */
+const CAMERA_FOV = 28;
+
+/**
+ * What the shot has to hold, in world units: the device at full stretch plus a
+ * margin. Taken from the open width rather than the current fold so the camera
+ * does not creep in and out while the fold slider is being dragged.
+ */
+const SUBJECT = {
+  width: OPEN_WIDTH * MM * 1.18,
+  height: BODY_HEIGHT * MM * 1.18,
+};
 
 /**
  * One leaf of the body: rounded on the two outer corners, square on the two
@@ -272,10 +286,36 @@ function Device({ fold, inner, outer, bodyColor }: DeviceProps) {
   );
 }
 
-export type CaptureFn = (scale: number) => Promise<Blob | null>;
+export type CaptureFn = (width: number, height: number) => Promise<Blob | null>;
 
 /**
- * Hands the page a function that renders one frame at a higher resolution and
+ * Pulls the camera back far enough that the subject fits whatever shape the
+ * canvas currently is, keeping the direction it is already looking from.
+ *
+ * A perspective camera holds its vertical angle, so a 9:16 stage sees a third
+ * of the width a 16:9 one does from the same spot and the device runs off both
+ * sides. The distance has to answer to the aspect, not just the height.
+ */
+function FrameFit() {
+  const { camera, size } = useThree();
+
+  useEffect(() => {
+    const lens = camera as PerspectiveCamera;
+    const aspect = size.width / size.height;
+    const halfAngle = Math.tan((lens.fov * Math.PI) / 360);
+
+    const forWidth = SUBJECT.width / (2 * halfAngle * aspect);
+    const forHeight = SUBJECT.height / (2 * halfAngle);
+
+    lens.position.setLength(Math.max(forWidth, forHeight));
+    lens.updateProjectionMatrix();
+  }, [camera, size]);
+
+  return null;
+}
+
+/**
+ * Hands the page a function that renders one frame at the size asked for and
  * reads it straight back, so an exported shot is the scene it was taken from
  * rather than a second renderer's idea of it.
  */
@@ -283,16 +323,23 @@ function CaptureRig({ onReady }: { onReady: (capture: CaptureFn) => void }) {
   const { gl, scene, camera, size } = useThree();
 
   useEffect(() => {
-    onReady(async (scale) => {
-      const previous = gl.getPixelRatio();
-      gl.setPixelRatio(scale);
+    onReady(async (width, height) => {
+      const previousRatio = gl.getPixelRatio();
+
+      // The canvas already has the aspect being exported, so the only thing
+      // that changes is how many pixels it is drawn at: no reframing, and the
+      // file is exactly the picture on screen. setSize is told not to write
+      // the element's style, which would resize it under the viewer mid-shot.
+      gl.setPixelRatio(1);
+      gl.setSize(width, height, false);
       gl.render(scene, camera);
 
       const blob = await new Promise<Blob | null>((resolve) =>
         gl.domElement.toBlob(resolve, "image/png"),
       );
 
-      gl.setPixelRatio(previous);
+      gl.setPixelRatio(previousRatio);
+      gl.setSize(size.width, size.height, false);
       gl.render(scene, camera);
       return blob;
     });
@@ -326,7 +373,7 @@ export default function HingeScene({
 }: HingeSceneProps) {
   return (
     <SceneCanvas
-      camera={{ position: [0, 0.55, 3.1], fov: 28 }}
+      camera={{ position: [0, 0.55, 3.1], fov: CAMERA_FOV }}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
       className="touch-none"
     >
@@ -379,9 +426,10 @@ export default function HingeScene({
         dampingFactor={0.08}
         rotateSpeed={0.65}
         minDistance={1.6}
-        maxDistance={6}
+        maxDistance={14}
       />
 
+      <FrameFit />
       <CaptureRig onReady={onCaptureReady} />
     </SceneCanvas>
   );
