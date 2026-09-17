@@ -23,6 +23,18 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "loom",
+    name: "Loom",
+    vibe: "Bohemian, warm and woven",
+    description:
+      "A three-room guesthouse that prices the same nights two ways. Pick your dates and the panel quotes the direct rate beside what an agent would list it at, because the 15 to 18 percent they take is the one number a listing can never show you and the owner's own site always can. The calendar says how many rooms are left on every night rather than only whether the house is full.",
+    accent: "#a8492a",
+    preview: { from: "#f4ece0", to: "#c99a6a" },
+    bestFor:
+      "Guesthouses, homestays, small resorts, anywhere fighting a booking site",
+    buildTime: "A week and a half once the rooms are photographed",
+  },
+  {
     slug: "rack",
     name: "Rack",
     vibe: "Y2K, chrome and windows",
