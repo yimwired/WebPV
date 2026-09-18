@@ -8,7 +8,12 @@ CLIENT-PLAYBOOK.md
 DEALS.md
 LAB-STYLES.md
 FASTWORK-GIG.md
+FASTWORK-COVER-BRIEF.md
 fastwork-covers/
+# the two scripts that build the covers: they carry the gig's own wording
+# and only ever write into fastwork-covers/, which is private too
+web/scripts/make-covers.mjs
+web/scripts/find-screens.mjs
 avatar-512.png
 
 # leftover empty scaffold folder — real app is web/

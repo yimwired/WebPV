@@ -1,8 +1,9 @@
 // Verifies /labs/hinge, which the generic audit cannot: the device is a WebGL
 // canvas, so "is it working" means the geometry moved when the fold changed,
 // an uploaded image actually landed on the panels, the inner display was split
-// across the two leaves in the right order, and the export button produced a
-// PNG bigger than the frame it was taken from.
+// across the two leaves in the right order, the outer display appeared on the
+// back once the device shut without taking the inner one with it, and the
+// export button produced a PNG bigger than the frame it was taken from.
 //
 // Needs the built site served. From the repo root:
 //   npx wrangler dev -c wrangler.jsonc --port 3000
@@ -42,7 +43,7 @@ const sample = (page) =>
 
     let hash = 0;
     let lit = 0;
-    const columnsWith = { red: [], blue: [] };
+    const columnsWith = { red: [], green: [], blue: [] };
 
     for (let i = 0; i < data.length; i += 4) {
       const [r, g, b, a] = [data[i], data[i + 1], data[i + 2], data[i + 3]];
@@ -51,6 +52,7 @@ const sample = (page) =>
 
       const column = ((i / 4) % grid.width) | 0;
       if (a > 200 && r > 150 && g < 90 && b < 90) columnsWith.red.push(column);
+      if (a > 200 && g > 150 && r < 90 && b < 90) columnsWith.green.push(column);
       if (a > 200 && b > 150 && g < 90 && r < 90) columnsWith.blue.push(column);
     }
 
@@ -60,6 +62,7 @@ const sample = (page) =>
       lit,
       total: (data.length / 4) | 0,
       red: { count: columnsWith.red.length, centre: mean(columnsWith.red) },
+      green: { count: columnsWith.green.length, centre: mean(columnsWith.green) },
       blue: { count: columnsWith.blue.length, centre: mean(columnsWith.blue) },
     };
   });
@@ -93,19 +96,24 @@ const EXPORT_FRAMES = [
   { label: "Frame", slug: "frame", size: null },
 ];
 
-/** A 600x400 PNG, red on the left half and blue on the right. */
-const splitImage = async (page) => {
-  const encoded = await page.evaluate(() => {
+/**
+ * A 600x400 PNG in two flat halves. The colours are an argument because the
+ * two panels have to be told apart on screen: the inner display is red beside
+ * blue, the outer green beside blue, so a sample says which one is facing the
+ * lens as well as which way round it landed.
+ */
+const halfImage = async (page, left, right) => {
+  const encoded = await page.evaluate(([leftColour, rightColour]) => {
     const canvas = document.createElement("canvas");
     canvas.width = 600;
     canvas.height = 400;
     const context = canvas.getContext("2d");
-    context.fillStyle = "#ff1818";
+    context.fillStyle = leftColour;
     context.fillRect(0, 0, 300, 400);
-    context.fillStyle = "#1818ff";
+    context.fillStyle = rightColour;
     context.fillRect(300, 0, 300, 400);
     return canvas.toDataURL("image/png").split(",")[1];
-  });
+  }, [left, right]);
   return Buffer.from(encoded, "base64");
 };
 
@@ -176,7 +184,7 @@ for (const size of SIZES) {
   await sleep(700);
 
   // 2. an uploaded image has to land on the panels, left half on the left leaf
-  const artwork = await splitImage(page);
+  const artwork = await halfImage(page, "#ff1818", "#1818ff");
   await page.locator('input[type="file"]').first().setInputFiles({
     name: "split.png",
     mimeType: "image/png",
@@ -208,13 +216,81 @@ for (const size of SIZES) {
     findings.push(`${size.name}: clearing the inner display left the artwork on it`);
   }
 
-  // 4. every export frame has to come out at exactly the size it advertises
+  // 4. the outer display, which nothing exercised until now. It sits on the
+  // back of the left leaf and only faces the lens once the device is shut, and
+  // loading it is what used to blank the inner one: a cleanup keyed on the pair
+  // disposed the texture that was still on screen. So the inner artwork goes
+  // back on first and has to survive the second upload.
   await page.locator('input[type="file"]').first().setInputFiles({
     name: "split.png",
     mimeType: "image/png",
     buffer: artwork,
   });
-  await sleep(900);
+  await sampleUntil(page, (s) => s.red.count >= 20 && s.blue.count >= 20);
+
+  const outerArtwork = await halfImage(page, "#18c818", "#1818ff");
+  await page.locator('input[type="file"]').nth(1).setInputFiles({
+    name: "outer.png",
+    mimeType: "image/png",
+    buffer: outerArtwork,
+  });
+  await sleep(1200);
+
+  const bothLoaded = await sample(page);
+  if (bothLoaded.red.count < 20) {
+    findings.push(
+      `${size.name}: loading the outer display took the inner display's artwork off ` +
+        `(red ${bothLoaded.red.count}px, and ${withArtwork.red.count}px before the upload)`,
+    );
+  }
+  if (bothLoaded.green.count > 10) {
+    findings.push(
+      `${size.name}: the outer display can be seen with the device open, so it is not ` +
+        `on the back of the leaf (green ${bothLoaded.green.count}px)`,
+    );
+  }
+
+  await slider.fill("1");
+  const shutOuter = await sampleUntil(page, (s) => s.green.count >= 20, 12000);
+  await page.screenshot({ path: `${OUT}/${size.name}-05-outer.png` });
+
+  if (shutOuter.green.count < 20) {
+    findings.push(
+      `${size.name}: with the device shut the outer display is not showing its artwork ` +
+        `(green ${shutOuter.green.count}px)`,
+    );
+  } else if (shutOuter.blue.centre !== null && shutOuter.green.centre >= shutOuter.blue.centre) {
+    findings.push(
+      `${size.name}: the outer display is mirrored - the left half of the artwork sits at ` +
+        `column ${shutOuter.green.centre.toFixed(1)}, the right half at ` +
+        `${shutOuter.blue.centre.toFixed(1)}`,
+    );
+  }
+  if (shutOuter.red.count > 10) {
+    findings.push(
+      `${size.name}: the inner display is still in shot with the device shut ` +
+        `(red ${shutOuter.red.count}px)`,
+    );
+  }
+
+  // clearing one panel has to leave the other alone, which is the same bug
+  // from the other end
+  await page.getByRole("button", { name: /Remove the outer/i }).click();
+  const outerCleared = await sampleUntil(page, (s) => s.green.count <= 10, 8000);
+  if (outerCleared.green.count > 10) {
+    findings.push(`${size.name}: clearing the outer display left the artwork on it`);
+  }
+
+  await slider.fill("0.12");
+  const innerKept = await sampleUntil(page, (s) => s.red.count >= 20, 8000);
+  if (innerKept.red.count < 20) {
+    findings.push(
+      `${size.name}: clearing the outer display took the inner display with it ` +
+        `(red ${innerKept.red.count}px)`,
+    );
+  }
+
+  // 5. every export frame has to come out at exactly the size it advertises
 
   const exportOnce = async () => {
     // The listener has to be attached before the click, but awaiting them
@@ -285,7 +361,7 @@ for (const size of SIZES) {
   await page.getByRole("button", { name: "9:16", exact: true }).click();
   await sleep(300);
 
-  // 5. an export renders the canvas at the file's size, so the element has to
+  // 6. an export renders the canvas at the file's size, so the element has to
   // be back at its own afterwards or the page is left showing a scaled buffer
   const beforeExport = await page.locator("canvas").first().boundingBox();
   await exportOnce();
@@ -298,7 +374,7 @@ for (const size of SIZES) {
     );
   }
 
-  // 6. dragging has to turn the device. The canvas sits below the controls on
+  // 7. dragging has to turn the device. The canvas sits below the controls on
   // a phone, so its box has to be brought into the viewport first or the drag
   // lands on whatever is at those coordinates instead.
   await page.locator("canvas").first().scrollIntoViewIfNeeded();
