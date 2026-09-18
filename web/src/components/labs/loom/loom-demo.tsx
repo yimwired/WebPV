@@ -98,7 +98,7 @@ export function LoomDemo() {
 
           <div className="grid gap-7 md:grid-cols-[minmax(0,1fr)_280px]">
             <div className="rounded-2xl border border-[#d8c6ae] bg-[#fbf6ee] p-4">
-              <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-[#8a7862]">
+              <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-[#6b5c49]">
                 {WEEKDAYS.map((day) => (
                   <span key={day}>{day}</span>
                 ))}
@@ -151,10 +151,17 @@ export function LoomDemo() {
                       {/* the month label sits inside its own cell: hung above
                           it, it landed on the square in the row before, which
                           belongs to the month it is announcing the end of */}
+                      {/*
+                        Three inks that only appear inside a cell, and a cell is
+                        darker than the paper and darker again under the cursor.
+                        The page's own #8a7862 and #a8492a measure 2.9:1 and
+                        4.0:1 down here at 9px, so these are the same hues taken
+                        far enough down to clear 4.5 on the hovered cell too.
+                      */}
                       {firstOfMonth && (
                         <span
                           className={`absolute inset-x-0 top-0.5 text-[9px] leading-none ${
-                            chosen ? "text-[#f0d9c8]" : "text-[#a8492a]"
+                            chosen ? "text-[#fbf6ee]" : "text-[#87381f]"
                           }`}
                         >
                           {THAI_MONTHS[date.getMonth()]}
@@ -165,10 +172,10 @@ export function LoomDemo() {
                           aria-hidden
                           className={`absolute inset-x-0 bottom-0.5 text-[9px] ${
                             chosen
-                              ? "text-[#f0d9c8]"
+                              ? "text-[#fbf6ee]"
                               : last
-                                ? "text-[#a8492a]"
-                                : "text-[#8a7862]"
+                                ? "text-[#87381f]"
+                                : "text-[#594e3d]"
                           }`}
                         >
                           {openRooms} ห้อง
@@ -185,7 +192,7 @@ export function LoomDemo() {
                 })}
               </div>
 
-              <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#8a7862]">
+              <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#6b5c49]">
                 <span className="flex items-center gap-1.5">
                   <span
                     aria-hidden
@@ -218,7 +225,7 @@ export function LoomDemo() {
                   max={7}
                   value={nights}
                   onChange={(event) => setNights(Number(event.target.value))}
-                  className="w-full accent-[#a8492a]"
+                  className="h-6 w-full accent-[#a8492a]"
                   aria-label="จำนวนคืนที่เข้าพัก"
                 />
               </label>
@@ -270,7 +277,7 @@ export function LoomDemo() {
                     <p className="mt-1 text-[13px] leading-relaxed text-[#6b5b4a]">
                       {room.character}
                     </p>
-                    <p className="mt-2 text-[12px] text-[#8a7862]">
+                    <p className="mt-2 text-[12px] text-[#6b5c49]">
                       นอน {room.sleeps} คน · {room.area} ตร.ม. · {room.bed}
                     </p>
 
@@ -281,7 +288,7 @@ export function LoomDemo() {
                           {baht(direct)} บาท
                         </dd>
                       </div>
-                      <div className="flex items-baseline justify-between text-[13px] text-[#8a7862]">
+                      <div className="flex items-baseline justify-between text-[13px] text-[#6b5c49]">
                         <dt>ราคาเดียวกันบนแอปจอง</dt>
                         <dd className="line-through">{baht(agent)} บาท</dd>
                       </div>
@@ -292,7 +299,7 @@ export function LoomDemo() {
                     </p>
 
                     {highNights > 0 && (
-                      <p className="mt-2 text-[12px] text-[#8a7862]">
+                      <p className="mt-2 text-[12px] text-[#6b5c49]">
                         {highNights === nights
                           ? "ทุกคืนอยู่ในช่วงไฮซีซั่น"
                           : `${highNights} คืนอยู่ในช่วงไฮซีซั่น`}
@@ -317,7 +324,7 @@ export function LoomDemo() {
                   className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-xl border border-[#e0d0b8] bg-[#f8f1e6] px-4 py-3 text-[14px]"
                 >
                   <span className="font-medium">{room.name}</span>
-                  <span className="text-[#8a7862]">
+                  <span className="text-[#6b5c49]">
                     มีคนจองคืนวันที่ {formatThaiDate(firstClash)} ไว้แล้ว
                   </span>
                 </li>
@@ -356,7 +363,7 @@ export function LoomDemo() {
           </p>
         </section>
 
-        <p className="text-center text-[12px] text-[#8a7862]">
+        <p className="text-center text-[12px] text-[#6b5c49]">
           ที่พักสมมติสำหรับศึกษางานออกแบบ ห้อง ราคา และคิวจองไม่มีอยู่จริง
         </p>
       </div>

@@ -333,7 +333,7 @@ export function TerminalShell({ animate, greeting }: ShellProps) {
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
-          className="w-full bg-transparent text-[#ffd591] caret-[#ffb000] outline-none placeholder:text-[#7a5520] focus-visible:outline-none disabled:opacity-50"
+          className="w-full bg-transparent py-1 text-[#ffd591] caret-[#ffb000] outline-none placeholder:text-[#7a5520] focus-visible:outline-none disabled:opacity-50"
           placeholder={busy ? "working…" : "try: deploy"}
         />
       </div>

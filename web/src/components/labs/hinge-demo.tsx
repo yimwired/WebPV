@@ -139,7 +139,7 @@ function DropZone({ panel, hasArtwork, onFile, onClear }: DropZoneProps) {
             {label} display
             {hasArtwork ? " · loaded" : ""}
           </span>
-          <span className="block font-mono text-[11px] text-neutral-500">
+          <span className="block font-mono text-[11px] text-neutral-400">
             {ratio}
           </span>
         </span>
@@ -160,6 +160,7 @@ function DropZone({ panel, hasArtwork, onFile, onClear }: DropZoneProps) {
         ref={input}
         type="file"
         accept="image/*"
+        aria-label={`Upload artwork for the ${label.toLowerCase()} display`}
         className="sr-only"
         onChange={(event) => {
           take(event.target.files);
@@ -341,7 +342,7 @@ export function HingeDemo() {
                 </label>
                 <output
                   htmlFor="fold"
-                  className="font-mono text-xs text-neutral-500"
+                  className="font-mono text-xs text-neutral-400"
                 >
                   {degrees}&deg;
                 </output>
@@ -354,7 +355,7 @@ export function HingeDemo() {
                 step={0.001}
                 value={fold}
                 onChange={(event) => setFold(Number(event.target.value))}
-                className="mt-2 w-full accent-amber-300"
+                className="mt-2 h-6 w-full accent-amber-300"
               />
             </div>
 
@@ -410,7 +411,7 @@ export function HingeDemo() {
                   );
                 })}
               </div>
-              <p className="mt-1.5 font-mono text-[11px] text-neutral-500">
+              <p className="mt-1.5 font-mono text-[11px] text-neutral-400">
                 {(FRAMES.find((f) => f.id === frame) ?? FRAMES[0]).note}
               </p>
             </fieldset>
@@ -453,7 +454,7 @@ export function HingeDemo() {
               </button>
             </div>
 
-            <p className="text-[11px] leading-relaxed text-neutral-500">
+            <p className="text-[11px] leading-relaxed text-neutral-400">
               The stage is the frame: what you see is the file, on a transparent
               background, so the shot drops straight onto whatever it is going
               into. Drag the device to turn it. An unofficial study: this is not

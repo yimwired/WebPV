@@ -260,14 +260,14 @@ export function SpaceDemo() {
           </div>
         </div>
 
-        <p className="mt-12 text-center text-[10px] tracking-[0.4em] text-slate-500 uppercase">
+        <p className="mt-12 text-center text-[10px] tracking-[0.4em] text-slate-400 uppercase">
           end of transmission
         </p>
 
         {/* Whose work is whose. The imagery is NASA's and public domain; what
             is built here is the sphere it is wrapped on. A portfolio that does
             not say so is claiming the wrong thing. */}
-        <p className="mt-6 text-center text-[10px] leading-relaxed text-slate-600">
+        <p className="mt-6 text-center text-[10px] leading-relaxed text-slate-400">
           Surface, cloud and night-lights imagery: NASA Visible Earth (public
           domain). Lighting, atmosphere and motion built for this page.
         </p>
