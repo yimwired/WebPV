@@ -270,7 +270,12 @@ export function TrineDemo({ serifClass }: { serifClass: string }) {
               className="grid gap-4 md:grid-cols-[0.9fr_1.1fr] md:gap-16"
             >
               <h3 className={`${serifClass} text-2xl font-light sm:text-3xl`}>
-                <span className="mr-3 font-mono text-xs tracking-widest text-[#b08d57]">
+                {/*
+                  A darker gold than the ring's own #b08d57: at 12px these
+                  numerals are small text, and the metal colour measures 2.8:1
+                  on this paper. Same hue, taken down to 5.3:1.
+                */}
+                <span className="mr-3 font-mono text-xs tracking-widest text-[#7d5f31]">
                   {c.n}
                 </span>
                 {c.h}
