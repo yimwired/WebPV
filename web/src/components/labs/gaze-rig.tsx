@@ -29,7 +29,14 @@ const MERIDIANS = [0, 1, 2, 3, 4, 5, 6].map((i) => (i * Math.PI) / 7);
 const PARALLELS = [-1, -0.62, -0.24, 0.24, 0.62, 1].map((v) => v * 1.1);
 
 /** Where the eyes sit on the sphere: longitude out from the nose, latitude up. */
-const EYES = [-0.38, 0.38].map((longitude) => ({ longitude, latitude: 0.16 }));
+const EYES = [-0.38, 0.38].map((longitude) => ({ longitude, latitude: 0.5 }));
+
+/**
+ * On the ridge, below the eyes. Two dots on a sphere read as two dots on a
+ * sphere; a third below them is what makes the whole thing read as a face and
+ * the turn read as a look.
+ */
+const MOUTH = { longitude: 0, latitude: -0.08 };
 
 /** Turn, in radians, at the far left and far right of the viewport. */
 const YAW_RANGE = 1.5;
@@ -39,8 +46,8 @@ const YAW_RANGE = 1.5;
  * parallels project to straight lines, which is correct and reads as a mistake,
  * so the range is kept entirely on one side of it.
  */
-const PITCH_CENTRE = -0.3;
-const PITCH_RANGE = 0.42;
+const PITCH_CENTRE = -0.38;
+const PITCH_RANGE = 0.66;
 
 interface Point {
   x: number;
@@ -71,12 +78,21 @@ function project(
   };
 }
 
+/** The near half of the meridian through the nose, as an SVG arc. */
+function ridgePath(yaw: number) {
+  const bulge = Math.abs(RADIUS * Math.sin(yaw)).toFixed(2);
+  const sweep = Math.sin(yaw) >= 0 ? 1 : 0;
+  return `M 0 ${-RADIUS} A ${bulge} ${RADIUS} 0 0 ${sweep} 0 ${RADIUS}`;
+}
+
 const yawOf = (progress: number) => (progress - 0.5) * YAW_RANGE;
-const pitchOf = (tilt: number) => PITCH_CENTRE + (tilt - 0.5) * PITCH_RANGE;
+const pitchOf = (tilt: number) => PITCH_CENTRE - (tilt - 0.5) * PITCH_RANGE;
 
 export function GazeRig({ ref }: { ref?: Ref<GazeRigHandle> }) {
   const meridianRefs = useRef<(SVGEllipseElement | null)[]>([]);
   const parallelRefs = useRef<(SVGEllipseElement | null)[]>([]);
+  const ridgeRef = useRef<SVGPathElement>(null);
+  const mouthRef = useRef<SVGEllipseElement>(null);
   const eyeRefs = useRef<(SVGEllipseElement | null)[]>([]);
   const pupilRefs = useRef<(SVGCircleElement | null)[]>([]);
 
@@ -108,6 +124,17 @@ export function GazeRig({ ref }: { ref?: Ref<GazeRigHandle> }) {
           Math.abs(RADIUS * Math.cos(latitude) * Math.sin(pitch)).toFixed(2)
         );
       });
+
+      ridgeRef.current?.setAttribute("d", ridgePath(yaw));
+
+      if (mouthRef.current) {
+        const point = project(MOUTH.longitude, MOUTH.latitude, yaw, pitch, RADIUS);
+        const facing = Math.max(0, point.z / RADIUS);
+        mouthRef.current.setAttribute("cx", point.x.toFixed(2));
+        mouthRef.current.setAttribute("cy", point.y.toFixed(2));
+        mouthRef.current.setAttribute("rx", (22 * facing).toFixed(2));
+        mouthRef.current.setAttribute("opacity", Math.min(0.85, facing * 1.8).toFixed(3));
+      }
 
       EYES.forEach((eye, i) => {
         const node = eyeRefs.current[i];
@@ -185,7 +212,34 @@ export function GazeRig({ ref }: { ref?: Ref<GazeRigHandle> }) {
         ))}
 
         <circle r={RADIUS} opacity="0.85" strokeWidth="1.5" />
+
+        <path
+          ref={ridgeRef}
+          d={ridgePath(yaw)}
+          strokeWidth="2"
+          opacity="0.9"
+          strokeLinecap="round"
+        />
       </g>
+
+      {(() => {
+        const point = project(MOUTH.longitude, MOUTH.latitude, yaw, pitch, RADIUS);
+        const facing = Math.max(0, point.z / RADIUS);
+        return (
+          <ellipse
+            ref={mouthRef}
+            cx={point.x.toFixed(2)}
+            cy={point.y.toFixed(2)}
+            rx={(22 * facing).toFixed(2)}
+            ry="3.5"
+            fill="none"
+            stroke="var(--gaze-accent)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity={Math.min(0.85, facing * 1.8).toFixed(3)}
+          />
+        );
+      })()}
 
       <g>
         {EYES.map((eye, i) => {

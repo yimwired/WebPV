@@ -82,6 +82,33 @@ const readRig = (page) =>
 
   check("progress bar follows", left.bar !== right.bar && right.bar.includes("scaleX"), `left "${left.bar}", right "${right.bar}"`);
 
+  // The pitch axis shipped inverted once: a cursor at the top of the window
+  // tipped the face down. Reading the eyes directly is the only way to catch
+  // it, since every other check passes either way round.
+  const eyeY = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('[data-gaze="rig"] ellipse')]
+        .slice(-2)
+        .reduce((sum, n) => sum + Number(n.getAttribute("cy")), 0)
+    );
+
+  await page.mouse.move(720, 40);
+  await sleep(1400);
+  const high = await eyeY();
+  await page.mouse.move(720, 860);
+  await sleep(1400);
+  const low = await eyeY();
+  check("subject looks up when the cursor is high", high < low, `eyes at ${high.toFixed(1)} with the cursor up, ${low.toFixed(1)} with it down`);
+
+  // Both axes should have a comparable throw, or one of them reads as ignored.
+  await page.mouse.move(40, 450);
+  await sleep(1400);
+  const farLeft = await page.evaluate(() => Number(document.querySelector('[data-gaze="rig"] ellipse:nth-last-child(2)').getAttribute("cx")));
+  check("vertical throw is not a token gesture", Math.abs(low - high) > Math.abs(farLeft) * 0.5, `vertical ${Math.abs(low - high).toFixed(0)}px against horizontal ${Math.abs(farLeft).toFixed(0)}px`);
+
+  await page.mouse.move(1080, 450);
+  await sleep(1400);
+
   // Arrived is arrived: two reads a second apart with the pointer parked must
   // be byte-identical, or the loop is still running with nothing to do.
   const parkedA = await readRig(page);
