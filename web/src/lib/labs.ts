@@ -150,6 +150,15 @@ export const labs: Lab[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
+//  One route is in neither list on purpose: `/labs/hinge`, a mockup studio
+//  that puts a design on a folding phone. It is a tool rather than a style
+//  to buy, so it has no vibe, no bestFor and no build estimate to give, and
+//  Film's call was that clients do not see it. It builds and answers on a
+//  direct URL exactly like the archived entries below.
+//  Source: components/labs/hinge-demo.tsx · verified by scripts/shoot-hinge.mjs
+// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
 //  Retired from the gallery on 2026-09-16, kept for reference.
 //  Nothing imports this: these demos are off the gallery, the home
 //  strip, the switcher, the sitemap and llms.txt. Their routes still
