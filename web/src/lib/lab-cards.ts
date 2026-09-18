@@ -11,7 +11,7 @@ export const labCardVersions: Record<string, string> = {
   "slab": "83a94b72",
   "ember": "451faf74",
   "unfold": "c4cc480f",
-  "trine": "ac85a815",
+  "trine": "9bdc2060",
   "cart": "85ba7b6a",
   "counter": "37137618",
   "longtail": "ab96eabe",

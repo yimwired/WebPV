@@ -3,7 +3,8 @@
 // an uploaded image actually landed on the panels, the inner display was split
 // across the two leaves in the right order, the outer display appeared on the
 // back once the device shut without taking the inner one with it, and the
-// export button produced a PNG bigger than the frame it was taken from.
+// export button produced a PNG of the advertised size with the device on it
+// and nothing painted behind it.
 //
 // Needs the built site served. From the repo root:
 //   npx wrangler dev -c wrangler.jsonc --port 3000
@@ -122,6 +123,50 @@ const pngSize = (buffer) => ({
   width: buffer.readUInt32BE(16),
   height: buffer.readUInt32BE(20),
 });
+
+/**
+ * Reads an exported PNG back through the page. Measuring the file's edges
+ * says nothing about what is inside it: an export of an empty stage is the
+ * right size too. This looks for the artwork on the display and for the
+ * transparent background the page promises the shot comes on.
+ */
+const inspectExport = (page, bytes) =>
+  page.evaluate(async (base64) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${base64}`;
+    await image.decode();
+
+    // Scaled down keeping the shape, so a column mean still means left/right.
+    const grid = document.createElement("canvas");
+    grid.width = 64;
+    grid.height = Math.max(1, Math.round((64 * image.naturalHeight) / image.naturalWidth));
+    const context = grid.getContext("2d");
+    context.drawImage(image, 0, 0, grid.width, grid.height);
+    const { data } = context.getImageData(0, 0, grid.width, grid.height);
+
+    const columnsWith = { red: [], blue: [] };
+    for (let i = 0; i < data.length; i += 4) {
+      const [r, g, b, a] = [data[i], data[i + 1], data[i + 2], data[i + 3]];
+      const column = ((i / 4) % grid.width) | 0;
+      if (a > 200 && r > 150 && g < 90 && b < 90) columnsWith.red.push(column);
+      if (a > 200 && b > 150 && g < 90 && r < 90) columnsWith.blue.push(column);
+    }
+
+    const at = (x, y) => context.getImageData(x, y, 1, 1).data[3];
+    const corners = [
+      at(0, 0),
+      at(grid.width - 1, 0),
+      at(0, grid.height - 1),
+      at(grid.width - 1, grid.height - 1),
+    ];
+
+    const mean = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : null);
+    return {
+      red: { count: columnsWith.red.length, centre: mean(columnsWith.red) },
+      blue: { count: columnsWith.blue.length, centre: mean(columnsWith.blue) },
+      opaqueCorners: corners.filter((alpha) => alpha > 8).length,
+    };
+  }, bytes.toString("base64"));
 
 await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch();
@@ -353,6 +398,35 @@ for (const size of SIZES) {
       findings.push(
         `${size.name}: the ${preset.label} export was saved as "${shot.name}", ` +
           `which does not say which frame it is`,
+      );
+    }
+
+    // and the file has to carry the picture, not just the right edges
+    const painted = await inspectExport(page, shot.bytes);
+    if (process.env.SHOOT_VERBOSE) {
+      console.log(
+        `  [${size.name}] ${preset.label}: ${shot.width}x${shot.height}, ` +
+          `red ${painted.red.count} at ${painted.red.centre?.toFixed(1)}, ` +
+          `blue ${painted.blue.count} at ${painted.blue.centre?.toFixed(1)}, ` +
+          `${painted.opaqueCorners} painted corner(s)`,
+      );
+    }
+    if (painted.red.count < 12 || painted.blue.count < 12) {
+      findings.push(
+        `${size.name}: the ${preset.label} export does not have the display on it ` +
+          `(red ${painted.red.count}px, blue ${painted.blue.count}px of a 64 wide sample)`,
+      );
+    } else if (painted.red.centre >= painted.blue.centre) {
+      findings.push(
+        `${size.name}: the ${preset.label} export is mirrored against the screen - the left ` +
+          `half of the artwork sits at column ${painted.red.centre.toFixed(1)}, the right at ` +
+          `${painted.blue.centre.toFixed(1)}`,
+      );
+    }
+    if (painted.opaqueCorners > 0) {
+      findings.push(
+        `${size.name}: the ${preset.label} export has ${painted.opaqueCorners} corner(s) painted, ` +
+          `but the page says the shot comes on a transparent background`,
       );
     }
   }
