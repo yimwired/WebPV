@@ -69,16 +69,22 @@ const probe = (page) =>
     // pale sheet over a dark page as 1:1 and buried real findings under the
     // noise. Still blind to images and canvas, which is what
     // shoot-contrast.mjs exists to measure.
+    //
+    // Every colour goes through the canvas rather than a regex over the
+    // computed value. This palette resolves to `lab(2.75381 0 0)`, and reading
+    // those three numbers as if they were channels composites a sheet of
+    // "rgb(2.75, 0, 0)" onto the plate: a translucent panel in the site's own
+    // tokens was being mixed in as near-black whatever colour it really was.
     const opaqueBg = (el) => {
       const sheets = [];
       let base = null;
       for (let n = el; n; n = n.parentElement) {
-        const rgba = getComputedStyle(n).backgroundColor.match(/[\d.]+/g)?.map(Number) ?? [];
-        if (rgba.length < 4 || rgba[3] > 0.9) {
-          base = toRgb(getComputedStyle(n).backgroundColor);
+        const [r, g, b, a] = toRgba(getComputedStyle(n).backgroundColor);
+        if (a > 0.9) {
+          base = [r, g, b];
           break;
         }
-        if (rgba[3] > 0.02) sheets.push(rgba);
+        if (a > 0.02) sheets.push([r, g, b, a]);
       }
       if (!base) base = toRgb(getComputedStyle(document.body).backgroundColor);
       for (let i = sheets.length - 1; i >= 0; i -= 1) {
@@ -159,8 +165,12 @@ const probe = (page) =>
           if (n.tagName === "CANVAS" || n.tagName === "IMG" || n.tagName === "VIDEO") return true;
           const bg = getComputedStyle(n);
           if (bg.backgroundImage !== "none") return true;
-          const rgba = bg.backgroundColor.match(/[\d.]+/g)?.map(Number) ?? [];
-          return rgba.length >= 4 && rgba[3] > 0.02;
+          // Resolved through the canvas, because `lab(100 0 0)` carries three
+          // numbers and a test for a fourth reads an opaque background as no
+          // background at all. That is what the language switch's knob is: the
+          // active label sits on it, and with the knob invisible to this test
+          // the label was reported at 1.05:1 where it measures about 19:1.
+          return toRgba(bg.backgroundColor)[3] > 0.02;
         });
         if (painter && !el.contains(painter) && !painter.contains(el)) {
           unmeasurable.push({
@@ -293,4 +303,10 @@ for (const [key, r] of Object.entries(report)) {
   if (r.imagesMissingAlt.length) issues.push(`img no alt ${JSON.stringify(r.imagesMissingAlt)}`);
   console.log(issues.length ? `\n=== ${key}\n  ${issues.join("\n  ")}` : `ok  ${key}`);
 }
-console.log(`\nheadings @desktop /: ${JSON.stringify(report["/ @desktop"]?.headings)}`);
+// The outline is printed for the home page, and only when the home page was
+// one of the routes asked for: on a run scoped to a lab it printed
+// `undefined`, which reads like a route that failed rather than one that
+// was never visited.
+const home = report["/ @desktop"];
+if (home) console.log(`
+headings @desktop /: ${JSON.stringify(home.headings)}`);
