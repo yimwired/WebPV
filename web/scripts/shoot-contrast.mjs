@@ -64,6 +64,9 @@ const settle = async (target, frames = 60) => {
 // Walk the page in viewport-sized steps so scroll-driven acts settle before
 // their text is measured.
 const results = [];
+// Text whose own colour is transparent because a gradient is clipped to it.
+// Reported apart from the measurements rather than counted as failures.
+const painted = new Set();
 const height = await page.evaluate(() => document.body.scrollHeight);
 const STEP = Number(process.env.STEP ?? 400);
 
@@ -72,8 +75,9 @@ for (let y = 0; y < height; y += STEP) {
   await page.waitForTimeout(900);
   await settle(page);
 
-  const candidates = await page.evaluate(() => {
+  const { out: candidates, gradientText } = await page.evaluate(() => {
     const out = [];
+    const gradientText = [];
     for (const el of document.querySelectorAll("body *")) {
       if (el.children.length || !el.textContent?.trim()) continue;
       const r = el.getBoundingClientRect();
@@ -93,6 +97,22 @@ for (let y = 0; y < height; y += STEP) {
         continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden") continue;
+
+      // Text painted through its own background, the bg-clip-text trick: the
+      // colour is transparent, so there is no ink to compare a plate against
+      // and the reader scored it 1:1 every time. shoot-audit lists the same
+      // case as unmeasurable rather than as a failure.
+      if (cs.color === "rgba(0, 0, 0, 0)" || cs.color === "transparent") {
+        gradientText.push(el.textContent.trim().slice(0, 34));
+        continue;
+      }
+
+      // Text belonging to a disabled control is exempt from 1.4.3, and it is
+      // meant to look unavailable: Loom's calendar greys and strikes through
+      // the nights the house is full, which is the state doing its job. Left
+      // in, every disabled control in a demo is a permanent failure nobody can
+      // fix without making it look enabled.
+      if (el.closest(":disabled, [aria-disabled='true']")) continue;
 
       // Scroll-driven acts crossfade. Mid-fade the text is half-transparent
       // over the *outgoing* act's backdrop, which is neither what the visitor
@@ -120,8 +140,10 @@ for (let y = 0; y < height; y += STEP) {
         },
       });
     }
-    return out;
+    return { out, gradientText };
   });
+
+  for (const text of gradientText) painted.add(text);
 
   const fresh = candidates.filter((c) => !results.some((r) => r.text === c.text));
   if (!fresh.length) continue;
@@ -242,6 +264,13 @@ console.log(`${ROUTE} at ${WIDTH}x${HEIGHT} in ${LOCALE}: measured ${results.len
 for (const f of failures)
   console.log(
     `  ${f.ratio}:1 (needs ${f.floor}) ${f.size}px ${JSON.stringify(f.text)} colour ${f.color} on rgb(${f.plate})`,
+  );
+
+if (painted.size)
+  console.log(
+    `  not measured, painted by a gradient through the text: ${[...painted]
+      .map((t) => JSON.stringify(t))
+      .join(", ")}`,
   );
 
 await browser.close();
