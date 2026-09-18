@@ -23,6 +23,18 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "gaze",
+    name: "Gaze",
+    vibe: "Interactive, cursor-driven",
+    description:
+      "A studio page whose subject turns to follow the pointer. The head is real geometry rather than a skewed drawing, so the meridians bunch towards the limb and the far eye narrows on its own, and the frame index printed under it is the one a video would have seeked to. Nothing in the loop goes through React: a full sweep of the viewport re-renders no components at all.",
+    accent: "#c6f24e",
+    preview: { from: "#0c1110", to: "#c6f24e" },
+    bestFor:
+      "Creative developers, motion studios, anyone selling the interaction itself",
+    buildTime: "Three days as vectors, a week once there is footage to cut",
+  },
+  {
     slug: "meeple",
     name: "Meeple",
     vibe: "Pixel art, drawn by hand",
