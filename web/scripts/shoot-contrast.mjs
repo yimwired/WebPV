@@ -12,8 +12,18 @@ const ROUTE = process.env.ROUTE || "/labs/contour";
 const WIDTH = Number(process.env.WIDTH) || 1440;
 const HEIGHT = Number(process.env.HEIGHT) || 900;
 
+// Pinned, like shoot-audit, because the site picks its language off
+// navigator.language: on a Thai machine this measured the Thai site while the
+// audit measured the English one, so the two disagreed about the same element
+// and neither said which language it had been looking at. LOCALE=th-TH to
+// measure the other one on purpose.
+const LOCALE = process.env.LOCALE || "en-US";
+
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT } });
+const ctx = await browser.newContext({
+  viewport: { width: WIDTH, height: HEIGHT },
+  locale: LOCALE,
+});
 const page = await ctx.newPage();
 const reader = await ctx.newPage();
 await reader.goto("about:blank");
@@ -228,7 +238,7 @@ for (let y = 0; y < height; y += STEP) {
 }
 
 const failures = results.filter((r) => r.ratio < r.floor);
-console.log(`${ROUTE}: measured ${results.length} text nodes, ${failures.length} below floor`);
+console.log(`${ROUTE} at ${WIDTH}x${HEIGHT} in ${LOCALE}: measured ${results.length} text nodes, ${failures.length} below floor`);
 for (const f of failures)
   console.log(
     `  ${f.ratio}:1 (needs ${f.floor}) ${f.size}px ${JSON.stringify(f.text)} colour ${f.color} on rgb(${f.plate})`,
