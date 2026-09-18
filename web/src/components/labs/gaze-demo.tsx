@@ -17,7 +17,7 @@ import { GazeRig, type GazeRigHandle } from "./gaze-rig";
 const FRAMES = 96;
 
 /** Fraction of the remaining distance covered per frame at 60fps. */
-const DAMPING = 0.12;
+const DAMPING = 0.2;
 
 /** Seconds per sweep when the page plays itself. */
 const LOOP_SECONDS = 7;
