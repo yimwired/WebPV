@@ -179,6 +179,17 @@ export const labs: Lab[] = [
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
   {
+    slug: "draft",
+    name: "Draft",
+    vibe: "Conceptual sketch, working drawing",
+    description:
+      "An interior studio that shows the working drawing rather than the render, because a render says how the room will look and a drawing says whether the furniture fits. Give it your room's real dimensions and the plan redraws to scale on ruled paper, dimensions itself, and writes in the margin how much walkway is left, which piece is wider than the wall, and by how many centimetres. Every rectangle on the sheet is measured in the same centimetres the notes are.",
+    accent: "#2f5fa8",
+    preview: { from: "#f3f1e9", to: "#cfc9b8" },
+    bestFor: "Interior designers, architects, fit-out and built-in furniture",
+    buildTime: "About a week, and the clearances are the work",
+  },
+  {
     slug: "paste",
     name: "Paste",
     vibe: "Scrapbook, taped down",
