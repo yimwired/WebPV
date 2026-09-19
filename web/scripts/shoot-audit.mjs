@@ -113,6 +113,11 @@ const probe = (page) =>
       const box = el.getBoundingClientRect();
       if (box.width < 4 || box.height < 4) continue;
 
+      // Disabled controls are exempt from 1.4.3 and are supposed to read as
+      // unavailable, so their text is not a finding. Same rule in
+      // shoot-contrast.mjs.
+      if (el.closest(":disabled, [aria-disabled='true']")) continue;
+
       const size = parseFloat(cs.fontSize);
       const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
       const plate = opaqueBg(el);
@@ -160,7 +165,27 @@ const probe = (page) =>
       // case: it reads the page's near-black root while the gradient sweep two
       // siblings up is what is behind the letters.
       if (r < (large ? 3 : 4.5)) {
-        const behind = document.elementsFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+        // The paint stack can only be read where the page is: `elementsFromPoint`
+        // answers with nothing for a point outside the viewport, and this pass
+        // measures the whole document from wherever the scroll sweep left it.
+        // Without this the same element was a finding on one width and
+        // unmeasurable on another purely by where it happened to sit.
+        const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+        if (
+          point.x < 0 ||
+          point.y < 0 ||
+          point.x > window.innerWidth ||
+          point.y > window.innerHeight
+        ) {
+          unmeasurable.push({
+            text: label(el),
+            size,
+            why: "off screen when the paint stack was read, measure it with shoot-contrast",
+          });
+          continue;
+        }
+
+        const behind = document.elementsFromPoint(point.x, point.y);
         const painter = behind.slice(behind.indexOf(el) + 1).find((n) => {
           if (n.tagName === "CANVAS" || n.tagName === "IMG" || n.tagName === "VIDEO") return true;
           const bg = getComputedStyle(n);
@@ -172,13 +197,29 @@ const probe = (page) =>
           // the label was reported at 1.05:1 where it measures about 19:1.
           return toRgba(bg.backgroundColor)[3] > 0.02;
         });
-        if (painter && !el.contains(painter) && !painter.contains(el)) {
-          unmeasurable.push({
-            text: label(el),
-            size,
-            why: `sits over a ${painter.tagName.toLowerCase()} painted beside it, not above it in the tree`,
-          });
-          continue;
+        if (painter) {
+          const related = el.contains(painter) || painter.contains(el);
+          // An ancestor is normally fine: the walk above composited its colour
+          // into the plate. It is not fine when what the ancestor paints is a
+          // gradient or an image, which has no single colour to composite:
+          // Rack's title bars are a linear-gradient on the header, so the walk
+          // sailed past them to the steel panel behind and called white text
+          // 1.41:1. Those go to shoot-contrast like the sibling case.
+          const image =
+            painter.tagName === "CANVAS" ||
+            painter.tagName === "IMG" ||
+            painter.tagName === "VIDEO" ||
+            getComputedStyle(painter).backgroundImage !== "none";
+          if (!related || image) {
+            unmeasurable.push({
+              text: label(el),
+              size,
+              why: related
+                ? `sits on a ${painter.tagName.toLowerCase()} its own ancestor paints an image or gradient on`
+                : `sits over a ${painter.tagName.toLowerCase()} painted beside it, not above it in the tree`,
+            });
+            continue;
+          }
         }
       }
 

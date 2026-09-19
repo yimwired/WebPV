@@ -115,9 +115,15 @@ export function DimensionDemo() {
               <div className="p-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold tracking-tight">{p.name}</h3>
+                  {/*
+                    The project accents are picked against the main site, and
+                    one of them is a dark teal: at 10px on this card it measures
+                    3.5:1. Lifted towards white so every project keeps its own
+                    colour and the dark ones still read.
+                  */}
                   <span
                     className="text-[10px] font-medium tracking-[0.25em] uppercase"
-                    style={{ color: p.accent }}
+                    style={{ color: `color-mix(in oklab, ${p.accent} 55%, white)` }}
                   >
                     {p.category}
                   </span>

@@ -75,7 +75,7 @@ export function RackDemo() {
                 step={1}
                 value={chest}
                 onChange={(event) => setChest(Number(event.target.value))}
-                className="w-full accent-[#ff2d94]"
+                className="h-6 w-full accent-[#ff2d94]"
                 aria-label="รอบอกของคุณ เป็นนิ้ว"
               />
             </label>
@@ -94,7 +94,7 @@ export function RackDemo() {
                 step={1}
                 value={height}
                 onChange={(event) => setHeight(Number(event.target.value))}
-                className="w-full accent-[#ff2d94]"
+                className="h-6 w-full accent-[#ff2d94]"
                 aria-label="ส่วนสูงของคุณ เป็นเซนติเมตร"
               />
             </label>
@@ -230,7 +230,7 @@ export function RackDemo() {
                     <p className="truncate text-[12px] font-bold text-neutral-700">
                       {verdict.piece.name}
                     </p>
-                    <p className="font-mono text-[11px] text-neutral-500">
+                    <p className="font-mono text-[11px] text-neutral-600">
                       อก {verdict.piece.chest}&quot;
                     </p>
                     <p
@@ -275,7 +275,17 @@ export function RackDemo() {
           </dl>
         </Win98>
 
-        <p className="pb-2 text-center text-[11px] text-white/70">
+        {/*
+          On a steel strip rather than straight onto the wallpaper. The
+          wallpaper is a radial ramp from #99a6cf to #4a5480, so no flat ink
+          clears 4.5:1 at both ends of it: white was 2.5:1 down here and a dark
+          ink would have failed at the top. A strip is also what the period
+          would have done with a line like this.
+        */}
+        <p
+          className="mx-auto w-fit px-3 py-1 text-center text-[11px] text-neutral-900"
+          style={raised}
+        >
           ร้านสมมติสำหรับศึกษางานออกแบบ สินค้าและราคาไม่มีอยู่จริง
         </p>
       </div>

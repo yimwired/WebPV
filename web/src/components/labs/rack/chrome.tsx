@@ -53,12 +53,19 @@ export function Win98({
 }: WindowProps) {
   return (
     <section className={className} style={raised}>
+      {/*
+        Both bars run left to right from dark to light, and the title sits on
+        them in white: the light end is what has to carry it. The hot bar
+        opened on #ff2d94 and the cool one closed on #8d93e0, which put the
+        title at 3.5:1 and the status text at 2.2:1. Same two ramps, light ends
+        taken down until white clears 4.5 across the whole width.
+      */}
       <header
         className="flex items-center gap-2 px-2 py-1.5"
         style={{
           background: accent
-            ? "linear-gradient(90deg, #ff2d94 0%, #a51bd0 60%, #4b19b8 100%)"
-            : "linear-gradient(90deg, #2b2f80 0%, #5b62c9 70%, #8d93e0 100%)",
+            ? "linear-gradient(90deg, #d4156f 0%, #a51bd0 60%, #4b19b8 100%)"
+            : "linear-gradient(90deg, #2b2f80 0%, #454ca8 70%, #5f66c4 100%)",
         }}
       >
         <span
@@ -73,7 +80,7 @@ export function Win98({
           {title}
         </h2>
         {status && (
-          <span className="hidden font-mono text-[11px] text-white/70 sm:block">
+          <span className="hidden font-mono text-[11px] text-white sm:block">
             {status}
           </span>
         )}

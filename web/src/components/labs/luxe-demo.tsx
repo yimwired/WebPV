@@ -160,7 +160,7 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
             </Link>
             <Link
               href="/#contact"
-              className="text-[11px] tracking-[0.3em] uppercase underline underline-offset-8"
+              className="inline-block py-1.5 text-[11px] tracking-[0.3em] uppercase underline underline-offset-8"
               style={{ color: GOLD }}
             >
               Enquire
