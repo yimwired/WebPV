@@ -102,9 +102,13 @@ export function Navbar() {
       </a>
 
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+        {/* The wordmark is four characters, so its text box is 26x20 and misses
+            the 24px target floor. Padding gives it a real target and the
+            matching negative margin keeps the optical alignment with the page
+            gutter below it. */}
         <a
           href={onHome ? "#top" : "/"}
-          className="text-foreground/90 hover:text-foreground text-sm font-medium tracking-tight transition-colors"
+          className="text-foreground/90 hover:text-foreground -mx-2 -my-3 rounded-md px-2 py-3 text-sm font-medium tracking-tight transition-colors"
         >
           Film
         </a>

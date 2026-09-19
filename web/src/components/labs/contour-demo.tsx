@@ -124,6 +124,18 @@ export function ContourDemo({
     [1, 0, 0, 1]
   );
 
+  /**
+   * The wordmark follows the light, the way the act copy already does.
+   *
+   * Acts one and four are shot on the warm sweep, which runs from cream to a
+   * pale pink, and the copy in those acts is set in black for that reason. The
+   * header was left white through all four, so for half the page the wordmark
+   * was white on `rgb(220,156,140)`: 2.29:1, under the 3:1 a 30px line needs.
+   * Interpolating it against the same value that fades the ground in costs
+   * nothing and keeps the mark free of a plate it does not want.
+   */
+  const wordmarkInk = useTransform(warmOpacity, [0, 1], ["#ffffff", "#2b0206"]);
+
   return (
     <div ref={container} className="relative h-[460vh] bg-[#150002]">
       <div className="sticky top-0 h-dvh overflow-hidden text-white">
@@ -199,15 +211,23 @@ export function ContourDemo({
         </div>
 
         <header className="relative z-30 flex items-center justify-between px-6 pt-7 sm:px-10">
-          <span
+          <motion.span
+            style={{ color: wordmarkInk }}
             className={cn(
               scriptClass,
               "pointer-events-none text-2xl leading-none sm:text-3xl"
             )}
           >
             Coca-Cola
-          </span>
+          </motion.span>
 
+          {/* The two pills carry a plate instead, for the reason written on the
+              disclaimer below: at 10px they need 4.5:1, and white is only 4.3:1
+              on the brightest part of the red sweep even before the warm acts
+              turn the ground pale. `Concept study` also had
+              `mix-blend-difference` on it, which means its painted colour is
+              whatever happens to be behind it - a number nobody can check, on
+              the one line that has to be read. */}
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -215,11 +235,11 @@ export function ContourDemo({
               aria-label={
                 locale === "en" ? "อ่านเป็นภาษาไทย" : "Read this in English"
               }
-              className="rounded-full border border-white/25 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/70 transition-colors hover:border-white/60 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="rounded-full border border-white/30 bg-black/70 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white transition-colors hover:border-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               {locale === "en" ? "ไทย" : "EN"}
             </button>
-            <span className="pointer-events-none rounded-full border border-white/25 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white/70 mix-blend-difference">
+            <span className="pointer-events-none rounded-full border border-white/30 bg-black/70 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white">
               Concept study
             </span>
           </div>
@@ -246,18 +266,25 @@ export function ContourDemo({
           style={{ opacity: focusOpacity }}
           className="pointer-events-none absolute inset-x-0 top-[11vh] z-20 px-6 sm:top-auto sm:bottom-[16vh] sm:px-10"
         >
+          {/* Nothing in this act is dimmed with alpha any more. Over the red
+              room, white at 75% measures 3.72:1 and white at 85% measures 4.43,
+              both under the 4.5 an 11px line needs, and the room is not one
+              colour: it runs from #d81a22 at the top of the sweep to near
+              black at the floor, so an alpha that passes in one act fails in
+              the next. The hierarchy is carried by size, weight and tracking
+              instead, which is what it was already mostly doing. */}
           <div className="max-w-xs sm:max-w-sm">
-            <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-white/75">
+            <p className="text-[11px] font-medium uppercase tracking-[0.24em] text-white">
               {String(active + 1).padStart(2, "0")} /{" "}
               {String(PACKS.length).padStart(2, "0")}
             </p>
             <h2 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
               {display(packCopy.name)}
             </h2>
-            <p className="mt-1 text-lg text-white/85 sm:text-xl">
+            <p className="mt-1 text-lg text-white sm:text-xl">
               {pack.volume}
             </p>
-            <p className="mt-5 text-sm leading-relaxed text-white/85">
+            <p className="mt-5 text-sm leading-relaxed text-white">
               {packCopy.line}
             </p>
 
@@ -268,7 +295,7 @@ export function ContourDemo({
                 { label: copy.stats.height, value: `${pack.heightMm} mm` },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <dt className="text-[10px] uppercase tracking-[0.16em] text-white/75">
+                  <dt className="text-[10px] uppercase tracking-[0.16em] text-white">
                     {stat.label}
                   </dt>
                   <dd className="mt-1 text-base font-medium tabular-nums">
@@ -277,7 +304,7 @@ export function ContourDemo({
                 </div>
               ))}
             </dl>
-            <p className="mt-3 text-[11px] text-white/75">{packCopy.serves}</p>
+            <p className="mt-3 text-[11px] text-white">{packCopy.serves}</p>
           </div>
         </motion.div>
 
@@ -337,11 +364,14 @@ export function ContourDemo({
               onClick={() => setActive(i)}
               aria-label={`${copy.packs[p.id].name}, ${p.volume}`}
               aria-current={i === active}
+              // The unpicked sizes used to be white/60 on nothing, which put
+              // them at 2.9:1 over the red room they are shown against. Same
+              // plate as the pills above: the picked one already had one.
               className={cn(
                 "grid h-9 w-9 place-items-center rounded-full border text-[9px] font-medium tabular-nums transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
                 i === active
                   ? "border-white bg-white text-neutral-900"
-                  : "border-white/30 text-white/60 hover:border-white/60 hover:text-white"
+                  : "border-white/30 bg-black/70 text-white hover:border-white/70"
               )}
             >
               {p.volume.replace(" ml", "").replace(" L", "L")}

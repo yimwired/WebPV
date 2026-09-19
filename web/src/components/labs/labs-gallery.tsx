@@ -18,9 +18,11 @@ export function LabsGallery() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease }}
         >
+          {/* Padded to clear the 24px target floor; the negative margin keeps
+              the label on the same gutter as the heading under it. */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="-mx-2 -my-2 inline-flex items-center gap-2 rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to site

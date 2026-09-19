@@ -6,26 +6,16 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const labCardVersions: Record<string, string> = {
-  "paste": "554c995d",
-  "kiln": "46a5f8d0",
+  "clash": "7fc6415f",
+  "gaze": "e6786eca",
+  "meeple": "08a29a94",
   "slab": "83a94b72",
-  "prism": "ca92aac2",
-  "ember": "451faf74",
-  "contour": "953be926",
+  "ember": "fd312528",
   "unfold": "c4cc480f",
-  "trine": "ac85a815",
-  "sable": "422d2181",
-  "meridian": "62b55d5b",
+  "trine": "30ed0153",
   "cart": "85ba7b6a",
   "counter": "37137618",
   "longtail": "ab96eabe",
   "stall": "6e1e6e44",
-  "playroom": "7577d738",
-  "signal": "375b08f2",
-  "terminal": "0819d577",
-  "dimension": "82f2bb66",
-  "vision": "32b3cd49",
-  "space": "756433aa",
-  "luxe": "ed1dc801",
   "minimal": "41711562"
 };

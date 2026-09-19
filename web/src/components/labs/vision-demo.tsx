@@ -7,6 +7,10 @@ import { projects } from "@/lib/projects";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
 const BLUE = "#2997ff";
+// The same blue as a fill carries white at 3.0:1, and the button's label is
+// 14px, which needs 4.5. Darkened for that one job; BLUE stays the accent
+// wherever it is the ink rather than the ground.
+const BLUE_FILL = "#0f6fcc";
 
 /** One pinned statement that fades in and out inside the cinematic scroll. */
 function Statement({
@@ -213,7 +217,7 @@ export function VisionDemo() {
             <Link
               href="/services"
               className="rounded-full px-7 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.04]"
-              style={{ background: BLUE }}
+              style={{ background: BLUE_FILL }}
             >
               Build yours
             </Link>

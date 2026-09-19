@@ -69,16 +69,22 @@ const probe = (page) =>
     // pale sheet over a dark page as 1:1 and buried real findings under the
     // noise. Still blind to images and canvas, which is what
     // shoot-contrast.mjs exists to measure.
+    //
+    // Every colour goes through the canvas rather than a regex over the
+    // computed value. This palette resolves to `lab(2.75381 0 0)`, and reading
+    // those three numbers as if they were channels composites a sheet of
+    // "rgb(2.75, 0, 0)" onto the plate: a translucent panel in the site's own
+    // tokens was being mixed in as near-black whatever colour it really was.
     const opaqueBg = (el) => {
       const sheets = [];
       let base = null;
       for (let n = el; n; n = n.parentElement) {
-        const rgba = getComputedStyle(n).backgroundColor.match(/[\d.]+/g)?.map(Number) ?? [];
-        if (rgba.length < 4 || rgba[3] > 0.9) {
-          base = toRgb(getComputedStyle(n).backgroundColor);
+        const [r, g, b, a] = toRgba(getComputedStyle(n).backgroundColor);
+        if (a > 0.9) {
+          base = [r, g, b];
           break;
         }
-        if (rgba[3] > 0.02) sheets.push(rgba);
+        if (a > 0.02) sheets.push([r, g, b, a]);
       }
       if (!base) base = toRgb(getComputedStyle(document.body).backgroundColor);
       for (let i = sheets.length - 1; i >= 0; i -= 1) {
@@ -106,6 +112,11 @@ const probe = (page) =>
       // shoot-contrast uses.
       const box = el.getBoundingClientRect();
       if (box.width < 4 || box.height < 4) continue;
+
+      // Disabled controls are exempt from 1.4.3 and are supposed to read as
+      // unavailable, so their text is not a finding. Same rule in
+      // shoot-contrast.mjs.
+      if (el.closest(":disabled, [aria-disabled='true']")) continue;
 
       const size = parseFloat(cs.fontSize);
       const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
@@ -144,6 +155,74 @@ const probe = (page) =>
         continue;
       }
 
+      // The ancestor walk only sees the element's own box tree, and on the
+      // scene pages the thing the text sits on is a sibling: a stack of
+      // full-bleed gradient layers, or a canvas, painted under the text but
+      // beside it in the DOM. `elementsFromPoint` is the paint stack as the
+      // browser actually assembled it, so if anything between this element and
+      // the ancestor the walk settled on paints a gradient, an image or a
+      // canvas, the plate above is fiction. /labs/contour's wordmark is the
+      // case: it reads the page's near-black root while the gradient sweep two
+      // siblings up is what is behind the letters.
+      if (r < (large ? 3 : 4.5)) {
+        // The paint stack can only be read where the page is: `elementsFromPoint`
+        // answers with nothing for a point outside the viewport, and this pass
+        // measures the whole document from wherever the scroll sweep left it.
+        // Without this the same element was a finding on one width and
+        // unmeasurable on another purely by where it happened to sit.
+        const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+        if (
+          point.x < 0 ||
+          point.y < 0 ||
+          point.x > window.innerWidth ||
+          point.y > window.innerHeight
+        ) {
+          unmeasurable.push({
+            text: label(el),
+            size,
+            why: "off screen when the paint stack was read, measure it with shoot-contrast",
+          });
+          continue;
+        }
+
+        const behind = document.elementsFromPoint(point.x, point.y);
+        const painter = behind.slice(behind.indexOf(el) + 1).find((n) => {
+          if (n.tagName === "CANVAS" || n.tagName === "IMG" || n.tagName === "VIDEO") return true;
+          const bg = getComputedStyle(n);
+          if (bg.backgroundImage !== "none") return true;
+          // Resolved through the canvas, because `lab(100 0 0)` carries three
+          // numbers and a test for a fourth reads an opaque background as no
+          // background at all. That is what the language switch's knob is: the
+          // active label sits on it, and with the knob invisible to this test
+          // the label was reported at 1.05:1 where it measures about 19:1.
+          return toRgba(bg.backgroundColor)[3] > 0.02;
+        });
+        if (painter) {
+          const related = el.contains(painter) || painter.contains(el);
+          // An ancestor is normally fine: the walk above composited its colour
+          // into the plate. It is not fine when what the ancestor paints is a
+          // gradient or an image, which has no single colour to composite:
+          // Rack's title bars are a linear-gradient on the header, so the walk
+          // sailed past them to the steel panel behind and called white text
+          // 1.41:1. Those go to shoot-contrast like the sibling case.
+          const image =
+            painter.tagName === "CANVAS" ||
+            painter.tagName === "IMG" ||
+            painter.tagName === "VIDEO" ||
+            getComputedStyle(painter).backgroundImage !== "none";
+          if (!related || image) {
+            unmeasurable.push({
+              text: label(el),
+              size,
+              why: related
+                ? `sits on a ${painter.tagName.toLowerCase()} its own ancestor paints an image or gradient on`
+                : `sits over a ${painter.tagName.toLowerCase()} painted beside it, not above it in the tree`,
+            });
+            continue;
+          }
+        }
+      }
+
       if (r < (large ? 3 : 4.5)) contrast.push({ text: label(el), size, ratio: +r.toFixed(2) });
     }
 
@@ -165,10 +244,38 @@ const probe = (page) =>
       }
     }
 
-    // An accessible name is required on every control.
+    // An accessible name is required on every control. A form control never has
+    // text of its own, so reading only textContent reported every labelled
+    // input on the contact form as unnamed. Follow the same order the accname
+    // spec does for the sources a page like this actually uses.
+    const accessibleName = (el) => {
+      const byIds = (el.getAttribute("aria-labelledby") || "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((id) => document.getElementById(id)?.textContent?.trim() || "")
+        .join(" ");
+      if (byIds.trim()) return byIds.trim();
+      if (el.getAttribute("aria-label")?.trim()) return el.getAttribute("aria-label").trim();
+
+      if (el.matches("input, select, textarea")) {
+        // Both associations count: `for=` pointing at the id, and a `<label>`
+        // the control is nested inside.
+        const explicit = el.id ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`) : null;
+        const implicit = el.closest("label");
+        const labelText = (explicit || implicit)?.textContent?.trim();
+        if (labelText) return labelText;
+        if (el.getAttribute("title")?.trim()) return el.getAttribute("title").trim();
+        // A placeholder is a fallback name, not a label, but it does leave the
+        // control named. Anything without one is genuinely anonymous.
+        return el.getAttribute("placeholder")?.trim() || "";
+      }
+
+      return el.textContent?.trim() || el.getAttribute("title")?.trim() || "";
+    };
+
     const unnamed = [...document.querySelectorAll("a, button, input, select, textarea")]
       .filter((el) => el.getClientRects().length)
-      .filter((el) => !(el.textContent?.trim() || el.getAttribute("aria-label") || el.getAttribute("title")))
+      .filter((el) => !accessibleName(el))
       .map((el) => el.tagName + (el.className ? `.${String(el.className).slice(0, 40)}` : ""));
 
     const images = [...document.querySelectorAll("img")]
@@ -197,7 +304,15 @@ for (const route of ROUTES) {
     const errors = [];
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
     page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text().slice(0, 160)}`));
-    page.on("requestfailed", (r) => errors.push(`requestfailed: ${r.url().slice(0, 120)}`));
+    // A cancelled request is not a failed one. The router starts a full-route
+    // fetch alongside its segment prefetches and aborts whichever it no longer
+    // needs, so ERR_ABORTED is the normal path and reporting it buried the
+    // 404s that actually mattered.
+    page.on("requestfailed", (r) => {
+      const reason = r.failure()?.errorText ?? "";
+      if (reason === "net::ERR_ABORTED") return;
+      errors.push(`requestfailed: ${r.url().slice(0, 120)} (${reason})`);
+    });
 
     const res = await page.goto(BASE + route, { waitUntil: "load" });
     await page.waitForTimeout(800);
@@ -229,4 +344,10 @@ for (const [key, r] of Object.entries(report)) {
   if (r.imagesMissingAlt.length) issues.push(`img no alt ${JSON.stringify(r.imagesMissingAlt)}`);
   console.log(issues.length ? `\n=== ${key}\n  ${issues.join("\n  ")}` : `ok  ${key}`);
 }
-console.log(`\nheadings @desktop /: ${JSON.stringify(report["/ @desktop"]?.headings)}`);
+// The outline is printed for the home page, and only when the home page was
+// one of the routes asked for: on a run scoped to a lab it printed
+// `undefined`, which reads like a route that failed rather than one that
+// was never visited.
+const home = report["/ @desktop"];
+if (home) console.log(`
+headings @desktop /: ${JSON.stringify(home.headings)}`);
