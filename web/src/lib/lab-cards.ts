@@ -6,12 +6,13 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const labCardVersions: Record<string, string> = {
+  "clash": "7fc6415f",
   "gaze": "e6786eca",
   "meeple": "08a29a94",
   "slab": "83a94b72",
-  "ember": "451faf74",
+  "ember": "fd312528",
   "unfold": "c4cc480f",
-  "trine": "9bdc2060",
+  "trine": "30ed0153",
   "cart": "85ba7b6a",
   "counter": "37137618",
   "longtail": "ab96eabe",

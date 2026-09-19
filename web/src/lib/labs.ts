@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "clash",
+    name: "Clash",
+    vibe: "Maximalism, festival poster",
+    description:
+      "A two day festival across three stages, and a lineup that answers the question a poster never does: which of the sets you want are on at the same time. Pick them and the running order names every collision, says it costs the overlap plus the walk whichever way you take it, and flags the transfers that look fine on paper and are nine minutes on foot. Loud type, hard borders, and black ink on every bright fill, because off-white on this palette measures 1.3:1.",
+    accent: "#f5e04b",
+    preview: { from: "#25d07a", to: "#0d0b0a" },
+    bestFor: "Festivals, temple fairs, club nights, anything with stages and a clock",
+    buildTime: "About a week, and the running order is most of it",
+  },
+  {
     slug: "gaze",
     name: "Gaze",
     vibe: "Interactive, cursor-driven",
@@ -167,17 +178,6 @@ export const labs: Lab[] = [
 //  เก็บไว้ดูเอง ลูกค้าหาไม่เจอแต่เปิดตรงได้
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
-  {
-    slug: "clash",
-    name: "Clash",
-    vibe: "Maximalism, festival poster",
-    description:
-      "A two day festival across three stages, and a lineup that answers the question a poster never does: which of the sets you want are on at the same time. Pick them and the running order names every collision, says it costs the overlap plus the walk whichever way you take it, and flags the transfers that look fine on paper and are nine minutes on foot. Loud type, hard borders, and black ink on every bright fill, because off-white on this palette measures 1.3:1.",
-    accent: "#f5e04b",
-    preview: { from: "#25d07a", to: "#0d0b0a" },
-    bestFor: "Festivals, temple fairs, club nights, anything with stages and a clock",
-    buildTime: "About a week, and the running order is most of it",
-  },
   {
     slug: "loom",
     name: "Loom",
