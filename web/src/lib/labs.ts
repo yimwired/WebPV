@@ -179,6 +179,17 @@ export const labs: Lab[] = [
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
   {
+    slug: "steep",
+    name: "Steep",
+    vibe: "Victorian apothecary, blended to order",
+    description:
+      "A tea room that blends to order, and prints the working label rather than a menu. Pick a leaf and what goes in with it, and the label sets the grams into a 500 ml pot, the water, the minutes and the caffeine per cup. Then it answers the thing a blend never admits: root and bark want boiling water for ten minutes, the leaf in the same pot is bitter long before that, so every material the pot is wrong for is named, by how many degrees or minutes, and told which second pot it belongs in.",
+    accent: "#6d1f2a",
+    preview: { from: "#f2ece0", to: "#c9b89a" },
+    bestFor: "Tea rooms, herbalists, coffee roasters, anything sold by the gram",
+    buildTime: "About a week, and the brewing table is the work",
+  },
+  {
     slug: "draft",
     name: "Draft",
     vibe: "Conceptual sketch, working drawing",
