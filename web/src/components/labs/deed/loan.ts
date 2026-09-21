@@ -95,8 +95,15 @@ export function closingCharges(unit: Unit, loan: number): Charge[] {
     {
       id: "transfer",
       label: "ค่าธรรมเนียมโอนกรรมสิทธิ์",
-      amount: unit.price * FEES.transferRate * FEES.transferShare,
-      basis: `${FEES.transferRate * 100}% ของราคาประเมิน ผู้ซื้อออกครึ่งหนึ่ง`,
+      amount:
+        unit.price *
+        FEES.appraisedShare *
+        FEES.transferRate *
+        FEES.transferShare,
+      basis:
+        `${FEES.transferRate * 100}% ของราคาประเมิน ` +
+        `(ประเมินไว้ ${Math.round(FEES.appraisedShare * 100)}% ของราคาขาย) ` +
+        "ผู้ซื้อออกครึ่งหนึ่ง",
     },
     {
       id: "mortgage",
@@ -181,20 +188,32 @@ export function assess(
 
   const payment = instalment(loan, LOAN.floatRate, years);
   const incomeNeeded = payment / LOAN.dsr;
-  const passes = income >= incomeNeeded && downPayment >= minimumDown;
+
+  // Income is the only thing that can fail here: the deposit control starts at
+  // the bank's own minimum, so a thinner deposit is not a state this page can
+  // be in, and a verdict that tried to cover both would have to explain a
+  // shortfall of zero baht.
+  const passes = income >= incomeNeeded;
 
   const rows = schedule(loan, payment, years);
   const totalInterest = rows.reduce((sum, row) => sum + row.interest, 0);
   const monthsTaken = rows.reduce(
-    (count, row) => count + (row.balance > 0.5 ? 12 : monthsInFinalYear(row, payment)),
+    (count, row) =>
+      count + (row.balance > 0.5 ? 12 : monthsInFinalYear(row, payment)),
     0,
   );
   // The year the split turns over for good. Taking the first year it happens
   // at all names a teaser year: while the promotional rate runs, more of the
   // instalment lands on the balance, and when the rate steps up it goes back.
-  const crossover = rows.find((_, index) =>
-    rows.slice(index).every((later) => later.principal > later.interest),
-  );
+  // Walked backwards, so it is the row after the last year interest won.
+  let lastLosing = -1;
+  for (let index = rows.length - 1; index >= 0; index -= 1) {
+    if (rows[index].principal <= rows[index].interest) {
+      lastLosing = index;
+      break;
+    }
+  }
+  const crossover = rows[lastLosing + 1];
 
   const charges = closingCharges(unit, loan);
   const chargesTotal = charges.reduce((sum, charge) => sum + charge.amount, 0);
@@ -211,7 +230,10 @@ export function assess(
       ) ?? null;
 
     remedy = {
-      moreDown: Math.max(0, Math.ceil((downNeeded - downPayment) / 1000) * 1000),
+      moreDown: Math.max(
+        0,
+        Math.ceil((downNeeded - downPayment) / 1000) * 1000,
+      ),
       longerYears,
     };
   }
@@ -238,8 +260,13 @@ export function assess(
   };
 }
 
-/** The last year is rarely a full twelve instalments, so count what it took. */
+/**
+ * The last year is rarely a full twelve instalments, so count what it took.
+ * Rounded up rather than to nearest: a final instalment of less than half a
+ * payment is still an instalment, and rounding it away made the "finishes
+ * early by N" figure one too many on every term but thirty years.
+ */
 function monthsInFinalYear(row: YearRow, payment: number): number {
   const paid = row.principal + row.interest;
-  return Math.max(1, Math.round(paid / payment));
+  return Math.max(1, Math.ceil(paid / payment - 0.001));
 }

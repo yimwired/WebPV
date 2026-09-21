@@ -77,7 +77,13 @@ export const LOAN = {
  * is left of the deposit. Not one of these appears on a listing.
  */
 export const FEES = {
-  /** of the assessed price, and the buyer conventionally pays half */
+  /**
+   * The Land Department assesses its own value for a unit and charges the
+   * transfer fee on that, not on what the flat sold for. On a new build it
+   * lands a little under the asking price.
+   */
+  appraisedShare: 0.85,
+  /** of the appraised value, and the buyer conventionally pays half */
   transferRate: 0.02,
   transferShare: 0.5,
   /** of the amount borrowed, and the buyer pays all of it */

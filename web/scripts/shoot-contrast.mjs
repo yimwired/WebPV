@@ -102,7 +102,19 @@ for (let y = 0; y < height; y += STEP) {
       // box and a position but are never painted, so the pixels under them
       // belong to whatever really is on screen there. /labs/deed's year table
       // was scored against the unit cards several thousand pixels above it.
-      if (el.closest("details:not([open])")) continue;
+      // checkVisibility is the general form of that: it covers content-
+      // visibility and anything else that keeps a box without painting it,
+      // and unlike closest("details:not([open])") it still measures the
+      // summary, which is painted and is the one part a reader can see.
+      if (
+        el.checkVisibility &&
+        !el.checkVisibility({
+          contentVisibilityAuto: true,
+          visibilityProperty: true,
+          opacityProperty: false,
+        })
+      )
+        continue;
 
       // Text painted through its own background, the bg-clip-text trick: the
       // colour is transparent, so there is no ink to compare a plate against

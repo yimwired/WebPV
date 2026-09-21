@@ -29,6 +29,7 @@ const PROMO_RATE = 3.5;
 const PROMO_YEARS = 3;
 const DSR = 0.4;
 const MAX_LOAN_SHARE = 0.9;
+const APPRAISED = 0.85;
 const TRANSFER = 0.02 * 0.5;
 const MORTGAGE = 0.01;
 const SINKING_PER_SQM = 500;
@@ -125,6 +126,28 @@ const readPage = (page) =>
     };
   });
 
+/**
+ * The teaser years finish the loan ahead of the contract, and the page states
+ * by how many instalments. Worked from the same walk, counting the part year
+ * as the instalments it really takes.
+ */
+const checkEarlyFigure = (state) => {
+  const loan = Math.min(state.price - state.down, state.price * MAX_LOAN_SHARE);
+  const payment = instalment(loan, FLOAT_RATE, state.years);
+  const rows = schedule(loan, payment, state.years);
+  const taken = rows.reduce((count, row, index) => {
+    if (index < rows.length - 1) return count + 12;
+    const paid = row.principal + row.interest;
+    return count + Math.max(1, Math.ceil(paid / payment - 0.001));
+  }, 0);
+  const saved = state.years * 12 - taken;
+  check(
+    state.early.includes(`${saved} งวด`),
+    `over ${state.years} years the teaser rate takes ${saved} instalments off, ` +
+      `and the page says: "${state.early}"`,
+  );
+};
+
 const setRange = async (page, selector, value) => {
   await page.locator(selector).fill(String(value));
   await page.waitForTimeout(250);
@@ -186,7 +209,7 @@ await page.waitForSelector("[data-figure]");
   const loan = Math.min(state.price - state.down, state.price * MAX_LOAN_SHARE);
 
   const wanted = {
-    transfer: state.price * TRANSFER,
+    transfer: state.price * APPRAISED * TRANSFER,
     mortgage: loan * MORTGAGE,
     sinking: state.sqm * SINKING_PER_SQM,
     maintenance: state.sqm * MAINTENANCE_PER_SQM * 12,
@@ -254,11 +277,21 @@ await page.waitForSelector("[data-figure]");
     `the years repay ${paidPrincipal.toFixed(0)} against a ${loan} loan`,
   );
 
-  // and the teaser years really do buy something
-  check(
-    /\d+ งวด/.test(state.early),
-    `the page does not say how much the teaser years take off: "${state.early}"`,
-  );
+  checkEarlyFigure(state);
+}
+
+// ── 3b. the same figure holds on every term on offer ───────────────────────
+{
+  const terms = await page
+    .locator('input[name="deed-years"]')
+    .evaluateAll((inputs) => inputs.map((input) => Number(input.value)));
+  check(terms.length >= 3, `the page offers ${terms.length} terms`);
+
+  for (const term of terms) {
+    await pick(page, String(term));
+    checkEarlyFigure(await readPage(page));
+  }
+  await pick(page, "30");
 }
 
 // ── 4. every bar is the height its own row asks for ────────────────────────
@@ -425,12 +458,17 @@ await page.waitForSelector("[data-figure]");
 
 // ── 9. the keyboard reaches the unit and the term ──────────────────────────
 {
+  // started from the unit the arrow key has to move away from, or the check
+  // passes on the value the page was already showing
+  await pick(page, "สตูดิโอ");
+  const beforeKey = (await readPage(page)).price;
   await page.getByRole("radio", { name: /ยูนิต A/ }).focus();
   await page.keyboard.press("ArrowDown");
   await page.waitForTimeout(250);
+  const afterKey = (await readPage(page)).price;
   check(
-    (await readPage(page)).price === 3_450_000,
-    "an arrow key did not move between the units",
+    afterKey !== beforeKey,
+    `an arrow key left the price at ${afterKey}`,
   );
 
   await page.locator("#deed-income").focus();

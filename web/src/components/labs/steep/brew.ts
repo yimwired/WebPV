@@ -24,8 +24,12 @@ export interface Aside {
 /** What goes in near the end instead, because the pot outlasts it. */
 export interface Late {
   names: string[];
-  /** minutes into the steep */
-  afterMinutes: number;
+  /**
+   * Minutes into the steep, or null when nothing here has a time fault. A
+   * material the pot is only too hot for has no delay to derive: waiting zero
+   * minutes is adding it at the start, which is the opposite of the advice.
+   */
+  afterMinutes: number | null;
   /** the hottest water this group survives */
   water: number;
 }
@@ -105,13 +109,16 @@ export function brew(base: Material, additions: Material[]): Brew {
   // Anything the pot outlasts goes in near the end, timed off whichever of them
   // gives out first.
   const over = faulted(["hot", "long"]);
+  const outlasted = faulted(["long"]);
   const late: Late | null = over.length
     ? {
         names: named(over),
-        afterMinutes: Math.max(
-          0,
-          minutes - Math.min(...over.map((m) => m.steep.max)),
-        ),
+        afterMinutes: outlasted.length
+          ? Math.max(
+              0,
+              minutes - Math.min(...outlasted.map((m) => m.steep.max)),
+            )
+          : null,
         water: Math.min(...over.map((m) => m.water.max)),
       }
     : null;

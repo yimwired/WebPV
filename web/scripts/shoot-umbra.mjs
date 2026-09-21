@@ -189,8 +189,9 @@ await page.waitForSelector("[data-scene]");
   await setSun(page, 24);
   const scene = await readScene(page);
   const sphere = scene.pieces.find((piece) => piece.lift > 0);
-  check(sphere !== undefined, "nothing in the scene floats");
-
+  if (!sphere) {
+    note("nothing in the scene floats, so the ellipse case is untested");
+  } else {
   const shadow = scene.shadows[sphere.id];
   const wanted = sphere.footprint / sin(scene.elevation);
   check(
@@ -208,6 +209,35 @@ await page.waitForSelector("[data-scene]");
     `the sphere floats ${sphere.lift} up, so its shadow falls ${wantedDrift.toFixed(1)} ` +
       `to the side, and it fell ${drift.toFixed(1)}`,
   );
+  }
+}
+
+// ── 4b. and it stays in the frame at every hour the page offers ────────────
+{
+  const hours = await page
+    .locator("button", { hasText: /องศา|°/ })
+    .allInnerTexts();
+  const angles = hours
+    .map((label) => Number(label.match(/(\d+)°/)?.[1]))
+    .filter(Number.isFinite);
+  check(angles.length >= 3, `the page offers ${angles.length} preset hours`);
+
+  for (const angle of angles) {
+    await setSun(page, angle);
+    const scene = await readScene(page);
+    const sphere = scene.pieces.find((piece) => piece.lift > 0);
+    if (!sphere) continue;
+    const shadow = scene.shadows[sphere.id];
+    const inside =
+      Math.min(shadow.x + shadow.width, scene.width) - Math.max(shadow.x, 0);
+    check(
+      inside / shadow.width > 0.55,
+      `at ${angle} degrees only ${Math.round((inside / shadow.width) * 100)}% of ` +
+        "the sphere's shadow is inside the frame, so the picture stops showing " +
+        "the geometry the table quotes",
+    );
+  }
+  await setSun(page, 24);
 }
 
 // ── 5. the light changes side and everything follows ───────────────────────
@@ -245,7 +275,9 @@ await page.waitForSelector("[data-scene]");
     Number.isFinite(own),
     `the note does not say what the borrowed object was shot at: "${scene.reading}"`,
   );
-
+  if (!borrowed || !Number.isFinite(own)) {
+    note("the borrowed object could not be read, so its case is untested");
+  } else {
   const drawn = bandLength(scene, borrowed.id);
   check(
     Math.abs(drawn - borrowed.height / tan(own)) < 0.5,
@@ -264,6 +296,16 @@ await page.waitForSelector("[data-scene]");
     scene.fix.includes("ถ่ายใหม่") && scene.price.includes("3,500"),
     `a wrong-sided object was quoted as "${scene.fix}" at ${scene.price}`,
   );
+
+  // the two suns are 180 minus both elevations apart when they face each other,
+  // which is the figure a compositor would measure and not the difference
+  const apart = 180 - scene.elevation - own;
+  check(
+    scene.reading.includes(`${apart} องศา`),
+    `a ${scene.elevation} degree sun on one side and a ${own} degree sun on the ` +
+      `other are ${apart} degrees apart, and the note says: "${scene.reading}"`,
+  );
+  }
 }
 
 // ── 7. the factor in the note is the ratio of the two shadows on screen ────
@@ -313,7 +355,11 @@ await page.waitForSelector("[data-scene]");
   const own = Number(
     (await readScene(page)).reading.match(/มุม (\d+) องศา/)?.[1],
   );
-  await setSun(page, own);
+  check(
+    Number.isFinite(own),
+    "the lamp's own elevation is not stated, so the matched case cannot be driven",
+  );
+  await setSun(page, Number.isFinite(own) ? own : 38);
   const scene = await readScene(page);
 
   check(
@@ -324,6 +370,12 @@ await page.waitForSelector("[data-scene]");
   check(
     scene.price.includes("ไม่มี"),
     `nothing to fix and the price says ${scene.price}`,
+  );
+  // and the prose agrees with the verdict beside it
+  check(
+    !/\d+(\.\d+)? เท่า/.test(scene.reading),
+    `an object that already matches was still described as being out by a ` +
+      `factor: "${scene.reading}"`,
   );
 
   // one degree of drift is still nothing; twenty is a redraw

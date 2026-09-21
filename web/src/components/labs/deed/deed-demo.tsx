@@ -211,7 +211,7 @@ export function DeedDemo() {
 
             <p className="mt-4 text-[12px] leading-relaxed" style={{ color: MUTED }}>
               ค่างวดคิดที่อัตราลอยตัว {LOAN.floatRate}% ต่อปี (MRR {LOAN.mrr}% ลบ 2)
-              ไม่ได้คิดที่อัตราโปรโมชัน {LOAN.promoRate}% สามปีแรก
+              ไม่ได้คิดที่อัตราโปรโมชัน {LOAN.promoRate}% {LOAN.promoYears} ปีแรก
               เพราะธนาคารใช้อัตราลอยตัวตัดสินว่าจะให้กู้เท่าไหร่
             </p>
           </div>
@@ -286,7 +286,7 @@ export function DeedDemo() {
               )}
               {deal.monthsSaved > 0 && (
                 <p data-early style={{ color: MUTED }}>
-                  สัญญา {years} ปี แต่สามปีแรกดอกเบี้ย {LOAN.promoRate}%
+                  สัญญา {years} ปี แต่ {LOAN.promoYears} ปีแรกดอกเบี้ย {LOAN.promoRate}%
                   ทำให้เงินไปตัดต้นได้มากกว่า หนี้หมดจริงเร็วกว่ากำหนด{" "}
                   {Math.round(deal.monthsSaved)} งวด
                 </p>

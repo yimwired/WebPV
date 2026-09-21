@@ -56,19 +56,28 @@ export function SteepDemo() {
   );
 
   const inPot = [pot.base, ...pot.additions];
+
+  // A bar is drawn as failing when brew.ts filed a fault against it, rather
+  // than by testing the bounds a second time here. Two implementations of one
+  // rule agree only until one of them is edited.
+  const faulted = (id: string, faults: string[]) =>
+    pot.troubles.some(
+      (trouble) => trouble.id === id && faults.includes(trouble.fault),
+    );
+
   const temperatureRows: Band[] = inPot.map((material) => ({
     id: material.id,
     name: material.name,
     from: material.water.min,
     to: material.water.max,
-    ok: pot.water >= material.water.min && pot.water <= material.water.max,
+    ok: !faulted(material.id, ["cold", "hot"]),
   }));
   const timeRows: Band[] = inPot.map((material) => ({
     id: material.id,
     name: material.name,
     from: material.steep.min,
     to: material.steep.max,
-    ok: pot.minutes >= material.steep.min && pot.minutes <= material.steep.max,
+    ok: !faulted(material.id, ["short", "long"]),
   }));
 
   const toggle = (id: string) =>
@@ -108,8 +117,8 @@ export function SteepDemo() {
           </h1>
           <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-[#4a4037]">
             รากกับเปลือกไม้ต้องน้ำเดือด ใบชาขมตั้งแต่ก่อนถึงตรงนั้น
-            เลือกของที่อยากได้ลงกา แล้วใบสั่งข้างล่างบอกเองว่าน้ำกี่องศา แช่กี่นาที
-            ตัวไหนไม่ออกรส และตัวไหนต้องแยกไปต้มอีกหม้อ
+            เลือกของที่อยากได้ลงกา แล้วใบสั่งข้างล่างบอกเองว่าน้ำกี่องศา
+            แช่กี่นาที ตัวไหนไม่ออกรส และตัวไหนต้องแยกไปต้มอีกหม้อ
           </p>
         </div>
       </header>
@@ -187,7 +196,9 @@ export function SteepDemo() {
           </fieldset>
 
           <div className="mt-4 border border-[#221c17]/30 bg-white/60 p-4">
-            <p className="text-[12px] tracking-[0.2em] uppercase">สูตรของร้าน</p>
+            <p className="text-[12px] tracking-[0.2em] uppercase">
+              สูตรของร้าน
+            </p>
             <div className="mt-2 space-y-2">
               {RECIPES.map((option) => (
                 <button
@@ -202,7 +213,9 @@ export function SteepDemo() {
                   <span className="font-[family-name:var(--font-steep-display)] text-[13px] tracking-[0.18em] text-[#6d1f2a]">
                     {option.latin}
                   </span>
-                  <span className="mt-0.5 block text-[14px]">{option.name}</span>
+                  <span className="mt-0.5 block text-[14px]">
+                    {option.name}
+                  </span>
                 </button>
               ))}
             </div>
@@ -231,7 +244,9 @@ export function SteepDemo() {
               <p className="mt-1 text-[14px] text-[#4a4037]">
                 {recipe
                   ? recipe.line
-                  : `ผสมจาก${pot.base.name} กับของอีก ${pot.additions.length} อย่าง`}
+                  : pot.additions.length === 0
+                    ? `${pot.base.name}ล้วน ไม่ผสมอะไรเลย`
+                    : `ผสมจาก${pot.base.name} กับของอีก ${pot.additions.length} อย่าง`}
               </p>
 
               {/* the weights, which is what the shop actually sells */}
@@ -356,7 +371,8 @@ export function SteepDemo() {
                     <>
                       {trouble.name} ทนน้ำได้ถึง{" "}
                       <strong>{pot.water - trouble.by} องศา</strong>{" "}
-                      กานี้ร้อนเกินไป {trouble.by} องศา กลิ่นลอยไปกับไอตั้งแต่เทน้ำ
+                      กานี้ร้อนเกินไป {trouble.by} องศา
+                      กลิ่นลอยไปกับไอตั้งแต่เทน้ำ
                     </>
                   )}
                   {trouble.fault === "short" && (
@@ -382,17 +398,27 @@ export function SteepDemo() {
                 {pot.aside && (
                   <p data-aside>
                     <span className="font-semibold">ต้มแยกอีกหม้อ</span>{" "}
-                    {pot.aside.names.join(" กับ ")} ใส่น้ำครึ่งหนึ่งของกา ตั้งไฟที่{" "}
-                    {pot.aside.water} องศา {pot.aside.minutes} นาที
+                    {pot.aside.names.join(" กับ ")} ใส่น้ำครึ่งหนึ่งของกา
+                    ตั้งไฟที่ {pot.aside.water} องศา {pot.aside.minutes} นาที
                     กรองแล้วเทลงกาชา
                   </p>
                 )}
                 {pot.late && (
                   <p data-late>
                     <span className="font-semibold">ใส่ทีหลัง</span>{" "}
-                    {pot.late.names.join(" กับ ")} รอให้กาแช่ไปแล้ว{" "}
-                    {pot.late.afterMinutes} นาทีค่อยใส่ พักให้น้ำลดลงมาราว{" "}
-                    {pot.late.water} องศาก่อนยิ่งดี
+                    {pot.late.names.join(" กับ ")}{" "}
+                    {pot.late.afterMinutes !== null ? (
+                      <>
+                        รอให้กาแช่ไปแล้ว {pot.late.afterMinutes} นาทีค่อยใส่
+                        พักให้น้ำลดลงมาราว {pot.late.water} องศาก่อนยิ่งดี
+                      </>
+                    ) : (
+                      <>
+                        ยกกาลงพักให้น้ำลดเหลือราว {pot.late.water} องศาก่อน
+                        แล้วค่อยใส่ลงไป
+                        กลิ่นจะอยู่ครบกว่าเทน้ำเดือดใส่ตั้งแต่แรก
+                      </>
+                    )}
                   </p>
                 )}
               </div>

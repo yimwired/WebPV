@@ -138,7 +138,7 @@ await page.waitForSelector("[data-blend]");
       `${scaleId}: the rule is drawn at ${scale.rows[0].rule.toFixed(1)}, not ${set}`,
     );
   }
-  await page.screenshot({ path: `${OUT}/01-evening.png` });
+  await page.screenshot({ path: `${OUT}/01-morning.png` });
 }
 
 // ── 2. a bar is marked as failing exactly when the rule misses it ──────────
@@ -162,7 +162,7 @@ await page.waitForSelector("[data-blend]");
   const temperature = await readScale(page, "temperature");
   const time = await readScale(page, "time");
   const failing = [...temperature.rows, ...time.rows].filter((row) => !row.ok);
-  check(failing.length > 0, "the shop's evening blend has nothing to report");
+  check(failing.length > 0, "the shop's opening blend has nothing to report");
 
   const named = await page.evaluate(() =>
     [...document.querySelectorAll("[data-weight] td:first-child")].map((td) => ({
@@ -247,8 +247,61 @@ await page.waitForSelector("[data-blend]");
   await page.screenshot({ path: `${OUT}/03-one-pot.png` });
 }
 
+// ── 5b. a petal the pot is only too hot for is not told to wait zero minutes ─
+{
+  await clearAdditions(page);
+  await pick(page, "ชาดำอัสสัม");
+  await pick(page, "กลีบกุหลาบแห้ง");
+
+  const label = await readLabel(page);
+  const temperature = await readScale(page, "temperature");
+  const time = await readScale(page, "time");
+  const rose = temperature.rows.find((row) => row.id === "rose");
+
+  check(!rose.ok, "rose was drawn as fine in a 95 degree pot");
+  check(
+    time.rows.every((row) => row.ok),
+    "rose and assam steep for the same minutes, and a time bar was marked failing",
+  );
+  check(
+    label.late.length > 0,
+    `a petal that cannot take 95 degrees was given no instruction: "${label.notes}"`,
+  );
+  check(
+    !/\d+ นาทีค่อยใส่/.test(label.late),
+    `nothing here runs out of time, so the advice should not be a delay: "${label.late}"`,
+  );
+  check(
+    label.late.includes(`${Math.round(rose.to)} องศา`),
+    `the advice does not name the ${rose.to} degrees rose survives: "${label.late}"`,
+  );
+  check(
+    label.aside === "",
+    `nothing needs a harder boil here: "${label.aside}"`,
+  );
+}
+
+// ── 5c. a pot with nothing in it but leaf says so ──────────────────────────
+{
+  await clearAdditions(page);
+  const label = await readLabel(page);
+  check(
+    label.weights.length === 1,
+    `clearing every addition left ${label.weights.length} rows on the label`,
+  );
+  check(
+    !label.body.includes("0 อย่าง"),
+    "an unmixed pot is described as blended with 0 other things",
+  );
+  check(
+    label.notes.includes("ชงหม้อเดียวจบ"),
+    `one leaf on its own has nothing to report, and the notes say: "${label.notes}"`,
+  );
+}
+
 // ── 6. the label weighs and prices what is actually in the pot ─────────────
 {
+  await pick(page, "ตะไคร้");
   const label = await readLabel(page);
   const summed =
     Math.round(label.weights.reduce((total, row) => total + row.grams, 0) * 10) /

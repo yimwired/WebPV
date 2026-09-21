@@ -219,7 +219,8 @@ export function UmbraDemo() {
           </table>
           <p className="mt-3 text-[13px] leading-relaxed text-[#9aa6bd]">
             ของที่ตั้งบนพื้นใช้ความสูงหารด้วย tan ของมุมแสง
-            ทรงกลมลอยไม่ได้ใช้สูตรเดียวกัน เงามันเป็นวงรีที่กว้างเท่ากับรัศมีหารด้วย sin
+            ทรงกลมลอยไม่ได้ใช้สูตรเดียวกัน
+            เงามันเป็นวงรีที่กว้างเท่ากับรัศมีหารด้วย sin
             และไปตกห่างจากตัวมันเองตามระยะที่ลอยอยู่
           </p>
         </section>
@@ -314,6 +315,14 @@ export function UmbraDemo() {
                     </p>
                   )}
                 </>
+              ) : mismatch.fix === "match" ? (
+                <p>
+                  {borrowed.name}ถ่ายมาตอนแสงทำมุม{" "}
+                  <strong>{borrowed.elevation} องศา</strong> ฉากนี้ {elevation}{" "}
+                  องศา ต่างกันไม่พอให้ตาจับได้ เงายาว {metres(mismatch.brought)}{" "}
+                  ม. ทั้งที่ควรเป็น {metres(mismatch.wanted)} ม.
+                  วางลงไปได้เลยไม่ต้องแก้
+                </p>
               ) : (
                 <>
                   <p>
@@ -354,7 +363,9 @@ export function UmbraDemo() {
                   className="mt-1 font-[family-name:var(--font-umbra-head)] text-[24px] leading-none font-light"
                   style={{ color: SUN }}
                 >
-                  {mismatch.price === 0 ? "ไม่มี" : `${baht(mismatch.price)} บาท`}
+                  {mismatch.price === 0
+                    ? "ไม่มี"
+                    : `${baht(mismatch.price)} บาท`}
                 </dd>
               </div>
             </dl>

@@ -93,7 +93,14 @@ export function compare(piece: Borrowed, light: Light): Mismatch {
   const ratio = wanted / brought;
   const factor = ratio >= 1 ? ratio : 1 / ratio;
   const opposite = piece.side !== light.side;
-  const degrees = Math.abs(light.elevation - piece.elevation);
+
+  // The angle between the two light directions, which is not the difference of
+  // the two elevations once they come from opposite sides: a sun 24 degrees up
+  // on the left and one 71 degrees up on the right are 85 degrees apart, not
+  // 47. A compositor measures the first number.
+  const degrees = opposite
+    ? 180 - light.elevation - piece.elevation
+    : Math.abs(light.elevation - piece.elevation);
 
   // A shadow that is only a little out can be stretched, and one that is well
   // out has to be drawn again. Neither helps once the lit side of the object

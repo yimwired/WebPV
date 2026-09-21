@@ -46,7 +46,7 @@ export const SCENE: Piece[] = [
     x: 30,
     height: 22,
     width: 22,
-    lift: 34,
+    lift: 24,
     lane: 0,
   },
   {
@@ -130,11 +130,16 @@ export const LANE_DROP = 6;
 export const HOURS = [
   { id: "morning", label: "เจ็ดโมงเช้า", elevation: 18 },
   { id: "noon", label: "เที่ยงตรง", elevation: 68 },
-  { id: "evening", label: "ห้าโมงเย็น", elevation: 15 },
+  { id: "evening", label: "ห้าโมงเย็น", elevation: 17 },
 ];
 
-/** Below 14 degrees every shadow in the scene runs off the frame. */
-export const ELEVATION_LIMITS = { min: 14, max: 74 };
+/**
+ * Below 16 degrees the sphere's ellipse is thrown so far to the side that most
+ * of it is outside the frame, which is what really happens to a shadow at that
+ * hour but leaves the picture with nothing to read. The bands of the two
+ * standing pieces run off the edge well before that, and are meant to.
+ */
+export const ELEVATION_LIMITS = { min: 16, max: 74 };
 
 /**
  * What the studio charges to put a borrowed object into a scene. Relighting in
