@@ -179,6 +179,17 @@ export const labs: Lab[] = [
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
   {
+    slug: "umbra",
+    name: "Umbra",
+    vibe: "Surrealism, lit by trigonometry",
+    description:
+      "A composite studio, selling the thing a client can never name: why a cut-out looks pasted on. The scene is one no camera could take, a sphere hanging over an empty plain, and every shadow in it is redrawn from the angle of the sun you set, at height over tan for anything standing on the ground and an ellipse of radius over sin for the one that floats. Then it drops in an object cut from a different photograph, with the light that came with it, and measures the lie: how many times out the shadow is, how many degrees between the two suns, and whether that is a stretch, a redraw or an honest reshoot.",
+    accent: "#e8a765",
+    preview: { from: "#1d3763", to: "#d8a074" },
+    bestFor: "Retouchers, ad agencies, photographers, anyone selling images",
+    buildTime: "About a week, and the geometry is the work",
+  },
+  {
     slug: "steep",
     name: "Steep",
     vibe: "Victorian apothecary, blended to order",
