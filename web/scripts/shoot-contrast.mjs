@@ -98,6 +98,12 @@ for (let y = 0; y < height; y += STEP) {
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden") continue;
 
+      // A closed <details> keeps its contents in layout in Chrome: they have a
+      // box and a position but are never painted, so the pixels under them
+      // belong to whatever really is on screen there. /labs/deed's year table
+      // was scored against the unit cards several thousand pixels above it.
+      if (el.closest("details:not([open])")) continue;
+
       // Text painted through its own background, the bg-clip-text trick: the
       // colour is transparent, so there is no ink to compare a plate against
       // and the reader scored it 1:1 every time. shoot-audit lists the same

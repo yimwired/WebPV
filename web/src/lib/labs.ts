@@ -179,6 +179,17 @@ export const labs: Lab[] = [
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
   {
+    slug: "deed",
+    name: "Deed",
+    vibe: "Property, priced honestly",
+    description:
+      "A condominium project that answers the two questions a listing never does: whether a bank will lend, and what has to be in the account on transfer day. Give it your income and your deposit and it works the instalment at the floating rate rather than the three year teaser, because that is what the bank sizes the loan against. If the forty percent rule turns it down it says by how much and what would fix it, in baht. Thirty years of instalments are charted where they actually go, and the transfer day costs are itemised down to the meters.",
+    accent: "#1b5e9c",
+    preview: { from: "#f6f4f0", to: "#c9c2b6" },
+    bestFor: "Developers, agents, anything sold on a mortgage",
+    buildTime: "A week and a half, and the loan maths is most of it",
+  },
+  {
     slug: "umbra",
     name: "Umbra",
     vibe: "Surrealism, lit by trigonometry",
