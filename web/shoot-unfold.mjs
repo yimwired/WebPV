@@ -7,7 +7,9 @@ import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 
 const URL = process.env.SHOOT_URL ?? "http://localhost:3000";
-const OUT = process.env.OUT ?? "shots";
+// screenshots/, like every other verify script: `shots/` was the one output
+// path .gitignore did not cover, so a sweep left 3 MB of PNGs staged.
+const OUT = process.env.OUT ?? "screenshots/unfold";
 
 /** Matched against each section's first heading. */
 const SECTIONS = [

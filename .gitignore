@@ -28,6 +28,9 @@ web/.git_disabled_scaffold/
 # lands one level up.
 web/screenshots/
 screenshots/
+# shoot-unfold.mjs wrote here before 2026-09-22; kept so an old checkout stays clean
+web/shots/
+shots/
 
 # local state written by `wrangler dev`
 .wrangler/
