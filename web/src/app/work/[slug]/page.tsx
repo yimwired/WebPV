@@ -1,11 +1,8 @@
+import { pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CaseStudy } from "@/components/site/case-study";
-import {
-  caseStudySlugs,
-  dictionary,
-  isCaseStudySlug,
-} from "@/lib/dictionary";
+import { caseStudySlugs, dictionary, isCaseStudySlug } from "@/lib/dictionary";
 import { projects } from "@/lib/projects";
 import { caseStudyGraph, jsonLdHtml } from "@/lib/structured-data";
 
@@ -28,10 +25,11 @@ export async function generateMetadata({
   const cs = dictionary.en.caseStudies[slug];
   const project = projects.find((p) => p.id === slug);
 
-  return {
+  return pageMetadata({
     title: `${cs.title} case study | Film`,
     description: project?.description ?? cs.subtitle,
-  };
+    path: `/work/${slug}`,
+  });
 }
 
 export default async function CaseStudyPage({

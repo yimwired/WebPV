@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Itim, Sarabun } from "next/font/google";
 import { DraftDemo } from "@/components/labs/draft/draft-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Sarabun sets the drawing, because it is the face Thai documents are set in
@@ -21,11 +21,12 @@ const hand = Itim({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Draft | The Lab · Film",
   description:
     "Conceptual sketch study: an interior studio that publishes the working drawing instead of the render. Set your room's real dimensions and the plan redraws to scale, measures the walkway left between the furniture, and writes in the margin which piece does not fit and by how many centimetres. A fictional studio.",
-};
+  path: "/labs/draft",
+});
 
 export default function DraftPage() {
   return (

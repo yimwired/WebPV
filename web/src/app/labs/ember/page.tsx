@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Anton, Kanit } from "next/font/google";
 import { EmberDemo } from "@/components/labs/ember/ember-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Two faces, and the split between them is not a style choice: Anton has no
@@ -20,11 +20,12 @@ const thai = Kanit({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Ember | The Lab · Film",
   description:
     "Thai charcoal grill buffet style study: a loud chain brand page with floating product cards, a scroll-parallax hero and a dialog that grows out of the card you pressed.",
-};
+  path: "/labs/ember",
+});
 
 export default function EmberPage() {
   return (

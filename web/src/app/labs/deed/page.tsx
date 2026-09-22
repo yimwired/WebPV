@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Noto_Sans_Thai, Noto_Serif_Thai } from "next/font/google";
 import { DeedDemo } from "@/components/labs/deed/deed-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // A serif for the figures and the headlines, because this is a page about money
@@ -20,11 +20,12 @@ const body = Noto_Sans_Thai({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Deed | The Lab · Film",
   description:
-    "Property study: a condominium site that answers what a listing never does. Give it your income and your deposit and it works the instalment at the floating rate rather than the teaser, says whether a bank's 40 percent rule lets it through and what would fix it, charts where thirty years of instalments actually go, and itemises the cash that has to be in the account on transfer day. A fictional project.",
-};
+    "Property study: a condominium site that answers what a listing never does. Give it your income and your deposit and it works the real instalment, says whether a bank would lend and what would fix it, and itemises the cash needed on transfer day. A fictional project.",
+  path: "/labs/deed",
+});
 
 export default function DeedPage() {
   return (

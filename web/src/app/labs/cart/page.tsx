@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Kanit } from "next/font/google";
 import { CartDemo } from "@/components/labs/cart-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // The headings on this page are Thai, and the rest of the site falls back to
@@ -13,11 +13,12 @@ const display = Kanit({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Cart | The Lab · Film",
   description:
     "Single product style study: off-black retail, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it.",
-};
+  path: "/labs/cart",
+});
 
 export default function CartPage() {
   return (

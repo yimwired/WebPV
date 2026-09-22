@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai } from "next/font/google";
 import { PrismDemo } from "@/components/labs/prism/prism-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // A panel that imitates an operating system wants a face with no opinion, and
@@ -13,11 +13,12 @@ const sans = IBM_Plex_Sans_Thai({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Prism | The Lab · Film",
   description:
     "Glass study: refraction at the rim, a chromatic fringe, a specular edge and a sheet that flips mode to keep its text readable. Switch each layer off and see what it was doing.",
-};
+  path: "/labs/prism",
+});
 
 export default function PrismPage() {
   return (

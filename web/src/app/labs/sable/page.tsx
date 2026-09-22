@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { StaticLabFrame } from "@/components/labs/static-lab-frame";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Sable | The Lab · Film",
   description:
     "Product page study: ink on paper, a CSS-drawn e-ink slate, and a text field that drives the panel at the hardware's real 41 ms latency.",
-};
+  path: "/labs/sable",
+});
 
 export default function SablePage() {
   return (

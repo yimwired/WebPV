@@ -6,6 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { dictionary, type CaseStudySlug } from "@/lib/dictionary";
+import { introOffer, pricingTiers } from "@/lib/pricing";
 import { projects } from "@/lib/projects";
 import { CONTACT_EMAIL, PROFILES, SITE_URL } from "@/lib/site";
 
@@ -91,6 +92,47 @@ export function caseStudyGraph(slug: CaseStudySlug) {
  * literal `</script>` inside any copy field from closing the tag early —
  * the data is ours today, but the fields it reads are edited by hand.
  */
+/**
+ * The price list, as the offers it is. Quoted at what a visitor is actually
+ * charged today, which is the intro price while that promotion is running: a
+ * schema that advertises a number the page does not show is the kind of thing
+ * a search engine is right to distrust.
+ */
+export function pricingGraph() {
+  const copy = dictionary.en.pricing.tiers;
+  const offers = pricingTiers
+    .filter((tier) => tier.price !== null)
+    .map((tier) => ({
+      "@type": "Offer",
+      name: copy[tier.id].name,
+      description: copy[tier.id].forWho,
+      price: Number(
+        (introOffer.active && tier.introPrice
+          ? tier.introPrice
+          : (tier.price as string)
+        ).replace(/,/g, ""),
+      ),
+      priceCurrency: "THB",
+      url: `${SITE_URL}/pricing`,
+      availability: "https://schema.org/InStock",
+    }));
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": `${SITE_URL}/pricing#service`,
+        name: "Website design and development",
+        serviceType: "Web development",
+        provider: { "@id": PERSON_ID },
+        areaServed: { "@type": "Country", name: "Thailand" },
+        offers,
+      },
+    ],
+  };
+}
+
 export function jsonLdHtml(graph: object): string {
   return JSON.stringify(graph).replace(/</g, "\u003c");
 }

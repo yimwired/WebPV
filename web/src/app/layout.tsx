@@ -22,17 +22,17 @@ export const metadata: Metadata = {
     "Nuttapon Yimnoi (Film), Bangkok. Five systems in production: a gold trading terminal, an 11-agent AI fleet, dashboards and publishing automation, all built solo.",
   // update if Vercel assigns a different domain (or a custom domain later)
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: SITE_URL },
   openGraph: {
     title: "Film | Trading systems, AI agents and the tools around them",
-    description:
-      "Five systems in production, all designed and built solo.",
+    description: "Five systems in production, all designed and built solo.",
+    url: SITE_URL,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Film | Trading systems, AI agents and the tools around them",
-    description:
-      "Five systems in production, all designed and built solo.",
+    description: "Five systems in production, all designed and built solo.",
   },
 };
 

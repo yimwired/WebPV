@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Trirong } from "next/font/google";
 import { LoomDemo } from "@/components/labs/loom/loom-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Trirong is the one Thai serif on Google Fonts with a Latin cut that belongs
@@ -14,11 +14,12 @@ const trirong = Trirong({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Loom | The Lab · Film",
   description:
     "Bohemian style study for a three-room guesthouse: pick your nights and the panel prices them direct and through a booking agent side by side, so the commission the owner pays is finally a number the guest can see.",
-};
+  path: "/labs/loom",
+});
 
 export default function LoomPage() {
   return (

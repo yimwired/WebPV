@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Bai_Jamjuree, Chakra_Petch } from "next/font/google";
 import { ClashDemo } from "@/components/labs/clash/clash-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Both cover Thai and Latin, which a poster in this register needs: the
@@ -21,11 +21,12 @@ const body = Bai_Jamjuree({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Clash | The Lab · Film",
   description:
     "Maximalist festival study: three stages, twenty-four sets, and a running order that answers the only question a lineup poster never does. Pick the sets you want and the page names every clash, how many minutes it costs, and whether you can walk it in time. A fictional festival.",
-};
+  path: "/labs/clash",
+});
 
 export default function ClashPage() {
   return (

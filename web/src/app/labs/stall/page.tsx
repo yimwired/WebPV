@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { StallDemo } from "@/components/labs/stall-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Stall | The Lab · Film",
   description:
     "Marketplace style study: accounts, listings, search and filters, with the seller messaged directly and no money held by the site.",
-};
+  path: "/labs/stall",
+});
 
 export default function StallPage() {
   return (

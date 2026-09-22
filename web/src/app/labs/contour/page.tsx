@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Grand_Hotel } from "next/font/google";
 import { ContourDemo } from "@/components/labs/contour-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 /**
@@ -10,11 +10,12 @@ import { LabSwitcher } from "@/components/labs/lab-switcher";
  */
 const script = Grand_Hotel({ subsets: ["latin"], weight: "400" });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Contour | The Lab · Film",
   description:
     "Beverage packaging study: one drink in three pack sizes, lathed in WebGL from published dimensions, with the labels painted in the browser. An unofficial concept.",
-};
+  path: "/labs/contour",
+});
 
 export default function ContourPage() {
   return (

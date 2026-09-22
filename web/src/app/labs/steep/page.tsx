@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Maitree, Playfair_Display, Trirong } from "next/font/google";
 import { SteepDemo } from "@/components/labs/steep/steep-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Three faces, because a page with no pictures on it has nothing else to work
@@ -30,11 +30,12 @@ const body = Maitree({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Steep | The Lab · Film",
   description:
     "Victorian apothecary study: a tea room that blends to order and prints the working label. Pick a leaf and what goes in with it, and the page sets the water, the minutes, the grams and the caffeine, then names every material the pot is too cool or too quick for and what to brew separately instead. A fictional shop.",
-};
+  path: "/labs/steep",
+});
 
 export default function SteepPage() {
   return (

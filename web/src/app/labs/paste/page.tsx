@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Charm, Maitree } from "next/font/google";
 import { PasteDemo } from "@/components/labs/paste/paste-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Charm is a Thai hand that is still legible at a heading size, which is the
@@ -24,11 +24,12 @@ const body = Maitree({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Paste | The Lab · Film",
   description:
     "Scrapbook style study: a wedding invitation made of taped-down instant photos and ruled paper, doing the one thing a paper invitation cannot. Type your name and it tells you your table.",
-};
+  path: "/labs/paste",
+});
 
 export default function PastePage() {
   return (

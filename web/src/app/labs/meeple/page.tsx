@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { K2D, Silkscreen } from "next/font/google";
 import { MeepleDemo } from "@/components/labs/meeple/meeple-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // There is no Thai pixel font, on Google Fonts or anywhere that ships webfonts,
@@ -23,11 +23,12 @@ const thai = K2D({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Meeple | The Lab · Film",
   description:
     "Pixel art style study for a board game cafe: answer the three questions the staff ask and the shelf splits into what you can actually play tonight and what you cannot, with the reason on every box.",
-};
+  path: "/labs/meeple",
+});
 
 export default function MeeplePage() {
   return (

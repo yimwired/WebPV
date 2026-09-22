@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai, Kanit } from "next/font/google";
 import { UmbraDemo } from "@/components/labs/umbra/umbra-demo";
+import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 // Kanit at its lightest weight for anything set large: a geometric Thai face
@@ -21,11 +21,12 @@ const body = IBM_Plex_Sans_Thai({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Umbra | The Lab · Film",
   description:
-    "Surrealism study: a composite studio whose scene is lit by real trigonometry. Move the sun and every shadow is redrawn at height over tan of the angle, while the floating sphere gets the ellipse its own geometry asks for. One object is cut from another photograph and brought its own light with it, and the page measures how far out it is and whether that is a stretch, a redraw or a reshoot. A fictional studio.",
-};
+    "Surrealism study: a composite studio whose scene is lit by real trigonometry. Move the sun and every shadow is redrawn from the angle. One object is cut from another photograph and kept its own light, and the page measures how far out it is. A fictional studio.",
+  path: "/labs/umbra",
+});
 
 export default function UmbraPage() {
   return (
