@@ -179,6 +179,17 @@ export const labs: Lab[] = [
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
   {
+    slug: "hoop",
+    name: "Hoop",
+    vibe: "Generative type, grown as you write",
+    description:
+      "A name embroidery shop where typing grows the design. Every character sprouts its own vine, leaves and roses in three timed acts, backspace withers them, and Thai is typed as readily as Latin. Then the garden is counted the way the machine will sew it: satin for the letters, fill for the leaves and roses, a triple run for the vines. The price on the page is the stitch count of the design on screen, not a rate per letter.",
+    accent: "#f2301f",
+    preview: { from: "#0b0b0c", to: "#3b55ff" },
+    bestFor: "Embroidery and engraving shops, personalised gifts, anything priced by the job",
+    buildTime: "About a week, and the growth choreography is most of it",
+  },
+  {
     slug: "deed",
     name: "Deed",
     vibe: "Property, priced honestly",
