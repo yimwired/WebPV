@@ -43,12 +43,12 @@ const grow = (page, ms = 3200) => page.waitForTimeout(ms);
 // the OS (net::ERR_NETWORK_ACCESS_DENIED), about one request in a thousand,
 // while curl gets every one of the same URLs; when the refused one is a script
 // chunk the page never hydrates and every check after it fails for nothing.
-// Running the network service outside its sandbox took it to none in a
-// thousand. It changes how the browser opens sockets, not what the page does.
-const browser = await chromium.launch({ args: ["--disable-features=NetworkServiceSandbox"] });
+// Running Chromium's network service unsandboxed did not stop it. So a refused
+// navigation is tried once more, and every refusal is listed apart from the
+// page's own errors, since the server never saw the request, rather than being
+// hidden or counted against the page.
+const browser = await chromium.launch();
 const errors = [];
-// Any refusal that still happens is listed apart from the page's own errors,
-// since the server never saw the request, rather than hidden or counted.
 const REFUSED = "net::ERR_NETWORK_ACCESS_DENIED";
 const refused = [];
 const watch = (page, tag = "") => {
