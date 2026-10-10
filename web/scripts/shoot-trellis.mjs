@@ -36,8 +36,22 @@ const graphemes = (text) =>
     .filter((s) => s.trim() !== "");
 
 const FIELD = "input[aria-label='ข้อความที่จะปลูก']";
-const LIVE = '.tr-plant[data-layer="back"]:not([data-dying])';
+// A palette change lays a still copy of the garden over it until it settles,
+// so plants are counted outside those copies, and a check that reads the
+// garden after a change waits until the garden is in the palette the controls
+// show and no copy is left. The copy is made a frame after the press, so "no
+// copy yet" alone would pass before anything had happened.
+const LIVE = '.tr-plant[data-layer="back"]:not([data-dying]):not([data-wipes] *)';
 const grow = (page, ms = 3200) => page.waitForTimeout(ms);
+const settlePalette = (page) =>
+  page.waitForFunction(
+    () => {
+      const ground = (el) => el?.style.getPropertyValue("--tr-ground");
+      return !document.querySelector("[data-wipes] > *") && ground(document.querySelector(".tr-root")) === ground(document.querySelector(".tr-chrome"));
+    },
+    null,
+    { timeout: 8000 },
+  );
 
 // On Film's Windows machine Chromium is now and then refused a local socket by
 // the OS (net::ERR_NETWORK_ACCESS_DENIED), about one request in a thousand,
@@ -478,7 +492,7 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
     window.__nodes = [...document.querySelectorAll(".tr-plant")];
   });
   await page.locator("label:has(input[name='trellis-palette'][value='banana-leaf'])").click();
-  await page.waitForTimeout(800);
+  await settlePalette(page);
   const state = await page.evaluate(() => {
     const rose = document.querySelector(".tr-head, .tr-bud");
     const vine = document.querySelector(".tr-vine");
@@ -512,6 +526,7 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
     `"${typed.text}" with ${typed.plants} plants, then "${await field.inputValue()}"`,
   );
   await page.locator("label:has(input[name='trellis-palette'][value='night'])").click();
+  await settlePalette(page);
 }
 
 // ── 8. a pointer shakes the plant it passes; a press grows it again ────────
@@ -563,20 +578,21 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
   await setText("in full bloom");
   await page.locator("label:has(input[name='trellis-mode'][value='poster'])").click();
   await page.locator("label:has(input[name='trellis-palette'][value='lotus'])").click();
+  await settlePalette(page);
   await page.waitForTimeout(600);
   await page.getByRole("button", { name: "คัดลอกลิงก์" }).click();
   await page.waitForTimeout(300);
   const link = await page.evaluate(() => navigator.clipboard.readText());
-  const shape = () =>
-    [...document.querySelectorAll('.tr-plant[data-layer="back"]:not([data-dying])')].map((p) =>
+  const shape = (live) =>
+    [...document.querySelectorAll(live)].map((p) =>
       [...p.querySelectorAll(".tr-vine")].map((v) => v.getAttribute("d")).join("|"),
     );
-  const here = await page.evaluate(shape);
+  const here = await page.evaluate(shape, LIVE);
   const other = await ctx.newPage();
   watch(other, "link: ");
   await visit(other, link);
   await grow(other, 4500);
-  const there = await other.evaluate(shape);
+  const there = await other.evaluate(shape, LIVE);
   const state = await other.evaluate(() => ({
     text: document.querySelector("input[aria-label='ข้อความที่จะปลูก']").value,
     palette: document.querySelector("input[name='trellis-palette']:checked")?.value,

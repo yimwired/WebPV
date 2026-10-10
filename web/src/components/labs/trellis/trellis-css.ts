@@ -29,16 +29,28 @@ html:has(.tr-root), html:has(.tr-root) body {
   overflow: hidden;
   overscroll-behavior: none;
 }
-/* No colour transitions in the garden: a palette change happens behind a veil
-   (see choosePalette in trellis-demo.tsx). Fading every fill and stroke
-   repainted each plant on every frame, and on the way from a dark palette to a
-   light one the letters and the ground met in the same grey and blinked out. */
+/* No colour transitions in the garden: a palette change opens over it as a
+   still copy (wipe.ts). Fading every fill and stroke repainted each plant on
+   every frame, and on the way from a dark palette to a light one the letters
+   and the ground met in the same grey and blinked out. */
 .tr-root {
   background-color: var(--tr-ground);
   color: var(--tr-ink);
 }
-/* The controls stay above the veil and fade to the new palette themselves:
-   a few dozen small elements, cheap to repaint. */
+/* A wipe is a picture of the garden: nothing in it moves, so it is one still
+   layer of its own while its circle opens. */
+.tr-wipe {
+  position: absolute;
+  inset: 0;
+  background-color: var(--tr-ground);
+  color: var(--tr-ink);
+  will-change: transform;
+}
+.tr-wipe * { animation: none !important; }
+/* The controls stay above the wipes and fade to the new palette themselves:
+   a few dozen small elements, cheap to repaint. Each sits on a ground of its
+   own, the page's colour at rest, so while a wipe has yet to reach it a
+   control in the new palette is still readable over the old one. */
 .tr-chrome, .tr-chrome * {
   transition-property: color, background-color, border-color, box-shadow, outline-color;
   transition-duration: .3s;
