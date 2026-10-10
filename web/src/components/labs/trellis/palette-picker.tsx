@@ -4,7 +4,8 @@ import { PALETTES, type Palette } from "./palettes";
 
 interface PalettePickerProps {
   value: Palette;
-  onChange: (next: Palette) => void;
+  /** `swatch` is where the chosen swatch sits on screen, for the change to open from */
+  onChange: (next: Palette, swatch: DOMRect | undefined) => void;
 }
 
 /**
@@ -17,7 +18,7 @@ export function PalettePicker({ value, onChange }: PalettePickerProps) {
   return (
     <fieldset
       className="flex items-center gap-0.5 rounded-full border px-1.5 py-1"
-      style={{ borderColor: "var(--tr-line)" }}
+      style={{ borderColor: "var(--tr-line)", backgroundColor: "var(--tr-ground)" }}
     >
       <legend className="sr-only">ชุดสี</legend>
       <span aria-hidden className="hidden pr-1.5 pl-2 text-[13px] whitespace-nowrap md:inline" style={{ color: "var(--tr-muted)" }}>
@@ -41,7 +42,7 @@ export function PalettePicker({ value, onChange }: PalettePickerProps) {
               name="trellis-palette"
               value={palette.id}
               checked={chosen}
-              onChange={() => onChange(palette)}
+              onChange={(event) => onChange(palette, event.currentTarget.parentElement?.getBoundingClientRect())}
               aria-label={palette.name}
               className="sr-only"
             />

@@ -23,6 +23,7 @@ import { readShared, shareLink } from "./share";
 import { Stage } from "./stage";
 import { TRELLIS_CSS } from "./trellis-css";
 import { useGarden, type Mode } from "./use-garden";
+import { stillCopy, wipeOrigin } from "./wipe";
 
 /** What is growing when the page opens, with seeds picked so it opens well. */
 const OPENING = { text: "Bloom", seeds: [246686, 974669, 948954, 842533, 936154] };
@@ -36,15 +37,18 @@ const MODES: { id: Mode; label: string }[] = [
 const CHROME_FONT = "var(--font-geist-mono), var(--font-trellis-ui), ui-monospace, monospace";
 
 const pill = "inline-flex h-9 items-center rounded-full border px-3.5 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2";
-const pillStyle: CSSProperties = { borderColor: "var(--tr-line)", color: "var(--tr-ink)", outlineColor: "var(--tr-ink)" };
+const pillStyle: CSSProperties = {
+  borderColor: "var(--tr-line)",
+  backgroundColor: "var(--tr-ground)",
+  color: "var(--tr-ink)",
+  outlineColor: "var(--tr-ink)",
+};
 
 const subscribeNever = () => () => {};
 
-/** The palette veil, ms: in until the garden is hidden, out once it has changed. */
-const VEIL_IN_MS = 240;
-const VEIL_OUT_MS = 420;
-/** Even a press that finds the veil already covering gets this long to turn it to the new ground. */
-const VEIL_MIN_MS = 120;
+/** A palette wipe, ms: the circle opening, then the still copy fading off the live garden. */
+const WIPE_MS = 650;
+const SETTLE_MS = 180;
 
 /**
  * Trellis: type a word and a garden grows out of its letters.
@@ -63,9 +67,15 @@ const VEIL_MIN_MS = 120;
 export function TrellisDemo() {
   /** the palette chosen: the controls, the link and the exports follow it at once */
   const [palette, setPalette] = useState<Palette>(PALETTES[0]);
-  /** the palette the garden is painted in, which catches up behind the veil */
+  /** the palette the garden is painted in, which catches up once a wipe has covered it */
   const [shown, setShown] = useState<Palette>(PALETTES[0]);
-  const veilRef = useRef<HTMLDivElement>(null);
+  /** where wipes are opened, between the garden and the controls; React renders nothing into it */
+  const wipesRef = useRef<HTMLDivElement>(null);
+  /** `palette`, for code that runs outside a render */
+  const chosen = useRef<Palette>(PALETTES[0]);
+  /** presses so far, and the one whose wipe has yet to open (0 for none) */
+  const presses = useRef(0);
+  const pending = useRef(0);
   const [mode, setMode] = useState<Mode>("type");
   const garden = useGarden(OPENING, mode);
   const hintsId = useId();
@@ -175,50 +185,104 @@ export function TrellisDemo() {
   const frameFooter = footerFor(shown);
   const chromeVars = paletteVars(palette) as CSSProperties;
 
-  // A new palette arrives behind a veil of its own ground colour: the veil
-  // fades in over the garden, the garden takes the new colours while it is
-  // hidden, and the veil fades away. Only the veil's opacity moves, which the
-  // compositor does on its own, so nothing in the garden is repainted while it
-  // is visible, and the garden is never painted half in one palette and half
-  // in the other.
+  /** Ends any palette change under way at once, on the palette chosen last. */
+  const cutWipes = useCallback(() => {
+    const layer = wipesRef.current;
+    if (pending.current === 0 && !layer?.firstChild) return;
+    pending.current = 0;
+    layer?.replaceChildren();
+    setShown(chosen.current);
+  }, []);
+
+  // A new palette opens over the garden as a circle from its swatch, and the
+  // letters and flowers stay exactly where they are while it does (wipe.ts
+  // says how, and why the browser's own view transition is not used). Once the
+  // circle covers the screen the garden underneath takes the new palette, and
+  // the still copy fades off it so the plants pick up their sway without a jump.
   //
-  // Two ways of doing this were tried and dropped. Fading every fill and stroke
-  // repainted each plant on every frame, and from a dark palette to a light one
-  // the letters met the ground in the same grey and blinked out. A view
-  // transition wiped cleanly on a desktop, but Chrome on an Android tablet took
-  // its snapshot with most of the garden missing.
+  // Fading every fill and stroke instead repainted each plant on every frame,
+  // and from a dark palette to a light one the letters met the ground in the
+  // same grey and blinked out; a veil faded over the garden hid it, which Film
+  // did not want.
   //
-  // The controls sit above the veil and take the new palette at once, through
+  // The controls sit above the wipes and take the new palette at once, through
   // short colour transitions of their own (.tr-chrome).
-  const choosePalette = (next: Palette) => {
+  const choosePalette = (next: Palette, swatch: DOMRect | undefined) => {
     setPalette(next);
-    const veil = veilRef.current;
-    if (!veil || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    chosen.current = next;
+    if (!swatch || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      cutWipes();
       setShown(next);
       return;
     }
-    // A press while an earlier change is still running carries on from
-    // wherever that one had got to, so running along the swatches never jumps:
-    // the veil keeps its opacity, and its colour turns to the new ground
-    // rather than switching while it shows. Opacity gets an animation of its
-    // own, so it stays one the compositor can run without the main thread.
-    const style = getComputedStyle(veil);
-    const opacity = Number(style.opacity);
-    const colour = style.backgroundColor;
-    for (const running of veil.getAnimations()) running.cancel();
-    veil.style.backgroundColor = next.colors.ground;
-    const timing = { duration: Math.max(VEIL_MIN_MS, VEIL_IN_MS * (1 - opacity)), easing: "ease-in" };
-    if (opacity > 0) veil.animate([{ backgroundColor: colour }, { backgroundColor: next.colors.ground }], timing);
-    const cover = veil.animate([{ opacity }, { opacity: 1 }], { ...timing, fill: "forwards" });
-    cover.finished.then(
+    // The controls answer the press in the next frame; the copy, which takes a
+    // moment on a long word and a slow tablet, is made in the one after. A
+    // newer press, or a cut, before then means this wipe never opens.
+    const press = ++presses.current;
+    pending.current = press;
+    requestAnimationFrame(() =>
+      setTimeout(() => {
+        if (pending.current !== press) return;
+        pending.current = 0;
+        openWipe(next, swatch);
+      }),
+    );
+  };
+
+  const openWipe = (next: Palette, swatch: DOMRect) => {
+    const layer = wipesRef.current;
+    const stage = stageRef.current;
+    const root = rootRef.current;
+    if (!layer || !stage || !root) {
+      setShown(next);
+      return;
+    }
+    // Measured before the copy goes in, so the press does not wait on its layout.
+    const { x, y, radius } = wipeOrigin(swatch, root.getBoundingClientRect());
+
+    const wipe = document.createElement("div");
+    wipe.className = "tr-wipe";
+    wipe.dataset.wipe = next.id;
+    for (const [name, value] of Object.entries(paletteVars(next))) wipe.style.setProperty(name, value);
+    const posterFrame = root.querySelector("[data-poster-frame]");
+    if (posterFrame) wipe.append(stillCopy(posterFrame));
+    wipe.append(stillCopy(stage));
+    // A press during a wipe opens a new one on top, so running along the
+    // swatches shows each palette in turn and ends on the last.
+    layer.append(wipe);
+
+    const open = wipe.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+      { duration: WIPE_MS, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "forwards" },
+    );
+    open.finished.then(
       () => {
+        // Cut while it opened: the garden has already settled.
+        if (!wipe.isConnected) return;
+        // Whatever lies under a finished wipe is hidden, so older ones can go.
+        while (wipe.previousSibling) wipe.previousSibling.remove();
+        // A newer wipe is open above this one, or on its way; that one settles.
+        if (wipe !== layer.lastElementChild || pending.current !== 0) return;
         flushSync(() => setShown(next));
-        veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: VEIL_OUT_MS, easing: "ease-out", fill: "forwards" });
+        wipe
+          .animate([{ opacity: 1 }, { opacity: 0 }], { duration: SETTLE_MS, easing: "ease-out", fill: "forwards" })
+          .finished.then(() => wipe.remove(), () => {});
       },
-      // Cancelled by a newer press, which has taken over the veil.
       () => {},
     );
   };
+
+  // A shared link sets the palette during render, where the ref cannot be.
+  useLayoutEffect(() => {
+    chosen.current = palette;
+  }, [palette]);
+
+  // A still copy shows the garden as it was. Anything that moves the garden
+  // mid-wipe (a key, a press on a letter, Poster, a turned screen) would leave
+  // it showing the wrong one, so the change completes there and then.
+  useLayoutEffect(() => {
+    cutWipes();
+  }, [cutWipes, sprouts, mode, fit]);
 
   const announce = useCallback((message: string) => {
     setStatus(message);
@@ -320,7 +384,7 @@ export function TrellisDemo() {
         stageRef={stageRef}
       />
 
-      <div ref={veilRef} aria-hidden data-veil="" className="pointer-events-none absolute inset-0 opacity-0" />
+      <div ref={wipesRef} aria-hidden data-wipes="" className="pointer-events-none absolute inset-0" />
 
       <div
         className="tr-chrome pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-5"
@@ -332,7 +396,10 @@ export function TrellisDemo() {
           </button>
           <div className="flex gap-2 sm:hidden">{exportButtons}</div>
         </div>
-        <fieldset className="pointer-events-auto flex rounded-full border p-1" style={{ borderColor: "var(--tr-line)" }}>
+        <fieldset
+          className="pointer-events-auto flex rounded-full border p-1"
+          style={{ borderColor: "var(--tr-line)", backgroundColor: "var(--tr-ground)" }}
+        >
           <legend className="sr-only">มุมมอง</legend>
           {MODES.map((option) => {
             const chosen = option.id === mode;
@@ -367,7 +434,10 @@ export function TrellisDemo() {
       >
         <div className="pointer-events-auto flex flex-col items-center gap-1.5 sm:items-end">
           {palette.credit ? (
-            <p className="text-[12px] leading-none" style={{ color: "var(--tr-muted)" }}>
+            <p
+              className="rounded px-1.5 py-0.5 text-[12px] leading-none"
+              style={{ color: "var(--tr-muted)", backgroundColor: "var(--tr-ground)" }}
+            >
               {palette.credit}
             </p>
           ) : null}
