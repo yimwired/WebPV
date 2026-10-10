@@ -162,11 +162,18 @@ export function TrellisDemo() {
   // site's theme toggle does it (theme-toggle.tsx says why the origin is a
   // percentage and why it is scripted). Every pixel is either the old palette
   // or the new one, never a blend of the two, and the wipe moves two snapshots
-  // rather than repainting the garden. Without view transitions, or under
-  // reduced motion, the palette simply changes.
+  // rather than repainting the garden.
+  //
+  // Only where the pointer is a mouse. Chrome on an Android tablet took the
+  // old snapshot with most of the garden missing, worse the more letters were
+  // typed: every swaying plant is a layer of its own, and the ones it had not
+  // painted yet came out blank, then flashed back for a frame at the end. A
+  // touch screen, a browser without view transitions, or reduced motion gets
+  // the new palette at once, which has no in-between frame to go wrong.
   const choosePalette = (next: Palette, swatch: DOMRect | undefined) => {
     const startViewTransition = document.startViewTransition?.bind(document);
-    if (!startViewTransition || !swatch || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const canWipe = window.matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
+    if (!startViewTransition || !swatch || !canWipe) {
       setPalette(next);
       return;
     }
