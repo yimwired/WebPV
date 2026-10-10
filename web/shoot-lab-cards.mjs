@@ -76,6 +76,18 @@ const PREPARE = {
     await prompt.press("Enter");
     await page.waitForTimeout(2600);
   },
+  // Trellis opens on a word that takes about 2.4s to grow, which the fixed
+  // wait above clears by half a second on an idle machine and not at all on a
+  // busy one. Wait for the growth itself. The sway never ends, so only
+  // animations with an end are counted.
+  trellis: async (page) => {
+    await page.waitForFunction(() =>
+      document.getAnimations().every((animation) => {
+        const end = animation.effect?.getComputedTiming().endTime;
+        return !Number.isFinite(end) || animation.playState === "finished";
+      }),
+    );
+  },
 };
 
 await mkdir(OUT, { recursive: true });
