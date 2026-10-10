@@ -29,12 +29,17 @@ html:has(.tr-root), html:has(.tr-root) body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+/* No colour transitions: a palette change is a view transition instead (see
+   choosePalette in trellis-demo.tsx). Fading every fill and stroke repainted
+   each plant on every frame, and on the way from a dark palette to a light one
+   the letters and the ground met in the same grey, so the words blinked out. */
 .tr-root {
   background-color: var(--tr-ground);
   color: var(--tr-ink);
-  transition: background-color .45s ease, color .45s ease;
 }
-.tr-root svg :where(path, g) { transition: fill .45s ease, stroke .45s ease; }
+/* Presses go through a running wipe, so the swatches can be run along without
+   waiting for each one to finish; a new one cuts the last one short. */
+::view-transition { pointer-events: none; }
 
 .tr-plant {
   position: absolute;
