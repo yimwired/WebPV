@@ -29,17 +29,21 @@ html:has(.tr-root), html:has(.tr-root) body {
   overflow: hidden;
   overscroll-behavior: none;
 }
-/* No colour transitions: a palette change is a view transition instead (see
-   choosePalette in trellis-demo.tsx). Fading every fill and stroke repainted
-   each plant on every frame, and on the way from a dark palette to a light one
-   the letters and the ground met in the same grey, so the words blinked out. */
+/* No colour transitions in the garden: a palette change happens behind a veil
+   (see choosePalette in trellis-demo.tsx). Fading every fill and stroke
+   repainted each plant on every frame, and on the way from a dark palette to a
+   light one the letters and the ground met in the same grey and blinked out. */
 .tr-root {
   background-color: var(--tr-ground);
   color: var(--tr-ink);
 }
-/* Presses go through a running wipe, so the swatches can be run along without
-   waiting for each one to finish; a new one cuts the last one short. */
-::view-transition { pointer-events: none; }
+/* The controls stay above the veil and fade to the new palette themselves:
+   a few dozen small elements, cheap to repaint. */
+.tr-chrome, .tr-chrome * {
+  transition-property: color, background-color, border-color, box-shadow, outline-color;
+  transition-duration: .3s;
+  transition-timing-function: ease;
+}
 
 .tr-plant {
   position: absolute;
