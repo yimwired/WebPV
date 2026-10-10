@@ -46,9 +46,8 @@ const pillStyle: CSSProperties = {
 
 const subscribeNever = () => () => {};
 
-/** A palette wipe, ms: the circle opening, then the still copy fading off the live garden. */
+/** How long a palette wipe takes to open, ms. */
 const WIPE_MS = 650;
-const SETTLE_MS = 180;
 
 /**
  * Trellis: type a word and a garden grows out of its letters.
@@ -197,8 +196,8 @@ export function TrellisDemo() {
   // A new palette opens over the garden as a circle from its swatch, and the
   // letters and flowers stay exactly where they are while it does (wipe.ts
   // says how, and why the browser's own view transition is not used). Once the
-  // circle covers the screen the garden underneath takes the new palette, and
-  // the still copy fades off it so the plants pick up their sway without a jump.
+  // circle covers the screen the garden underneath takes the new palette, wound
+  // back to the pose the copy was taken in, and the copy is removed.
   //
   // Fading every fill and stroke instead repainted each plant on every frame,
   // and from a dark palette to a light one the letters met the ground in the
@@ -245,8 +244,9 @@ export function TrellisDemo() {
     wipe.dataset.wipe = next.id;
     for (const [name, value] of Object.entries(paletteVars(next))) wipe.style.setProperty(name, value);
     const posterFrame = root.querySelector("[data-poster-frame]");
-    if (posterFrame) wipe.append(stillCopy(posterFrame));
-    wipe.append(stillCopy(stage));
+    if (posterFrame) wipe.append(stillCopy(posterFrame).copy);
+    const still = stillCopy(stage);
+    wipe.append(still.copy);
     // A press during a wipe opens a new one on top, so running along the
     // swatches shows each palette in turn and ends on the last.
     layer.append(wipe);
@@ -263,10 +263,11 @@ export function TrellisDemo() {
         while (wipe.previousSibling) wipe.previousSibling.remove();
         // A newer wipe is open above this one, or on its way; that one settles.
         if (wipe !== layer.lastElementChild || pending.current !== 0) return;
+        // The garden takes the new palette in the copy's pose, and the copy
+        // goes in the same frame: nothing on screen changes.
+        still.restore();
         flushSync(() => setShown(next));
-        wipe
-          .animate([{ opacity: 1 }, { opacity: 0 }], { duration: SETTLE_MS, easing: "ease-out", fill: "forwards" })
-          .finished.then(() => wipe.remove(), () => {});
+        wipe.remove();
       },
       () => {},
     );
