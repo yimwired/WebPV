@@ -14,7 +14,7 @@ import {
 
 import type { Fit } from "./fit";
 import { PlantView } from "./plant-view";
-import type { MarkWindow } from "./scene";
+import { MARK_BLEED, type MarkWindow } from "./scene";
 import type { Garden } from "./use-garden";
 import type { Piece } from "./weave";
 
@@ -115,6 +115,38 @@ export function Stage({ garden, fit, pieces, marks, hintsId, inputRef, stageRef 
   };
   const baseline = layout?.baseline ?? 0.8;
 
+  // Marks are drawn again over the garden in two passes, every ground-coloured
+  // edge before any letter, so no edge ever lands on a mark already drawn; the
+  // letters' windows reach MARK_BLEED past the edges'.
+  const markLayer = (pass: "edge" | "ink") => {
+    const bleed = pass === "ink" ? MARK_BLEED : 0;
+    return marks.map((w) => {
+      const line = layout?.lines[w.line];
+      if (!line) return null;
+      return (
+        <div
+          key={`${pass}${w.key}`}
+          aria-hidden
+          data-marks={pass}
+          className="absolute overflow-hidden"
+          style={{
+            left: `${w.x - bleed}em`,
+            top: `${w.y - bleed}em`,
+            width: `${w.width + 2 * bleed}em`,
+            height: `${w.height + 2 * bleed}em`,
+          }}
+        >
+          <span
+            className={`tr-mark-${pass} absolute leading-none whitespace-pre`}
+            style={{ left: `${line.x - w.x + bleed}em`, top: `${line.y - baseline - w.y + bleed}em` }}
+          >
+            {lines[w.line].map((s) => s.text).join("")}
+          </span>
+        </div>
+      );
+    });
+  };
+
   const plants = (layer: "back" | "front") => (
     <>
       {sprouts.map((sprout) => {
@@ -170,26 +202,8 @@ export function Stage({ garden, fit, pieces, marks, hintsId, inputRef, stageRef 
           </span>
         ))}
         {plants("front")}
-        {marks.map((w) => {
-          const line = layout?.lines[w.line];
-          if (!line) return null;
-          return (
-            <div
-              key={w.key}
-              aria-hidden
-              data-marks=""
-              className="absolute overflow-hidden"
-              style={{ left: `${w.x}em`, top: `${w.y}em`, width: `${w.width}em`, height: `${w.height}em` }}
-            >
-              <span
-                className="tr-marks absolute leading-none whitespace-pre"
-                style={{ left: `${line.x - w.x}em`, top: `${line.y - baseline - w.y}em` }}
-              >
-                {lines[w.line].map((s) => s.text).join("")}
-              </span>
-            </div>
-          );
-        })}
+        {markLayer("edge")}
+        {markLayer("ink")}
         {focused && layout ? (
           <span
             aria-hidden

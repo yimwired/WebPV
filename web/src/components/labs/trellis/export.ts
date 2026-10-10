@@ -12,7 +12,7 @@
 import { fitDesign } from "./fit";
 import type { Palette } from "./palettes";
 import type { Bounds } from "./plant";
-import type { MarkWindow } from "./scene";
+import { MARK_BLEED, type MarkWindow } from "./scene";
 import type { Layout, Mode, Sprout } from "./use-garden";
 import type { Piece } from "./weave";
 
@@ -112,20 +112,27 @@ export function buildSvg(input: SceneInput, fontCss: string) {
   }
   out.push(`</g>`);
 
-  // Marks again, on top of everything, edged in the ground colour.
+  // Marks again, on top of everything: every ground-coloured edge, then every
+  // letter through a window MARK_BLEED larger, as the stage draws them.
   if (input.marks.length) {
+    const clip = (w: MarkWindow, bleed: number) =>
+      `<rect x="${px(fit.originX + (w.x - bleed) * em)}" y="${px(fit.originY + (w.y - bleed) * em)}" width="${px((w.width + 2 * bleed) * em)}" height="${px((w.height + 2 * bleed) * em)}"/>`;
     out.push(`<defs>`);
     input.marks.forEach((w, i) => {
-      out.push(
-        `<clipPath id="m${i}"><rect x="${px(fit.originX + w.x * em)}" y="${px(fit.originY + w.y * em)}" width="${px(w.width * em)}" height="${px(w.height * em)}"/></clipPath>`,
-      );
+      out.push(`<clipPath id="me${i}">${clip(w, 0)}</clipPath><clipPath id="mi${i}">${clip(w, MARK_BLEED)}</clipPath>`);
     });
     out.push(`</defs>`);
-    input.marks.forEach((w, i) => {
+    const at = (w: MarkWindow) => {
       const line = input.layout.lines[w.line];
+      return `x="${px(fit.originX + line.x * em)}" y="${px(fit.originY + line.y * em)}" ${font} xml:space="preserve"`;
+    };
+    input.marks.forEach((w, i) => {
       out.push(
-        `<text clip-path="url(#m${i})" x="${px(fit.originX + line.x * em)}" y="${px(fit.originY + line.y * em)}" ${font} fill="${c.ink}" stroke="${c.ground}" stroke-width="${px(em * 0.024)}" stroke-linejoin="round" paint-order="stroke" xml:space="preserve">${lineText(w.line)}</text>`,
+        `<text clip-path="url(#me${i})" ${at(w)} fill="${c.ground}" stroke="${c.ground}" stroke-width="${px(em * 0.024)}" stroke-linejoin="round">${lineText(w.line)}</text>`,
       );
+    });
+    input.marks.forEach((w, i) => {
+      out.push(`<text clip-path="url(#mi${i})" ${at(w)} fill="${c.ink}">${lineText(w.line)}</text>`);
     });
   }
 

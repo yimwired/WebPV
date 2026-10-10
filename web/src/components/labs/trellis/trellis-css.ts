@@ -160,13 +160,11 @@ html:has(.tr-root), html:has(.tr-root) body {
   to { transform: translateY(.06px) rotate(35deg) scale(.4); opacity: 0; }
 }
 
-/* Marks drawn again above the garden, with a ground-coloured edge, so a tone
-   mark is never under a petal. They fade with the letters under them: set
-   without a transition, every mark took the new palette at once while its
-   letter was still fading, and flashed as an outline on the old ground. */
-.tr-marks {
-  transition: color .45s ease, text-shadow .45s ease;
-  color: var(--tr-ink);
+/* Marks drawn again above the garden, so a tone mark is never under a petal:
+   a ground-coloured edge, then the letter itself. */
+.tr-mark-ink { color: var(--tr-ink); }
+.tr-mark-edge {
+  color: var(--tr-ground);
   text-shadow:
     .012em 0 0 var(--tr-ground), -.012em 0 0 var(--tr-ground),
     0 .012em 0 var(--tr-ground), 0 -.012em 0 var(--tr-ground),
