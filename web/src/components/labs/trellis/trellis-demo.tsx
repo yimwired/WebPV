@@ -40,6 +40,12 @@ const pillStyle: CSSProperties = { borderColor: "var(--tr-line)", color: "var(--
 
 const subscribeNever = () => () => {};
 
+/** The palette veil, ms: in until the garden is hidden, out once it has changed. */
+const VEIL_IN_MS = 240;
+const VEIL_OUT_MS = 420;
+/** Even a press that finds the veil already covering gets this long to turn it to the new ground. */
+const VEIL_MIN_MS = 120;
+
 /**
  * Trellis: type a word and a garden grows out of its letters.
  *
@@ -55,7 +61,11 @@ const subscribeNever = () => () => {};
  * as Latin, with its marks kept clear; and a link rebuilds the same garden.
  */
 export function TrellisDemo() {
+  /** the palette chosen: the controls, the link and the exports follow it at once */
   const [palette, setPalette] = useState<Palette>(PALETTES[0]);
+  /** the palette the garden is painted in, which catches up behind the veil */
+  const [shown, setShown] = useState<Palette>(PALETTES[0]);
+  const veilRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("type");
   const garden = useGarden(OPENING, mode);
   const hintsId = useId();
@@ -76,7 +86,11 @@ export function TrellisDemo() {
     setAppliedSearch(search);
     const shared = readShared(search);
     if (shared.text !== undefined) garden.replace(shared.text, shared.seeds);
-    if (shared.palette) setPalette(paletteById(shared.palette));
+    if (shared.palette) {
+      const linked = paletteById(shared.palette);
+      setPalette(linked);
+      setShown(linked);
+    }
     if (shared.mode) setMode(shared.mode);
   }
 
@@ -153,42 +167,55 @@ export function TrellisDemo() {
       ),
     [sprouts],
   );
-  const footer = {
+  const footerFor = (p: Palette) => ({
     left: `กุหลาบ ${counts.roses} ดอก · ใบ ${counts.leaves} ใบ`,
-    right: palette.credit ? `ชุดสี${palette.name} · ระบบสีไทยโทน` : `ชุดสี${palette.name}`,
-  };
+    right: p.credit ? `ชุดสี${p.name} · ระบบสีไทยโทน` : `ชุดสี${p.name}`,
+  });
+  const footer = footerFor(palette);
+  const frameFooter = footerFor(shown);
+  const chromeVars = paletteVars(palette) as CSSProperties;
 
-  // A new palette wipes in as a circle opening from its swatch, the way the
-  // site's theme toggle does it (theme-toggle.tsx says why the origin is a
-  // percentage and why it is scripted). Every pixel is either the old palette
-  // or the new one, never a blend of the two, and the wipe moves two snapshots
-  // rather than repainting the garden.
+  // A new palette arrives behind a veil of its own ground colour: the veil
+  // fades in over the garden, the garden takes the new colours while it is
+  // hidden, and the veil fades away. Only the veil's opacity moves, which the
+  // compositor does on its own, so nothing in the garden is repainted while it
+  // is visible, and the garden is never painted half in one palette and half
+  // in the other.
   //
-  // Only where the pointer is a mouse. Chrome on an Android tablet took the
-  // old snapshot with most of the garden missing, worse the more letters were
-  // typed: every swaying plant is a layer of its own, and the ones it had not
-  // painted yet came out blank, then flashed back for a frame at the end. A
-  // touch screen, a browser without view transitions, or reduced motion gets
-  // the new palette at once, which has no in-between frame to go wrong.
-  const choosePalette = (next: Palette, swatch: DOMRect | undefined) => {
-    const startViewTransition = document.startViewTransition?.bind(document);
-    const canWipe = window.matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
-    if (!startViewTransition || !swatch || !canWipe) {
-      setPalette(next);
+  // Two ways of doing this were tried and dropped. Fading every fill and stroke
+  // repainted each plant on every frame, and from a dark palette to a light one
+  // the letters met the ground in the same grey and blinked out. A view
+  // transition wiped cleanly on a desktop, but Chrome on an Android tablet took
+  // its snapshot with most of the garden missing.
+  //
+  // The controls sit above the veil and take the new palette at once, through
+  // short colour transitions of their own (.tr-chrome).
+  const choosePalette = (next: Palette) => {
+    setPalette(next);
+    const veil = veilRef.current;
+    if (!veil || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(next);
       return;
     }
-    const x = ((swatch.left + swatch.width / 2) / window.innerWidth) * 100;
-    const y = ((swatch.top + swatch.height / 2) / window.innerHeight) * 100;
-    const transition = startViewTransition(() => flushSync(() => setPalette(next)));
-    transition.ready.then(
+    // A press while an earlier change is still running carries on from
+    // wherever that one had got to, so running along the swatches never jumps:
+    // the veil keeps its opacity, and its colour turns to the new ground
+    // rather than switching while it shows. Opacity gets an animation of its
+    // own, so it stays one the compositor can run without the main thread.
+    const style = getComputedStyle(veil);
+    const opacity = Number(style.opacity);
+    const colour = style.backgroundColor;
+    for (const running of veil.getAnimations()) running.cancel();
+    veil.style.backgroundColor = next.colors.ground;
+    const timing = { duration: Math.max(VEIL_MIN_MS, VEIL_IN_MS * (1 - opacity)), easing: "ease-in" };
+    if (opacity > 0) veil.animate([{ backgroundColor: colour }, { backgroundColor: next.colors.ground }], timing);
+    const cover = veil.animate([{ opacity }, { opacity: 1 }], { ...timing, fill: "forwards" });
+    cover.finished.then(
       () => {
-        document.documentElement.animate(
-          { clipPath: [`circle(0% at ${x}% ${y}%)`, `circle(150% at ${x}% ${y}%)`] },
-          { duration: 600, easing: "cubic-bezier(0.65, 0, 0.35, 1)", pseudoElement: "::view-transition-new(root)" },
-        );
+        flushSync(() => setShown(next));
+        veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: VEIL_OUT_MS, easing: "ease-out", fill: "forwards" });
       },
-      // A press on the next swatch before this one is ready skips it, which
-      // rejects `ready`. The newer wipe is the one that should run.
+      // Cancelled by a newer press, which has taken over the veil.
       () => {},
     );
   };
@@ -261,7 +288,7 @@ export function TrellisDemo() {
     <div
       ref={rootRef}
       className="tr-root fixed inset-x-0 top-0 h-dvh overflow-hidden"
-      style={{ ...paletteVars(palette), fontFamily: CHROME_FONT } as CSSProperties}
+      style={{ ...paletteVars(shown), fontFamily: CHROME_FONT } as CSSProperties}
     >
       <style>{TRELLIS_CSS}</style>
       <h1 className="sr-only">Trellis พิมพ์คำ แล้วดูกุหลาบงอกจากตัวอักษร</h1>
@@ -277,8 +304,8 @@ export function TrellisDemo() {
             className="absolute inset-x-[10%] bottom-[3.2%] flex justify-between gap-4"
             style={{ fontSize: Math.max(11, frame.width * 0.022), color: "var(--tr-muted)", fontFamily: "var(--font-trellis-ui), sans-serif" }}
           >
-            <span>{footer.left}</span>
-            <span>{footer.right}</span>
+            <span>{frameFooter.left}</span>
+            <span>{frameFooter.right}</span>
           </div>
         </div>
       ) : null}
@@ -293,7 +320,12 @@ export function TrellisDemo() {
         stageRef={stageRef}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-5">
+      <div ref={veilRef} aria-hidden data-veil="" className="pointer-events-none absolute inset-0 opacity-0" />
+
+      <div
+        className="tr-chrome pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-5"
+        style={chromeVars}
+      >
         <div className="pointer-events-auto flex gap-2">
           <button type="button" className={pill} style={pillStyle} onClick={copyLink}>
             {copied ? "คัดลอกแล้ว" : "คัดลอกลิงก์"}
@@ -329,7 +361,10 @@ export function TrellisDemo() {
         </fieldset>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-[76px] flex justify-center px-3 sm:justify-end sm:px-5">
+      <div
+        className="tr-chrome pointer-events-none absolute inset-x-0 bottom-[76px] flex justify-center px-3 sm:justify-end sm:px-5"
+        style={chromeVars}
+      >
         <div className="pointer-events-auto flex flex-col items-center gap-1.5 sm:items-end">
           {palette.credit ? (
             <p className="text-[12px] leading-none" style={{ color: "var(--tr-muted)" }}>

@@ -4,8 +4,7 @@ import { PALETTES, type Palette } from "./palettes";
 
 interface PalettePickerProps {
   value: Palette;
-  /** `swatch` is where the chosen swatch sits on screen, for the change to start from */
-  onChange: (next: Palette, swatch: DOMRect | undefined) => void;
+  onChange: (next: Palette) => void;
 }
 
 /**
@@ -42,7 +41,7 @@ export function PalettePicker({ value, onChange }: PalettePickerProps) {
               name="trellis-palette"
               value={palette.id}
               checked={chosen}
-              onChange={(event) => onChange(palette, event.currentTarget.parentElement?.getBoundingClientRect())}
+              onChange={() => onChange(palette)}
               aria-label={palette.name}
               className="sr-only"
             />
