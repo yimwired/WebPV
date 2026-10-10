@@ -179,6 +179,17 @@ export const labs: Lab[] = [
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
   {
+    slug: "trellis",
+    name: "Trellis",
+    vibe: "Generative type, grown as you write",
+    description:
+      "Type a word and a garden grows out of it. Vines coil around the letters' strokes, passing in front of one and behind the next, roses settle on their tops, and backspace withers them. Thai works as well as Latin, with its tone marks kept clear of every petal. Ten palettes, a Poster mode, PNG and SVG export, and a link that grows the same garden on any screen.",
+    accent: "#f2301f",
+    preview: { from: "#0b0b0c", to: "#3b55ff" },
+    bestFor: "Title cards, covers, wedding and event names, any brand that sells a feeling",
+    buildTime: "About a week, and the growth choreography is most of it",
+  },
+  {
     slug: "deed",
     name: "Deed",
     vibe: "Property, priced honestly",
