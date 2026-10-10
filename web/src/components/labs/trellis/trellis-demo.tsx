@@ -11,6 +11,7 @@ import {
   useSyncExternalStore,
   type CSSProperties,
 } from "react";
+import { flushSync } from "react-dom";
 
 import { buildSvg, download, embeddedFonts, fileName, sceneText, svgToPng, type SceneInput } from "./export";
 import { fitDesign } from "./fit";
@@ -157,6 +158,34 @@ export function TrellisDemo() {
     right: palette.credit ? `ชุดสี${palette.name} · ระบบสีไทยโทน` : `ชุดสี${palette.name}`,
   };
 
+  // A new palette wipes in as a circle opening from its swatch, the way the
+  // site's theme toggle does it (theme-toggle.tsx says why the origin is a
+  // percentage and why it is scripted). Every pixel is either the old palette
+  // or the new one, never a blend of the two, and the wipe moves two snapshots
+  // rather than repainting the garden. Without view transitions, or under
+  // reduced motion, the palette simply changes.
+  const choosePalette = (next: Palette, swatch: DOMRect | undefined) => {
+    const startViewTransition = document.startViewTransition?.bind(document);
+    if (!startViewTransition || !swatch || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPalette(next);
+      return;
+    }
+    const x = ((swatch.left + swatch.width / 2) / window.innerWidth) * 100;
+    const y = ((swatch.top + swatch.height / 2) / window.innerHeight) * 100;
+    const transition = startViewTransition(() => flushSync(() => setPalette(next)));
+    transition.ready.then(
+      () => {
+        document.documentElement.animate(
+          { clipPath: [`circle(0% at ${x}% ${y}%)`, `circle(150% at ${x}% ${y}%)`] },
+          { duration: 600, easing: "cubic-bezier(0.65, 0, 0.35, 1)", pseudoElement: "::view-transition-new(root)" },
+        );
+      },
+      // A press on the next swatch before this one is ready skips it, which
+      // rejects `ready`. The newer wipe is the one that should run.
+      () => {},
+    );
+  };
+
   const announce = useCallback((message: string) => {
     setStatus(message);
     setTimeout(() => setStatus((current) => (current === message ? "" : current)), 2600);
@@ -301,7 +330,7 @@ export function TrellisDemo() {
             </p>
           ) : null}
           <div className="flex items-center gap-2">
-            <PalettePicker value={palette} onChange={setPalette} />
+            <PalettePicker value={palette} onChange={choosePalette} />
             <div className="hidden gap-2 sm:flex">{exportButtons}</div>
           </div>
         </div>

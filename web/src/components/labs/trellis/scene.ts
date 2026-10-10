@@ -20,6 +20,14 @@ export interface MarkWindow {
   line: number;
 }
 
+/**
+ * How far past its window a mark's letter is drawn, em, beyond the edge drawn
+ * round it. A window can cut through a stroke (the top of ฟ, the tail of ไ),
+ * and the pixel its clip crosses would otherwise blend the edge into the
+ * stroke as a dark seam; drawn this far past, the letter always finishes it.
+ */
+export const MARK_BLEED = 0.02;
+
 type GlyphOf = (sprout: Sprout) => Glyph | null;
 
 export function placedGlyphs(sprouts: Sprout[], layout: Layout | null, glyphOf: GlyphOf): PlacedGlyph[] {

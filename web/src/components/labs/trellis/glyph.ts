@@ -89,8 +89,13 @@ export function markAt(glyph: Glyph, x: number, y: number): boolean {
 
 const THAI = /[฀-๿]/;
 const COMBINING = /\p{M}/u;
-/** Consonants without a tall stroke or a tail, so their tops give the body line. */
-const THAI_BODY = "กขคงจดตถทนบพมยรลวสหอ";
+/**
+ * Consonants without a tall stroke or a tail, so their tops give the body line.
+ * ส is not one of them: in a looped face its tail rises well clear of the rest
+ * (0.77em against 0.6em in Mali), which put the line above where the marks
+ * begin. That tail is also all that tells ส from ล, so it is a mark to keep clear.
+ */
+const THAI_BODY = "กขคงจดตถทนบพมยรลวหอ";
 /** A vine needs this much upright stroke to coil around, em. */
 const MIN_STEM = 0.15;
 /** Thinner than this is a hairline, not something to climb. */
