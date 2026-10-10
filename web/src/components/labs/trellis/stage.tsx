@@ -26,7 +26,7 @@ interface StageProps {
   fit: Fit | null;
   pieces: Map<number, Piece[]>;
   marks: MarkWindow[];
-  /** id of the line of key hints, read out with the field */
+  /** id of the key hints, read out with the field */
   hintsId: string;
   inputRef: RefObject<HTMLInputElement | null>;
   stageRef: RefObject<HTMLDivElement | null>;

@@ -217,6 +217,11 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
     caret: Boolean(document.querySelector(".tr-caret")),
   }), FIELD);
   check("on a desktop the field has focus on arrival, caret showing, so typing starts at once", ready.focused && ready.caret, JSON.stringify(ready));
+  const hints = await page.evaluate((field) => {
+    const description = document.getElementById(document.querySelector(field).getAttribute("aria-describedby") ?? "");
+    return { read: Boolean(description?.textContent.trim()), drawn: description ? description.getBoundingClientRect().width > 1 : false };
+  }, FIELD);
+  check("the key hints are read out with the field but not drawn on the canvas", hints.read && !hints.drawn, JSON.stringify(hints));
 }
 
 // ── 2. one plant per character, none for a space ──────────────────────────
@@ -427,16 +432,28 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
   await field.focus();
   await page.keyboard.press("End");
   await page.keyboard.press("Backspace");
-  // Timed from the moment the withering plant is on the page, not from the key,
-  // so a busy machine cannot make it look as if nothing was fading.
-  await page.waitForSelector('.tr-plant[data-layer="front"][data-dying]', { state: "attached", timeout: 2000 });
-  await page.waitForTimeout(220);
-  const midway = await page.evaluate(() => {
-    const dying = [...document.querySelectorAll('.tr-plant[data-layer="back"][data-dying]')];
-    const ghost = dying.find((n) => n.style.left === window.__doomed);
-    const leaf = document.querySelector('.tr-plant[data-layer="front"][data-dying] .tr-leaf');
-    return { found: Boolean(ghost), count: dying.length, opacity: leaf ? parseFloat(getComputedStyle(leaf).opacity) : null };
-  });
+  // Timed by the droop's own clock, not the wall's. A headless browser on a busy
+  // machine draws this page a few frames a second, and an animation only starts
+  // on the next frame, so a fixed wait can read a leaf that has not begun to
+  // fall. Read once the droop has run 150ms of its 420.
+  const midway = await page
+    .waitForFunction(
+      () => {
+        const leaf = document.querySelector('.tr-plant[data-layer="front"][data-dying] .tr-leaf');
+        const droop = leaf?.getAnimations().find((a) => a.animationName === "tr-droop");
+        if (!document.querySelector(".tr-plant[data-dying]") || (leaf && !(droop?.currentTime >= 150))) return false;
+        const dying = [...document.querySelectorAll('.tr-plant[data-layer="back"][data-dying]')];
+        return {
+          found: dying.some((n) => n.style.left === window.__doomed),
+          count: dying.length,
+          opacity: leaf ? parseFloat(getComputedStyle(leaf).opacity) : null,
+        };
+      },
+      null,
+      { timeout: 4000, polling: "raf" },
+    )
+    .then((handle) => handle.jsonValue())
+    .catch(() => ({ found: false, count: 0, opacity: null }));
   check("one plant withers, where the deleted character stood", midway.found && midway.count === 1, `${midway.count} withering`);
   check("and is fading, not just gone", midway.opacity === null || (midway.opacity < 0.95 && midway.opacity >= 0), `leaf opacity ${midway.opacity}`);
   await page.waitForTimeout(900);
@@ -614,6 +631,10 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
   check("Type PNG is a 3840x2160 title card", card.data.readUInt32BE(16) === 3840 && card.data.readUInt32BE(20) === 2160, `${card.data.readUInt32BE(16)}x${card.data.readUInt32BE(20)}`);
 }
 
+// The desktop page is done. Left open, its garden keeps swaying and takes
+// frames from every page that follows.
+await ctx.close();
+
 // ── 12. phone: the same screen, typed into with a tap ─────────────────────
 {
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "no-preference", hasTouch: true, isMobile: true });
@@ -648,6 +669,11 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
   const p = await offline.newPage();
   const uncaught = [];
   p.on("pageerror", (e) => uncaught.push(e.message));
+  // Not watched like the others, since every font failing is the point, but a
+  // script the OS refused would leave the page bare too, so list those.
+  p.on("requestfailed", (r) => {
+    if (r.failure()?.errorText === REFUSED) refused.push(`offline: ${r.url().replace(BASE, "")}`);
+  });
   await visit(p, ROUTE);
   const grew = await p
     .waitForFunction((live) => document.querySelectorAll(live).length === 5, LIVE, { timeout: 8000 })
@@ -664,20 +690,17 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
   watch(quiet, "reduced: ");
   await visit(quiet, ROUTE);
   await quiet.waitForFunction((live) => document.querySelectorAll(live).length > 0, LIVE, { timeout: 8000 }).catch(() => undefined);
-  // Poll rather than sleep: the claim is that nothing animates, so everything
-  // should be in its final pose within a few frames of appearing.
-  const settled = await quiet
-    .waitForFunction(
-      () =>
-        [...document.querySelectorAll(".tr-rose")].every((el) => {
-          const m = new DOMMatrix(getComputedStyle(el).transform);
-          return Math.abs(Math.hypot(m.a, m.b) - 1) < 0.01;
-        }),
-      null,
-      { timeout: 500, polling: "raf" },
-    )
-    .then(() => true)
-    .catch(() => false);
+  // Counted in frames, not milliseconds: the claim is that nothing animates, so
+  // a few frames after the plants appear everything is in its final pose,
+  // however slowly the machine draws those frames.
+  await quiet.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let frames = 0;
+        const tick = () => (++frames === 4 ? resolve() : requestAnimationFrame(tick));
+        requestAnimationFrame(tick);
+      }),
+  );
   const pose = await quiet.evaluate(() => {
     const scale = (el) => {
       const m = new DOMMatrix(getComputedStyle(el).transform);
@@ -689,7 +712,7 @@ await page.screenshot({ path: `${OUT}/trellis-default.png` });
       sway: getComputedStyle(document.querySelector(".tr-plant")).animationDuration,
     };
   });
-  check("every rose is open within half a second of appearing", settled && pose.roses.length > 0 && pose.roses.every((s) => Math.abs(s - 1) < 0.01), pose.roses.map((s) => s.toFixed(2)).join(","));
+  check("every rose is open within four frames of appearing", pose.roses.length > 0 && pose.roses.every((s) => Math.abs(s - 1) < 0.01), pose.roses.map((s) => s.toFixed(2)).join(","));
   check("every stem and crossing is already drawn", pose.strokes.every((v) => v === 0), `${pose.strokes.filter((v) => v !== 0).length} of ${pose.strokes.length} not drawn`);
   check("the wind stops", parseFloat(pose.sway) < 1, pose.sway);
   await still.close();

@@ -293,17 +293,7 @@ export function TrellisDemo() {
         </fieldset>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-[76px] flex flex-col-reverse items-center gap-2.5 px-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-        <p id={hintsId} className="text-center text-[12px] leading-relaxed sm:text-left sm:text-[13px]" style={{ color: "var(--tr-muted)" }}>
-          <span className="sm:hidden">แตะเพื่อพิมพ์ · แตะตัวอักษรให้งอกใหม่</span>
-          <span className="hidden sm:inline lg:hidden">
-            {mode === "poster" ? "เว้นวรรคแล้วขึ้นบรรทัดใหม่" : "พิมพ์แล้วงอก"} · คลิกตัวอักษรให้งอกใหม่
-          </span>
-          <span className="hidden lg:inline">
-            {mode === "poster" ? "เว้นวรรคแล้วขึ้นบรรทัดใหม่" : "พิมพ์แล้วงอก"} · Backspace แล้วเหี่ยว · Enter ล้างสวน ·
-            คลิกตัวอักษรให้งอกใหม่
-          </span>
-        </p>
+      <div className="pointer-events-none absolute inset-x-0 bottom-[76px] flex justify-center px-3 sm:justify-end sm:px-5">
         <div className="pointer-events-auto flex flex-col items-center gap-1.5 sm:items-end">
           {palette.credit ? (
             <p className="text-[12px] leading-none" style={{ color: "var(--tr-muted)" }}>
@@ -317,6 +307,12 @@ export function TrellisDemo() {
         </div>
       </div>
 
+      {/* Film took the hint line off the canvas: the blinking caret already says
+          where to type. The keys are still read out with the field. */}
+      <p id={hintsId} className="sr-only">
+        {mode === "poster" ? "เว้นวรรคแล้วขึ้นบรรทัดใหม่" : "พิมพ์แล้วงอก"} Backspace แล้วเหี่ยว Enter ล้างสวน
+        คลิกตัวอักษรให้งอกใหม่
+      </p>
       <p role="status" className="sr-only">
         {status}
       </p>

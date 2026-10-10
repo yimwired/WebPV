@@ -36,10 +36,13 @@ export interface Surface {
   height: number;
 }
 
-/** Room kept for the controls laid over the stage, px. */
+/**
+ * Room kept for the controls laid over the stage, px. The bottom row is the
+ * palettes above the lab switcher at every width, so it keeps the same room.
+ */
 function chromeFor(width: number) {
   const phone = width < 640;
-  return { top: phone ? 64 : 76, bottom: phone ? 168 : 136, side: phone ? 16 : 48 };
+  return { top: phone ? 64 : 76, bottom: 136, side: phone ? 16 : 48 };
 }
 
 /** Space the plants usually take above and below a line, em: the floor for the fit. */
