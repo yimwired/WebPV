@@ -17,7 +17,7 @@ const thai = IBM_Plex_Sans_Thai_Looped({
 export const metadata = pageMetadata({
   title: "Thock | The Lab · Film",
   description:
-    "A ball of keycaps in raw WebGL2, no three.js and no images. Drag it and it spins on, hover a key and it lifts. Press a key on your own keyboard, in English or Thai, and the same key on the ball presses down and sends a ripple around it. Four colourways and a synthesised key sound.",
+    "A ball of keycaps in raw WebGL2, no three.js and no images. Drag it and it spins on, hover a key and it lifts. Press a key on your own keyboard, in English or Thai, and the same key on the ball presses down and sends a ripple around it. Four colourways, and the click of a real Cherry MX Blue switch.",
   path: "/labs/thock",
 });
 

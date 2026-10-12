@@ -7,7 +7,9 @@
 // and not the character, so Thai typing presses the same caps; that shortcuts
 // and keys meant for a focused control are left alone; that reduced motion
 // stops the idle turn and the waves and lets the loop sleep; that a colourway
-// repaints the stage; that the ball comes back after the GPU context is lost;
+// repaints the stage; that switching sound on fetches the recorded blue switch
+// and the browser decodes six keystrokes from it; that the ball comes back
+// after the GPU context is lost;
 // and that a browser without WebGL2 is told so.
 //
 // The canvas has no DOM to query, so state is read through `window.__thock`,
@@ -338,13 +340,52 @@ for (const size of [
   const shortcutKeys = await page.evaluate(() => window.__thock.inspect().waves.map((wave) => window.__thock.keyOf(wave.origin)));
   check("a shortcut is left to the browser", !shortcutKeys.includes("KeyC"), `waves from ${shortcutKeys.join(", ") || "nothing"}`);
 
-  // Space on the focused sound button works the button, not the ball.
+  // Space on the focused sound button works the button, not the ball. The
+  // switch only shows on once the recorded strokes have loaded and decoded.
   const sound = page.getByRole("button", { name: "เสียงปุ่ม" });
   await sound.focus();
   await until(page, (s) => s.waves.length === 0, 4000);
+  const soundFile = page
+    .waitForResponse((response) => response.url().endsWith("/lab-assets/thock/mx-blue.mp3"), { timeout: 8000 })
+    .catch(() => null);
   const spaceOnButton = await waveFor(() => page.keyboard.press("Space"));
-  const pressedState = await sound.getAttribute("aria-pressed");
-  check("Space on a focused control stays with the control", spaceOnButton === null && pressedState === "true", `aria-pressed ${pressedState}`);
+  const switchedOn = await page
+    .waitForFunction(() => document.querySelector("button[aria-pressed]")?.getAttribute("aria-pressed") === "true", null, { timeout: 8000 })
+    .then(() => true, () => false);
+  check("Space on a focused control stays with the control", spaceOnButton === null && switchedOn);
+  const served = await soundFile;
+  check(
+    "switching sound on fetches the recorded switch as audio",
+    served?.status() === 200 && (served.headers()["content-type"] ?? "").includes("audio/mpeg"),
+    served ? `${served.status()} ${served.headers()["content-type"]}` : "never requested",
+  );
+  // The page finds the strokes by their onsets after decoding; check the
+  // browser's own decoder sees six of them, silence between each. Counted the
+  // way the page counts: a stroke starts at the first loud sample and ends a
+  // tenth of a second after the last sound. Requiring silence right before an
+  // onset instead finds none: MP3 smears a little noise ahead of every click.
+  const decoded = await page.evaluate(async () => {
+    const data = await (await fetch("/lab-assets/thock/mx-blue.mp3")).arrayBuffer();
+    const buffer = await new OfflineAudioContext(1, 44100, 44100).decodeAudioData(data);
+    const samples = buffer.getChannelData(0);
+    const silence = Math.round(0.1 * buffer.sampleRate);
+    let strokes = 0;
+    let i = 0;
+    while (i < samples.length) {
+      if (Math.abs(samples[i]) < 0.02) {
+        i++;
+        continue;
+      }
+      strokes++;
+      let end = i;
+      while (i < samples.length && i - end < silence) {
+        if (Math.abs(samples[i]) > 0.002) end = i;
+        i++;
+      }
+    }
+    return { strokes, seconds: buffer.duration };
+  });
+  check("the recorded switch decodes to six separate keystrokes", decoded.strokes === 6, `${decoded.strokes} in ${decoded.seconds.toFixed(2)} s`);
   await page.keyboard.press("Space");
   check("the sound switch turns off again", (await sound.getAttribute("aria-pressed")) === "false");
 

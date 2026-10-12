@@ -80,7 +80,7 @@ function chromeVars(colorway: Colorway): CSSProperties {
  * own keyboard presses the copy of that key facing them, in either language,
  * since keys are matched by where they are and not by what they type. The
  * wave starts from that cap rather than from wherever the pointer was. It also
- * has four colourways and a synthesised key sound.
+ * has four colourways and the sound of a real Cherry MX Blue switch.
  */
 export function ThockDemo() {
   const rootRef = useRef<HTMLDivElement>(null);
