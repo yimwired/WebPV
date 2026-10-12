@@ -88,11 +88,28 @@ const PREPARE = {
       }),
     );
   },
+  // Thock types T-H-O-C-K by itself once its legends are printed, and every
+  // press sends a wave round the ball. Wait for the last one to die away, so
+  // the card is the ball at rest and not one frame of a ripple.
+  thock: async (page) => {
+    await page.waitForFunction(
+      () => {
+        const state = window.__thock?.inspect();
+        return state?.legendsReady && state.waves.length === 0 && state.lift.every((lift) => Math.abs(lift) < 0.01);
+      },
+      null,
+      { timeout: 15000 },
+    );
+  },
 };
 
 await mkdir(OUT, { recursive: true });
 
-const browser = await chromium.launch();
+// Headless Chromium draws WebGL on SwiftShader, on the CPU, unless it is
+// pointed at the GPU, and a demo that notices drops to its lowest quality:
+// Thock loses its floor reflection there. On Windows the real GPU is one flag
+// away, and the card is then what a visitor actually sees.
+const browser = await chromium.launch({ args: process.platform === "win32" ? ["--use-angle=d3d11"] : [] });
 // force English: the gallery around these cards is English, and the demos
 // pick their language up from the browser
 const page = await browser.newPage({

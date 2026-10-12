@@ -6,6 +6,7 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const labCardVersions: Record<string, string> = {
+  "thock": "941d73fe",
   "trellis": "c4e75f94",
   "clash": "7fc6415f",
   "gaze": "e6786eca",

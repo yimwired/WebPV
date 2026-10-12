@@ -23,6 +23,17 @@ export interface Lab {
 
 export const labs: Lab[] = [
   {
+    slug: "thock",
+    name: "Thock",
+    vibe: "Keycaps, raw WebGL2",
+    description:
+      "A ball of keycaps you can play from your own keyboard. Drag it and it spins on, hover a key and it lifts, and press a real key, in English or Thai, to press the copy of it facing you and send a ripple from it around the whole ball. Raw WebGL2 with no three.js, legends painted in the browser, a floor that reflects the ball, four colourways and the click of a real Cherry MX Blue switch, recorded rather than synthesised.",
+    accent: "#d8321f",
+    preview: { from: "#0b0505", to: "#a3170d" },
+    bestFor: "Keyboard shops, gaming and tech brands, anything sold on how it feels to press",
+    buildTime: "About a week, and the shading is most of it",
+  },
+  {
     slug: "trellis",
     name: "Trellis",
     vibe: "Generative type, grown as you write",
@@ -189,17 +200,6 @@ export const labs: Lab[] = [
 //  เก็บไว้ดูเอง ลูกค้าหาไม่เจอแต่เปิดตรงได้
 // ─────────────────────────────────────────────────────────────
 export const archivedLabs: Lab[] = [
-  {
-    slug: "thock",
-    name: "Thock",
-    vibe: "Keycaps, raw WebGL2",
-    description:
-      "A ball of keycaps you can play from your own keyboard. Drag it and it spins on, hover a key and it lifts, and press a real key, in English or Thai, to press the copy of it facing you and send a ripple from it around the whole ball. Raw WebGL2 with no three.js, legends painted in the browser, a floor that reflects the ball, four colourways and the click of a real Cherry MX Blue switch, recorded rather than synthesised.",
-    accent: "#d8321f",
-    preview: { from: "#0b0505", to: "#a3170d" },
-    bestFor: "Keyboard shops, gaming and tech brands, anything sold on how it feels to press",
-    buildTime: "About a week, and the shading is most of it",
-  },
   {
     slug: "deed",
     name: "Deed",
