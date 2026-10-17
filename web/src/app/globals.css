@@ -3,6 +3,10 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* The visitor's theme, as opposed to `dark:`, which a dark section also
+   triggers. The theme toggle's icon has to say which theme is on, not which
+   section the navbar happens to be passing over. */
+@custom-variant theme-dark (&:is(html.dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -13,9 +17,14 @@
   --color-line-strong: var(--line-strong);
   --color-line-control: var(--line-control);
   --color-surface: var(--surface);
+  --color-zone-dark: var(--zone-dark);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  /* The site's own pages set these on a wrapper (see `.font-site` below). The
+     labs keep --font-sans: several of them inherit it and are not ours to restyle. */
+  --font-site: var(--font-site);
+  --font-hand: var(--font-hand);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -54,27 +63,36 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ── Palette ────────────────────────────────────────────────────────────────
+   Since 2026-10-17 the site follows fastwork.com's selling page, on Film's
+   call: ink on white by default, with whole sections set in the dark navy
+   their page uses (`.dark` on a section scopes these tokens to it). The ink
+   and the navy carry a little blue, as theirs do; amber stays the one accent,
+   for state, emphasis and the focus ring. Every ratio below was computed from
+   the painted colour, alpha composited over the ground it is quoted against. */
 :root {
+  /* Native controls and scrollbars follow the page; `.dark` flips it back. */
+  color-scheme: light;
+
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* #151a23, the ink fastwork.com sets its text in. 17.4:1 on the page. */
+  --foreground: oklch(0.217 0.019 262);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.217 0.019 262);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --popover-foreground: oklch(0.217 0.019 262);
+  --primary: oklch(0.217 0.019 262);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary-foreground: oklch(0.217 0.019 262);
   --muted: oklch(0.97 0 0);
-  /* One step darker than the shadcn default: at 0.556 this lands on 4.4:1
-     over --surface, the ground under the featured pricing card. 4.6:1
-     there now, 5.0:1 on the page. */
-  --muted-foreground: oklch(0.545 0 0);
+  /* 6.05:1 on the page, 5.54:1 on --surface, where the fact tiles sit. */
+  --muted-foreground: oklch(0.498 0.022 263);
   --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: oklch(0.217 0.019 262);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.217 0.019 262 / 11%);
+  --input: oklch(0.217 0.019 262 / 20%);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -83,33 +101,32 @@
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
 
-  /* Single accent, used for state and emphasis only. Amber rather than a
-     blue-violet gradient: the site should read like an instrument panel,
-     not a launch page.
-
-     Same hue as the dark theme, three steps darker, because the two are
-     measured against opposite grounds. The dark value carried over here
-     unchanged for a while and sat at 2.05:1 on white, which made every piece
-     of --brand text unreadable and the focus ring invisible. At this
-     lightness: 5.2:1 on the page, 4.9:1 on --surface, and 5.2:1 as a focus
-     ring, against the 4.5 and 3.0 those two jobs ask for. */
+  /* Same hue as the dark theme, three steps darker, because the two are
+     measured against opposite grounds: the dark value sits at 2.05:1 on
+     white. Here it is 5.20:1 on the page and 4.77:1 on --surface, against the
+     4.5 text asks for and the 3.0 a focus ring needs. */
   --brand: oklch(0.54 0.12 66);
-  --line: oklch(0.145 0 0 / 12%);
-  --line-strong: oklch(0.145 0 0 / 22%);
+  --line: oklch(0.217 0.019 262 / 11%);
+  --line-strong: oklch(0.217 0.019 262 / 20%);
   /* Only for a boundary that IDENTIFIES a control (input, select, textarea).
-     WCAG 1.4.11 wants 3:1 there, and --line-strong is 1.7:1 -- fine as a
-     decorative rule, invisible as the edge of a text field. 3.22:1 over
-     --surface. Do not use it for decorative hairlines. */
-  --line-control: oklch(0.145 0 0 / 46%);
-  --surface: oklch(0.975 0 0);
+     WCAG 1.4.11 wants 3:1 there, and --line-strong is 1.5:1: fine as a
+     decorative rule, invisible as the edge of a text field. 3.16:1 on the
+     page, 3.10:1 on --surface. Do not use it for decorative hairlines. */
+  --line-control: oklch(0.217 0.019 262 / 48%);
+  /* #f5f5f5, the grey of fastwork.com's countdown tiles. */
+  --surface: oklch(0.97 0 0);
+  /* The navy of the dark sections, as a plain colour that does not change
+     with the theme: for the ground showing around a card that does. Same
+     value as --background in .dark. */
+  --zone-dark: oklch(0.212 0.02 258);
 
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.217 0.019 262);
+  --sidebar-primary: oklch(0.217 0.019 262);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-accent-foreground: oklch(0.217 0.019 262);
+  --sidebar-border: oklch(0.217 0.019 262 / 11%);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
@@ -119,49 +136,51 @@
      it they stay light and read as a rendering bug on a dark page. */
   color-scheme: dark;
 
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* #131922, fastwork.com's dark sections. */
+  --background: oklch(0.212 0.02 258);
+  --foreground: oklch(0.972 0.005 258);
+  --card: oklch(0.259 0.025 261);
+  --card-foreground: oklch(0.972 0.005 258);
+  --popover: oklch(0.259 0.025 261);
+  --popover-foreground: oklch(0.972 0.005 258);
+  --primary: oklch(0.972 0.005 258);
+  --primary-foreground: oklch(0.212 0.02 258);
+  --secondary: oklch(0.3 0.025 261);
+  --secondary-foreground: oklch(0.972 0.005 258);
+  --muted: oklch(0.3 0.025 261);
+  /* 7.62:1 on the page, 6.73:1 on --surface. */
+  --muted-foreground: oklch(0.739 0.02 258);
+  --accent: oklch(0.3 0.025 261);
+  --accent-foreground: oklch(0.972 0.005 258);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 
-  /* The light theme uses the same hue at oklch(0.54 0.12 66); see the note in
-     :root for why the two lightnesses differ. 9.6:1 here. */
+  /* See the note in :root for why the two lightnesses differ. 8.56:1 on the
+     page, 7.56:1 on --surface. */
   --brand: oklch(0.78 0.13 66);
-  --line: oklch(1 0 0 / 9%);
+  --line: oklch(1 0 0 / 10%);
   --line-strong: oklch(1 0 0 / 18%);
-  /* See the note in :root. 3.21:1 over --surface, 3.41:1 over --background. */
-  --line-control: oklch(1 0 0 / 35%);
+  /* See the note in :root. 3.34:1 on the page, 3.27:1 on --surface. */
+  --line-control: oklch(1 0 0 / 36%);
   /* Opaque, one step above the page. Panels are lifted by tone, not by
      blurring whatever happens to be behind them. */
-  --surface: oklch(0.185 0 0);
+  --surface: oklch(0.259 0.025 261);
 
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.259 0.025 261);
+  --sidebar-foreground: oklch(0.972 0.005 258);
   /* shadcn ships a blue-violet here (oklch(0.488 0.243 264.376)). Removed: the
      site has one accent and it is amber. Nothing consumes it -- no sidebar
-     component exists -- so this falls back to the neutral :root value. */
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+     component exists -- so this falls back to the :root value. */
+  --sidebar-primary-foreground: oklch(0.972 0.005 258);
+  --sidebar-accent: oklch(0.3 0.025 261);
+  --sidebar-accent-foreground: oklch(0.972 0.005 258);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
@@ -197,7 +216,9 @@
   }
 }
 
-/* Thin, premium scrollbar */
+/* Thin scrollbar. The thumb takes the hairline tokens so it shows on either
+   ground: it was white at 12% when the site was dark-only, which made it
+   invisible on the light page. */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -206,13 +227,13 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(1 0 0 / 12%);
+  background: var(--line-strong);
   border-radius: 9999px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(1 0 0 / 22%);
+  background: var(--line-control);
   background-clip: padding-box;
 }
 
@@ -286,3 +307,117 @@
    coordinates: custom properties set on <html> never reach this pseudo tree, so
    a keyframe reading var(--theme-x) would quietly open the wipe from the wrong
    place. The toggle also skips the transition entirely under reduce motion. */
+
+/* ── Home page ─────────────────────────────────────────────────────────────
+   The pieces of the 2026-10-17 redesign that are easier to say in CSS than in
+   Motion: they either have to run before hydration, or they are triggered by
+   a `data-shown` attribute that <Sweep> and <Scribble> set once in view. The
+   reduced-motion block above already collapses every one of them to its end
+   state. */
+
+/* The hero's handwritten word writes itself in: a clip opening left to right,
+   which reads as a pen moving. CSS rather than Motion so it runs from the
+   first paint, like the rest of the headline it sits in. The insets reach
+   past the box because handwriting overhangs its own line. */
+@keyframes hand-write {
+  from {
+    clip-path: inset(-30% 100% -40% -8%);
+  }
+  to {
+    clip-path: inset(-30% -8% -40% -8%);
+  }
+}
+
+.hand-write {
+  display: inline-block;
+  animation: hand-write 0.9s cubic-bezier(0.45, 0, 0.15, 1) 0.35s both;
+}
+
+/* A gradient that sweeps across a key word once it is on screen, as
+   fastwork.com does, in this site's colours: amber into coral and pink. Each
+   stop clears 4.5:1 on the ground it is used on: the light theme takes the
+   darker three (5.2, 5.2 and 6.0 on white), `.dark` the lighter ones (8.6,
+   6.9 and 6.7 on the navy). */
+:root {
+  --sweep-1: var(--brand);
+  --sweep-2: oklch(0.553 0.174 38.4);
+  --sweep-3: oklch(0.525 0.199 4);
+}
+
+.dark {
+  --sweep-1: var(--brand);
+  --sweep-2: oklch(0.729 0.17 35.1);
+  --sweep-3: oklch(0.725 0.175 349.8);
+}
+
+/* The gradient is three words wide and starts parked on its plain first
+   third; sliding it to the middle third brings the colour across the word. */
+.sweep {
+  background-image: linear-gradient(
+    90deg,
+    var(--foreground) 0% 30%,
+    var(--sweep-1) 36%,
+    var(--sweep-2) 51%,
+    var(--sweep-3) 66% 100%
+  );
+  background-size: 300% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.sweep[data-shown] {
+  animation: sweep 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+@keyframes sweep {
+  to {
+    background-position: 50% 0;
+  }
+}
+
+/* A hand-drawn line under a phrase, wiped on left to right. A wipe rather
+   than a dash offset because the line stretches to the phrase it sits under,
+   and a dash measured along a stretched path stops matching the stroke. */
+.scribble svg {
+  clip-path: inset(0 100% 0 0);
+}
+
+.scribble[data-shown] svg {
+  animation: scribble-draw 0.8s cubic-bezier(0.45, 0, 0.15, 1) 0.25s forwards;
+}
+
+@keyframes scribble-draw {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Paper grain over the pastel panels, as fastwork.com lays over its own: a
+   fractal-noise SVG at low opacity, blended so it darkens and lightens the
+   colour under it instead of greying it. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The lift every floating card on the home page shares. */
+.shadow-float {
+  box-shadow:
+    0 1px 2px oklch(0.217 0.019 262 / 6%),
+    0 14px 32px -10px oklch(0.217 0.019 262 / 22%);
+}

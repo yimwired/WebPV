@@ -19,7 +19,7 @@ export function CaseStudy({ slug }: { slug: CaseStudySlug }) {
   const project = projects.find((p) => p.id === slug);
 
   return (
-    <main className="relative mx-auto max-w-4xl px-5 pb-24 pt-24 sm:px-8 sm:pb-32">
+    <main className="font-site relative mx-auto max-w-4xl px-5 pb-24 pt-24 sm:px-8 sm:pb-32">
       <div className="flex items-center justify-between">
         <Link
           href="/"

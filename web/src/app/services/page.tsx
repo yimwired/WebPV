@@ -12,12 +12,12 @@ export const metadata = pageMetadata({
 
 export default function ServicesPage() {
   return (
-    <>
+    <div className="font-site">
       <Navbar />
       <main id="main" tabIndex={-1}>
         <Services />
         <Footer />
       </main>
-    </>
+    </div>
   );
 }

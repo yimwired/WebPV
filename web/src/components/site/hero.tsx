@@ -1,15 +1,19 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ChevronsDown, ReceiptText } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { useLocale } from "@/lib/i18n";
 import { thaiWrap } from "@/lib/thai-text";
+import { cn } from "@/lib/utils";
+import { HeroCardBand, HeroCardCloud } from "./hero-cards";
+import { pillPrimary, pillSecondary } from "./pill";
 
 const container: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
 const item: Variants = {
@@ -17,80 +21,116 @@ const item: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 export function Hero() {
   const { locale, t } = useLocale();
-
-  // every count and price here is filled from the data it describes
-  const facts = t.hero.facts.map((f) => withCounts(f.value));
+  const sectionRef = useRef<HTMLElement>(null);
+  const isThai = locale === "th";
+  const wrap = (text: string) => (isThai ? thaiWrap(text) : text);
+  const { lead, hand, tail } = t.hero.headline;
 
   return (
     <section
+      ref={sectionRef}
       id="top"
-      className="mx-auto flex min-h-[84svh] max-w-6xl flex-col justify-center px-5 pt-24 pb-10 sm:px-8"
+      className="relative isolate overflow-hidden"
     >
-      <motion.div variants={container} initial="hidden" animate="visible">
-        <motion.p variants={item} className="spec">
-          {t.hero.name} · {t.hero.location}
-        </motion.p>
-
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-[640px] flex-col items-center justify-center px-5 pt-28 pb-16 text-center lg:pb-20">
         {/*
-          The headline does not animate, and that is a performance decision
+          The headline does not fade in, and that is a performance decision
           rather than a stylistic one. It is the largest thing above the fold,
-          so the browser times the page by it, and every entrance - even one
-          that only moves and never fades - has to wait for hydration before it
-          can run. On a throttled phone that put the largest paint at 3.9s for
-          text that was in the HTML the whole time. Everything around it still
-          staggers in; the heading is simply already there.
+          so the browser times the page by it, and an entrance driven by
+          Motion has to wait for hydration before it can run. The handwritten
+          word animates in CSS instead, which starts with the first paint.
         */}
-        <h1 className="mt-5 max-w-4xl text-4xl leading-[1.1] font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl">
-          {locale === "th" ? thaiWrap(t.hero.headline) : t.hero.headline}
+        {/* Thai runs a size smaller: at the English size its first line
+            overflows the 640px column and the headline takes three lines. */}
+        <h1
+          className={cn(
+            "font-medium tracking-[-0.025em] text-balance",
+            isThai
+              ? "text-[36px] leading-[1.22] sm:text-[50px] lg:text-[58px]"
+              : "text-[40px] leading-[1.06] sm:text-[56px] lg:text-[66px]",
+          )}
+        >
+          {wrap(lead)}
+          <span className="font-hand hand-write text-brand relative mx-[0.04em] -rotate-3 text-[1.12em] leading-none font-medium">
+            {hand}
+          </span>
+          {wrap(tail)}
         </h1>
 
-        <motion.p
-          variants={item}
-          className="text-muted-foreground mt-6 max-w-xl text-base leading-relaxed text-pretty sm:text-lg"
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="visible"
+          className="flex w-full flex-col items-center"
         >
-          {withCounts(t.hero.sub)}
-        </motion.p>
+          <motion.p
+            variants={item}
+            className="text-muted-foreground mt-6 max-w-[34rem] text-[17px] leading-relaxed text-pretty sm:text-lg"
+          >
+            {withCounts(t.hero.sub)}
+          </motion.p>
 
-        {/* Try first, then the price: the two questions a buyer arrives with.
-            Getting in touch stays in the navbar, which is always on screen. */}
-        <motion.div variants={item} className="mt-9 flex flex-wrap gap-3">
-          <a
-            href="#lab"
-            className="group bg-foreground text-background inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90"
+          {/* fastwork.com counts down to its launch in four tiles; these four
+              are the numbers a buyer checks, each one filled from the data it
+              describes. The label is the term and the number its value, so
+              the order is flipped on screen and not in the markup. */}
+          <motion.dl
+            variants={item}
+            className="mt-9 grid w-full max-w-[34rem] grid-cols-2 gap-2 sm:grid-cols-4"
           >
-            {t.hero.tryLabs}
-            <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
-          </a>
-          <Link
-            href="/pricing"
-            className="border-line-strong text-foreground/90 hover:border-foreground/40 hover:text-foreground inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm font-medium transition-colors"
+            {t.hero.facts.map((fact) => (
+              <div
+                key={fact.label}
+                className="bg-surface flex flex-col-reverse items-center justify-center rounded-[20px] px-3 py-4 sm:aspect-square sm:py-0"
+              >
+                <dt className="text-muted-foreground mt-1.5 text-[13px] leading-snug">
+                  {fact.label}
+                </dt>
+                <dd className="text-[34px] leading-none tracking-tight tabular-nums sm:text-[38px]">
+                  {withCounts(fact.value)}
+                </dd>
+              </div>
+            ))}
+          </motion.dl>
+
+          {/* Try first, then the price: the two questions a buyer arrives
+              with. Getting in touch stays in the navbar, always on screen. */}
+          <motion.div
+            variants={item}
+            className="mt-9 flex flex-col items-center gap-3 sm:flex-row"
           >
-            {t.hero.seePricing}
-          </Link>
+            <a href="#showcase" className={cn(pillPrimary, "group")}>
+              {t.hero.tryLabs}
+              <ArrowDown
+                aria-hidden
+                className="h-4 w-4 transition-transform group-hover:translate-y-0.5"
+              />
+            </a>
+            <Link href="/pricing" className={pillSecondary}>
+              <ReceiptText aria-hidden className="h-4 w-4" />
+              {t.hero.seePricing}
+            </Link>
+          </motion.div>
         </motion.div>
 
-        {/* Measured facts, not adjectives. Each one is checkable on this site:
-            the demos in The Lab, the packages on /pricing, the work below. */}
-        <motion.dl
-          variants={item}
-          className="border-line mt-16 grid grid-cols-2 gap-px border-t sm:grid-cols-4"
-        >
-          {t.hero.facts.map((f, i) => (
-            <div key={f.label} className="pt-5">
-              <dt className="text-2xl font-semibold tracking-tight tabular-nums">
-                {facts[i]}
-              </dt>
-              <dd className="text-muted-foreground mt-1 text-sm">{f.label}</dd>
-            </div>
-          ))}
-        </motion.dl>
-      </motion.div>
+        <HeroCardBand />
+      </div>
+
+      <HeroCardCloud target={sectionRef} />
+
+      <p
+        aria-hidden
+        className="text-muted-foreground absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-sm lg:flex"
+      >
+        {t.hero.scrollHint}
+        <ChevronsDown className="h-4 w-4" />
+      </p>
     </section>
   );
 }

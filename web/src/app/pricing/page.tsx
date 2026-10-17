@@ -13,7 +13,7 @@ export const metadata = pageMetadata({
 
 export default function PricingPage() {
   return (
-    <>
+    <div className="font-site">
       {/* the packages as offers, so a search result can carry the prices */}
       <script
         type="application/ld+json"
@@ -24,6 +24,6 @@ export default function PricingPage() {
         <Pricing />
         <Footer />
       </main>
-    </>
+    </div>
   );
 }

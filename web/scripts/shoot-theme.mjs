@@ -1,12 +1,13 @@
-// Verifies the dark/light switch, which is three claims a screenshot cannot
-// make: that dark is what a first visitor gets, that a choice survives a
-// reload, and that the remembered choice is on the page before the first
-// paint rather than a frame later.
+// Verifies the light/dark switch, which is three claims a screenshot cannot
+// make: that light is what a first visitor gets (the default since the
+// 2026-10-17 redesign; it was dark before), that a choice survives a reload,
+// and that the remembered choice is on the page before the first paint rather
+// than a frame later.
 //
 // The last one is the one that matters and the one nobody checks. The theme
 // lives in localStorage, which a static export can only read on the client, so
-// without the inline script in <head> a returning visitor gets a dark frame
-// before their light page arrives. This records the class on <html> at
+// without the inline script in <head> a returning visitor gets a light frame
+// before their dark page arrives. This records the class on <html> at
 // DOMContentLoaded, from inside the page, which is before React has run.
 //
 // Needs the built site served. From the repo root:
@@ -72,7 +73,7 @@ const toggle = async (page) => {
 await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch();
 
-// ── 1. a first visitor gets the dark the site was designed in ──────────────
+// ── 1. a first visitor gets the light page ─────────────────────────────────
 {
   const context = await browser.newContext({ locale: "en-US" });
   await recordFirstPaint(context);
@@ -80,17 +81,16 @@ const browser = await chromium.launch();
   await page.goto(`${BASE}${ROUTE}`, { waitUntil: "load" });
 
   const theme = await readTheme(page);
-  check(theme.dark, "a first visit did not come up dark");
+  check(!theme.dark, "a first visit did not come up light");
   check(
     theme.stored === null,
     `nothing was chosen yet and localStorage already holds "${theme.stored}"`,
   );
   check(
-    theme.colorScheme === "dark",
-    `the dark page declares color-scheme: ${theme.colorScheme}, so the browser ` +
-      "paints its own scrollbars and form controls light",
+    theme.colorScheme === "light",
+    `the light page declares color-scheme: ${theme.colorScheme}`,
   );
-  await page.screenshot({ path: `${OUT}/01-dark.png` });
+  await page.screenshot({ path: `${OUT}/01-light.png` });
   await context.close();
 }
 
@@ -107,40 +107,41 @@ const browser = await chromium.launch();
   await toggle(page);
   const after = await readTheme(page);
 
-  check(!after.dark, "pressing the switch left the page dark");
+  check(after.dark, "pressing the switch left the page light");
   check(
     after.background !== before.background,
     `the body stayed ${after.background} through the switch`,
   );
   check(
-    after.colorScheme !== "dark",
-    `the light page still declares color-scheme: ${after.colorScheme}`,
+    after.colorScheme === "dark",
+    `the dark page declares color-scheme: ${after.colorScheme}, so the browser ` +
+      "paints its own scrollbars and form controls light",
   );
   check(
-    after.stored === "light",
+    after.stored === "dark",
     `the choice was saved as "${after.stored}"`,
   );
-  await page.screenshot({ path: `${OUT}/02-light.png` });
+  await page.screenshot({ path: `${OUT}/02-dark.png` });
 
   // ── 3. and it holds across a reload, before the first paint ──────────────
   await page.reload({ waitUntil: "load" });
   const returned = await readTheme(page);
-  check(!returned.dark, "the light choice did not survive a reload");
+  check(returned.dark, "the dark choice did not survive a reload");
   check(
-    returned.atParse === "light",
+    returned.atParse === "dark",
     `a returning visitor's document was ${returned.atParse} when it finished ` +
-      "parsing, so the dark page is on screen before the light one replaces it",
+      "parsing, so the light page is on screen before the dark one replaces it",
   );
 
   // ── 4. and back again ────────────────────────────────────────────────────
   await toggle(page);
   const back = await readTheme(page);
-  check(back.dark, "pressing the switch again did not return to dark");
-  check(back.stored === "dark", `going back stored "${back.stored}"`);
+  check(!back.dark, "pressing the switch again did not return to light");
+  check(back.stored === "light", `going back stored "${back.stored}"`);
 
   await page.reload({ waitUntil: "load" });
   const kept = await readTheme(page);
-  check(kept.dark && kept.atParse === "dark", "dark did not survive a reload");
+  check(!kept.dark && kept.atParse === "light", "light did not survive a reload");
 
   for (const error of errors) note(`page error - ${error}`);
   await context.close();
@@ -165,7 +166,7 @@ const browser = await chromium.launch();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(900);
   check(
-    !(await readTheme(page)).dark,
+    (await readTheme(page)).dark,
     "the keyboard could not work the switch",
   );
   await context.close();
@@ -182,7 +183,7 @@ const browser = await chromium.launch();
 
   await toggle(page);
   check(
-    !(await readTheme(page)).dark,
+    (await readTheme(page)).dark,
     "with reduced motion on, the switch did not change the theme",
   );
   await page.screenshot({ path: `${OUT}/03-reduced-motion.png` });

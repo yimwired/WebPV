@@ -21,18 +21,129 @@ const en = {
     toggleTheme: "Switch between dark and light",
   },
   hero: {
-    name: "Nuttapon Yimnoi (Film)",
-    location: "Bangkok",
-    headline: "I build websites you can try before you hire me.",
-    sub: "{labs} working examples, all of them live. Pick the one that fits and I turn it into your site, on my own from the first call to launch.",
+    // The headline is cut in three so the middle word can be set in
+    // handwriting. Spaces belong to the pieces, since Thai joins them with none.
+    headline: {
+      lead: "Websites you can ",
+      hand: "try",
+      tail: " before you hire",
+    },
+    sub: "{labs} live examples to click through. Pick one and I build it into your site myself, start to finish.",
     tryLabs: "Try the examples",
     seePricing: "See prices",
     facts: [
-      { value: "{labs}", label: "Live styles to try first" },
-      { value: "{fromPrice}", label: "Baht starting price" },
-      { value: "30", label: "Days of free fixes after launch" },
-      { value: "{projects}", label: "Projects shipped" },
+      { value: "{labs}", label: "live examples" },
+      { value: "{fromPrice}", label: "baht to start" },
+      { value: "30", label: "days of free fixes" },
+      { value: "{projects}", label: "projects shipped" },
     ],
+    scrollHint: "Scroll down",
+  },
+  showcase: {
+    // `text` is what a screen reader hears. On screen the "o" of "shop" is a
+    // row of round thumbnails, which would otherwise be read as "sh p".
+    title: {
+      text: "Every kind of shop, already built",
+      lead: "Every kind of sh",
+      tail: "p, already built",
+    },
+    sub: "Pick the one closest to yours. Each opens a working site you can click through, with the package that builds it.",
+    tablistLabel: "Kinds of business",
+    categories: {
+      food: "Food and drink",
+      tours: "Tours and bookings",
+      shops: "Shops and sellers",
+      events: "Events and weddings",
+      premium: "Premium products",
+      studios: "Studios and courses",
+    },
+    examplesCount: "{count} examples",
+    exampleCount: "1 example",
+    stats: {
+      from: "starting price",
+      time: "to launch",
+      examples: "to try",
+    },
+    live: "Live",
+    examples: "Examples",
+    packages: "Packages",
+    openDemo: "Open {name}",
+    seeAll: "All {count} in The Lab",
+  },
+  pains: {
+    title: "Hiring a web developer is hard enough...",
+    sub: "So I took the guesswork out.",
+    notesLabel: "Common worries about hiring someone to build a website",
+    notes: [
+      "I paid the deposit. Then they stopped replying.",
+      "The quote doubled halfway through.",
+      "I can't picture it until I see it.",
+      "Every small change costs extra.",
+      "Fine on a laptop, broken on my phone.",
+      "The site went down. Who do I even call?",
+      "It looks like the template next door.",
+    ],
+  },
+  promise: {
+    titleMuted: "Others send you a mockup.",
+    title: { lead: "I let you ", mark: "try the real thing", tail: "." },
+    rows: {
+      tryFirst: {
+        title: { lead: "Try every one first, ", mark: "for free", tail: "" },
+        body: "Each example is a working site. Book the tour, fill the cart, see the restaurant say whether it is open right now. Then decide.",
+        from: "{labs} examples",
+        to: "to try them all",
+      },
+      fixedPrice: {
+        title: { lead: "A price agreed ", mark: "before anything starts", tail: "" },
+        body: "Fixed packages from {fromPrice} baht. The number you agree to is the number on the invoice.",
+        message: "Hi! Can I get the Counter style for my cafe?",
+        quote: "Quote",
+        tier: "Standard package",
+        deposit: "Deposit",
+        launch: "On launch day",
+        paid: "Paid",
+        due: "Due at launch",
+      },
+    },
+  },
+  platform: {
+    title: "Everything between hello and launch",
+    cells: {
+      design: {
+        title: { mark: "Designed", rest: " for your business" },
+        body: "Start from an example, then it becomes yours: your words, your photos, in Thai, English or both.",
+      },
+      live: {
+        title: { mark: "Live", rest: " on your own domain" },
+        // {performance} and {accessibility} come from lib/lighthouse.ts, the lowest
+        // score across the measured pages.
+        body: "Quick on a phone, and measured rather than promised: on Lighthouse this site scores {performance} or better for speed and {accessibility} for accessibility.",
+        scores: {
+          performance: "Performance",
+          accessibility: "Accessibility",
+          bestPractices: "Best practices",
+          seo: "SEO",
+        },
+        caption: "Phone run, lowest of {routes} pages",
+      },
+      yours: {
+        title: { mark: "Yours", rest: " to keep, code included" },
+        body: "The code, the domain and the hosting sit in your name. Leave whenever you like and take all of it.",
+        owner: "Owner",
+        you: "you",
+      },
+      fixes: {
+        title: { mark: "Fixed", rest: " free for 30 days" },
+        body: "Anything that does not work the way we agreed gets mended free for a month after launch.",
+        fixed: "Fixed",
+        tickets: [
+          "Menu overlaps on a small phone",
+          "Sale price shows without the discount",
+          "Thai heading breaks mid-word",
+        ],
+      },
+    },
   },
   work: {
     label: "projects",
@@ -40,31 +151,13 @@ const en = {
     sub: "Beyond websites: systems in daily use, not demos. Open any of them for how it was built and what it does.",
     caseStudy: "Read the build",
   },
-  lab: {
-    title: "{labs} directions, every one built",
-    sub: "Each is a working page, not a theme with the colours swapped: the tour panel quotes real totals, the shop page knows whether it is open right now. Pick the one that fits your business and your content goes in it.",
-    seeAll: "All {count} in The Lab",
-    railEnd: "directions to browse",
-    proof: [
-      {
-        value: "41 ms",
-        label:
-          "The e-ink latency Sable reproduces, full-refresh flicker included.",
-      },
-      {
-        value: "30%",
-        label:
-          "The deposit Longtail quotes live as you add adults, children and hotel pickup.",
-      },
-      {
-        value: "3",
-        label: "Render real-time 3D in the browser, not a video of one.",
-      },
-    ],
-  },
   about: {
     label: "What I work with",
     title: "One person, the whole stack.",
+    profile: "Film's profile",
+    name: "Nuttapon Yimnoi",
+    nickname: "Film",
+    location: "Bangkok, Thailand",
     p1: "I'm Film. I build websites for businesses, and the systems I use every day: trading bots, AI assistants, dashboards and content pipelines. I own each project from the first sketch to the thing running in production.",
     p2: "My default is to ship: small, real, improving over time. Whether it's a shop's website or an automated strategy, the goal is the same. Make it work, then make it better.",
     stats: [
@@ -620,22 +713,125 @@ const th: typeof en = {
     toggleTheme: "สลับธีมมืดกับสว่าง",
   },
   hero: {
-    // Roman spelling on both sides: it is how the name appears on GitHub and
-    // in email, and a guessed Thai spelling of it would be worse than none.
-    name: "Nuttapon Yimnoi (ฟิล์ม)",
-    location: "กรุงเทพฯ",
     // The zero-width spaces are deliberate: they mark where a line may break
     // inside a Thai run, for engines with no Thai dictionary loaded.
-    headline: "ผมทำเว็บ​ที่กดเล่นได้จริง ลองก่อน​แล้วค่อยจ้าง",
-    sub: "ตัวอย่าง {labs} แบบเปิดใช้งานอยู่จริงทุกอัน เลือกแบบที่ใช่ แล้วผมปรับให้เป็นเว็บของคุณ ทำเองคนเดียวตั้งแต่คุยงานจนเว็บขึ้น",
+    headline: {
+      lead: "ผมทำเว็บ​ที่",
+      hand: "กดเล่น",
+      tail: "ได้จริง ลองก่อน​แล้วค่อยจ้าง",
+    },
+    sub: "ตัวอย่าง {labs} แบบ กดเล่นได้ทุกอัน ถูกใจแบบไหน ผมทำเป็นเว็บของคุณเองตั้งแต่ต้นจนจบ",
     tryLabs: "ลองเล่นตัวอย่าง",
     seePricing: "ดูราคา",
     facts: [
-      { value: "{labs}", label: "แบบให้กดลองก่อนจ้าง" },
+      { value: "{labs}", label: "แบบให้ลองเล่น" },
       { value: "{fromPrice}", label: "บาท ราคาเริ่มต้น" },
-      { value: "30", label: "วัน แก้ฟรีหลังส่งงาน" },
+      { value: "30", label: "วัน แก้ฟรีหลังเว็บขึ้น" },
       { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
     ],
+    scrollHint: "เลื่อนลง",
+  },
+  showcase: {
+    title: {
+      text: "ธุรกิจแบบไหน ก็มีเว็บให้ลองแล้ว",
+      lead: "ธุรกิจ",
+      tail: "แบบไหน ก็มีเว็บ​ให้ลองแล้ว",
+    },
+    sub: "เลือกแบบที่ใกล้กับธุรกิจคุณที่สุด แต่ละแบบเปิดเป็นเว็บที่กดเล่นได้จริง พร้อมบอกแพ็กเกจที่ใช้ทำ",
+    tablistLabel: "ประเภทธุรกิจ",
+    categories: {
+      food: "ร้านอาหารและคาเฟ่",
+      tours: "ทัวร์และระบบจอง",
+      shops: "ร้านค้าออนไลน์",
+      events: "อีเวนต์และงานแต่ง",
+      premium: "สินค้าพรีเมียม",
+      studios: "สตูดิโอและคอร์สเรียน",
+    },
+    examplesCount: "ตัวอย่าง {count} แบบ",
+    exampleCount: "ตัวอย่าง 1 แบบ",
+    stats: {
+      from: "ราคาเริ่มต้น",
+      time: "ใช้เวลาทำ",
+      examples: "แบบให้ลอง",
+    },
+    live: "ใช้งานได้",
+    examples: "ตัวอย่าง",
+    packages: "แพ็กเกจ",
+    openDemo: "เปิด {name}",
+    seeAll: "ดูครบ {count} แบบใน The Lab",
+  },
+  pains: {
+    title: "จ้างคนทำเว็บ ก็ปวดหัวพอแล้ว...",
+    sub: "ผมเลยตัดเรื่องที่ต้องลุ้นออกไปให้หมด",
+    notesLabel: "เรื่องที่คนจ้างทำเว็บกังวลกันบ่อย",
+    notes: [
+      "โอนมัดจำไปแล้ว ติดต่อไม่ได้อีกเลย",
+      "ทำไปครึ่งทาง ราคาขึ้นอีกเท่าตัว",
+      "นึกภาพไม่ออก จนกว่าจะเห็นของจริง",
+      "ขอแก้นิดเดียว ก็คิดเงินเพิ่ม",
+      "ในคอมสวย เปิดในมือถือพัง",
+      "เว็บล่ม แล้วจะโทรหาใคร",
+      "หน้าตาเหมือนเทมเพลตร้านข้างๆ",
+    ],
+  },
+  promise: {
+    titleMuted: "ที่อื่นส่งภาพตัวอย่างมาให้ดู",
+    title: { lead: "ผมให้", mark: "ลองของจริง", tail: "ก่อน" },
+    rows: {
+      tryFirst: {
+        title: { lead: "ลองเล่นก่อนได้", mark: "ฟรี", tail: " ทุกแบบ" },
+        body: "ทุกแบบเป็นเว็บที่ใช้งานได้จริง ลองจองทัวร์ ใส่ของลงตะกร้า ดูหน้าร้านบอกว่าตอนนี้เปิดหรือปิด แล้วค่อยตัดสินใจ",
+        from: "ตัวอย่าง {labs} แบบ",
+        to: "ลองได้ครบทุกแบบ",
+      },
+      fixedPrice: {
+        title: { lead: "ราคาตกลงกัน", mark: "ก่อนเริ่มงาน", tail: "" },
+        body: "แพ็กเกจราคาชัดเจน เริ่มต้น {fromPrice} บาท ตกลงกันไว้เท่าไหร่ ใบแจ้งหนี้ก็เท่านั้น",
+        message: "สวัสดี อยากได้แบบ Counter ไปทำเว็บร้านกาแฟ",
+        quote: "ใบเสนอราคา",
+        tier: "แพ็กเกจ Standard",
+        deposit: "มัดจำ",
+        launch: "วันเว็บขึ้น",
+        paid: "จ่ายแล้ว",
+        due: "จ่ายวันเว็บขึ้น",
+      },
+    },
+  },
+  platform: {
+    title: "ทุกอย่างตั้งแต่ทักมา จนเว็บขึ้น",
+    cells: {
+      design: {
+        title: { mark: "ออกแบบ", rest: "ให้ธุรกิจคุณ" },
+        body: "เริ่มจากตัวอย่างที่ชอบ แล้วปรับให้เป็นของคุณ ทั้งข้อความ รูป และภาษา จะไทย อังกฤษ หรือทั้งคู่ก็ได้",
+      },
+      live: {
+        title: { mark: "ขึ้นเว็บ", rest: "บนโดเมนของคุณ" },
+        body: "เปิดในมือถือได้ไว วัดผลจริง ไม่ได้แค่พูด เว็บนี้ได้คะแนนความเร็วจาก Lighthouse {performance} ขึ้นไป และการเข้าถึง {accessibility} เต็ม",
+        scores: {
+          performance: "ความเร็ว",
+          accessibility: "การเข้าถึง",
+          bestPractices: "แนวปฏิบัติที่ดี",
+          seo: "SEO",
+        },
+        caption: "วัดบนมือถือ ค่าต่ำสุดจาก {routes} หน้า",
+      },
+      yours: {
+        title: { mark: "เป็นของคุณ", rest: " รวมโค้ดทั้งหมด" },
+        body: "โค้ด โดเมน และโฮสติ้งอยู่ในชื่อคุณ จะเลิกจ้างเมื่อไหร่ ก็เอาไปได้ทั้งหมด",
+        owner: "เจ้าของ",
+        you: "คุณ",
+      },
+      fixes: {
+        title: { mark: "แก้ฟรี", rest: " 30 วันหลังเว็บขึ้น" },
+        body: "อะไรที่ไม่ตรงกับที่ตกลงกันไว้ แก้ให้ฟรีหนึ่งเดือนหลังเว็บขึ้น",
+        fixed: "แก้แล้ว",
+        tickets: [
+          "เมนูซ้อนกันบนมือถือจอเล็ก",
+          "ราคาลดไม่ขึ้นในหน้าสินค้า",
+          "หัวข้อภาษาไทยตัดกลางคำ",
+        ],
+      },
+    },
   },
   work: {
     label: "โปรเจกต์",
@@ -643,31 +839,15 @@ const th: typeof en = {
     sub: "นอกจากเว็บ ผมสร้างระบบที่ใช้งานจริงทุกวันด้วย ไม่ใช่ตัวอย่างโชว์ กดเข้าไปดูได้ว่าสร้างยังไงและทำอะไรได้บ้าง",
     caseStudy: "ดูเบื้องหลัง",
   },
-  lab: {
-    title: "{labs} แบบ สร้างขึ้นมา​จริงทุกอัน",
-    sub: "ทุกอันเป็นเว็บที่ทำงานได้จริง ไม่ใช่ธีมที่เปลี่ยนแค่สี ตัวจองทัวร์คิดเงินได้จริง หน้าร้านอาหารรู้ว่าตอนนี้เปิดหรือปิด เลือกอันที่เข้ากับธุรกิจคุณ แล้วผมเอาเนื้อหาของคุณใส่ลงไปในแบบนั้น",
-    seeAll: "ดูครบ {count} แบบใน The Lab",
-    railEnd: "แบบให้เลือกดู",
-    proof: [
-      {
-        value: "41 ms",
-        label:
-          "ค่าหน่วงจริงของจอ e-ink ที่ Sable ทำซ้ำ รวมอาการกะพริบตอนรีเฟรชทั้งจอ",
-      },
-      {
-        value: "30%",
-        label:
-          "ค่ามัดจำที่ Longtail คิดให้สดๆ ตอนเพิ่มผู้ใหญ่ เด็ก และรถรับที่โรงแรม",
-      },
-      {
-        value: "3",
-        label: "อันที่เรนเดอร์ 3D สดในเบราว์เซอร์ ไม่ใช่วิดีโอที่อัดมา",
-      },
-    ],
-  },
   about: {
     label: "เครื่องมือที่ใช้",
     title: "คนเดียว ครบทั้งกอง",
+    profile: "โปรไฟล์ของฟิล์ม",
+    // Roman spelling on both sides: it is how the name appears on GitHub and
+    // in email, and a guessed Thai spelling of it would be worse than none.
+    name: "Nuttapon Yimnoi",
+    nickname: "ฟิล์ม",
+    location: "กรุงเทพฯ",
     p1: "ผมชื่อฟิล์ม รับทำเว็บไซต์ให้ธุรกิจ และสร้างระบบที่ใช้เองทุกวัน ทั้งบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
     p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นเว็บร้านค้าหรือบอทเทรดก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
     stats: [

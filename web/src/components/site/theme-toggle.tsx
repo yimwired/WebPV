@@ -4,14 +4,15 @@ import { Moon, Sun } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 
 /**
- * Dark ⇄ light, with the change wiping out from the button itself.
+ * Light ⇄ dark, with the change wiping out from the button itself.
  *
  * The button holds no React state: which icon shows is decided by the `dark`
  * class on <html> through Tailwind's dark variant, so the server and the client
  * always render the same markup and there is nothing to hydrate.
  *
- * Dark stays the default. Only an explicit choice is remembered, and the inline
- * script in layout.tsx applies it before first paint.
+ * Light is the default since the 2026-10-17 redesign. Only an explicit choice
+ * is remembered, and the inline script in layout.tsx applies it before first
+ * paint.
  */
 export function ThemeToggle() {
   const { t } = useLocale();
@@ -82,10 +83,12 @@ export function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label={t.nav.toggleTheme}
-      className="border-line-strong text-foreground/80 hover:text-foreground hover:border-foreground/40 grid h-8 w-8 place-items-center rounded-md border transition-[color,border-color,transform] duration-200 active:scale-90"
+      className="border-line-strong text-foreground/80 hover:text-foreground hover:border-foreground/40 grid h-9 w-9 place-items-center rounded-full border transition-[color,border-color,transform] duration-200 active:scale-90"
     >
-      <Sun aria-hidden className="hidden h-4 w-4 dark:block" />
-      <Moon aria-hidden className="h-4 w-4 dark:hidden" />
+      {/* `theme-dark`, not `dark`: the navbar turns dark over a dark section,
+          and the icon must keep saying which theme the visitor chose. */}
+      <Sun aria-hidden className="theme-dark:block hidden h-4 w-4" />
+      <Moon aria-hidden className="theme-dark:hidden h-4 w-4" />
     </button>
   );
 }

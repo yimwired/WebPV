@@ -21,12 +21,13 @@ const LOCALE = process.env.LOCALE || "en-US";
 
 
 /**
- * The site ships dark and remembers an explicit choice in localStorage, so the
- * light palette is only ever on screen for someone who asked for it. THEME=light
+ * The site ships light (dark until 2026-10-17) and remembers an explicit choice
+ * in localStorage, so the dark palette is only ever on screen for someone who
+ * asked for it. THEME=dark
  * seeds that choice before the first navigation, which is the only way to
  * measure the other half of the tokens.
  */
-const THEME = process.env.THEME === "light" ? "light" : "dark";
+const THEME = process.env.THEME === "dark" ? "dark" : "light";
 const seedTheme = (context) =>
   context.addInitScript((theme) => {
     try {

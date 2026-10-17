@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Google_Sans, Playpen_Sans_Thai } from "next/font/google";
 import { LocaleProvider } from "@/lib/i18n";
 import { MotionProvider } from "@/components/site/motion-provider";
 import "./globals.css";
@@ -7,6 +7,8 @@ import { withCounts } from "@/lib/counts";
 import { SITE_URL } from "@/lib/site";
 import { jsonLdHtml, siteGraph } from "@/lib/structured-data";
 
+// Still the root face, because a dozen labs inherit it and each lab is a style
+// study that is not ours to restyle. The site's own pages use the two below.
 const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -15,6 +17,22 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// The face fastwork.com sets its selling page in. It carries Thai as well as
+// Latin, so Thai copy no longer falls back to whatever the visitor's OS has.
+const googleSans = Google_Sans({
+  variable: "--font-site",
+  subsets: ["latin", "thai"],
+});
+
+// The handwriting: one word in the hero headline and the sticky notes. `block`
+// rather than `swap`, because the fallback for `cursive` on Windows is Comic
+// Sans, and a word that appears a moment late beats a word that changes face.
+const playpen = Playpen_Sans_Thai({
+  variable: "--font-hand",
+  subsets: ["latin", "thai"],
+  display: "block",
 });
 
 const SITE_TITLE = "Film | Websites you can try before you hire";
@@ -44,11 +62,11 @@ export const metadata: Metadata = {
 };
 
 // The phone paints its own bar with this colour. Two entries so the bar follows
-// the theme the visitor is actually on; the dark value matches --background in
-// the .dark block, the light one matches :root.
+// the visitor's system setting; the dark value matches --background in the
+// .dark block, the light one matches :root.
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: dark)", color: "#131922" },
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
   ],
 };
@@ -61,17 +79,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${googleSans.variable} ${playpen.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
-        {/* Runs before first paint, so a visitor who chose light never sees the
-            dark page flash first. <html> already carries `dark`, so this only
-            has to take it off. */}
+        {/* Runs before first paint, so a visitor who chose dark never sees the
+            light page flash first. Light is the default since 2026-10-17, so
+            this only ever has to add `dark`. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.remove('dark')}catch(e){}",
+              "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}",
           }}
         />
       </head>
