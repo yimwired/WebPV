@@ -3,9 +3,9 @@
 //  its own share card and its own canonical URL.
 //
 //  Without this, Next inherits the root's openGraph block on every
-//  route: /pricing pasted into LINE or Facebook previewed as
-//  "Film | Trading systems, AI agents..." rather than as the price
-//  list, which is the one thing a link to it is meant to say.
+//  route: /pricing pasted into LINE or Facebook previewed as the
+//  home page's card rather than as the price list, which is the
+//  one thing a link to it is meant to say.
 //  แก้ share card ของหน้าไหนก็แก้ที่หน้านั้น ผ่าน helper ตัวนี้
 // ─────────────────────────────────────────────────────────────
 
@@ -22,7 +22,7 @@ const SHARE_CARD = {
   url: `${SITE_URL}/opengraph-image`,
   width: 1200,
   height: 630,
-  alt: "Film: trading systems, AI agents and the tools around them",
+  alt: "Film: websites you can try before you hire",
 };
 
 interface PageSeo {

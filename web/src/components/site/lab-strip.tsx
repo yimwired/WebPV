@@ -4,34 +4,42 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
-import { labs } from "@/lib/labs";
+import { labBestFor, labs } from "@/lib/labs";
 import { labCardVersions } from "@/lib/lab-cards";
 import { useLocale } from "@/lib/i18n";
+import { thaiWrap } from "@/lib/thai-text";
+import { LabStage } from "./lab-stage";
 import { Reveal } from "./reveal";
 
 /**
- * The Lab, on the home page.
+ * The Lab, on the home page, straight after the hero: the demos are what a
+ * client is shopping for, so they come before the systems in the Work grid.
  *
- * Deliberately a different shape from the Work grid above it: this one runs
- * off the right edge of the screen instead of wrapping, so the count reads as
+ * Two shapes for two screens. From lg up it is a pinned stage that the page
+ * scrolls through one demo at a time (`lab-stage.tsx`). Below that, a rail
+ * that runs off the right edge instead of wrapping, so the count reads as
  * "there is more of this" rather than as a tidy set. The gallery at /labs is
- * still where a visitor compares them properly — this is the part that has to
+ * still where a visitor compares them properly; this is the part that has to
  * survive someone who never clicks through.
  */
 export function LabStrip() {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
 
   return (
+    // overflow-x-clip rather than overflow-hidden: hidden would make this
+    // section the scroll container the stage pins against, and it never scrolls.
     <section
       id="lab"
-      className="scroll-mt-20 overflow-hidden pt-10 pb-20 sm:pt-14 sm:pb-28"
+      className="scroll-mt-20 overflow-x-clip pt-10 pb-20 sm:pt-14 sm:pb-28"
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal>
           <div className="border-line flex flex-wrap items-end justify-between gap-4 border-b pb-6">
             <div>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {withCounts(t.lab.title)}
+                {locale === "th"
+                  ? thaiWrap(withCounts(t.lab.title))
+                  : withCounts(t.lab.title)}
               </h2>
               <p className="text-muted-foreground mt-3 max-w-xl text-sm leading-relaxed sm:text-base">
                 {t.lab.sub}
@@ -48,6 +56,8 @@ export function LabStrip() {
         </Reveal>
       </div>
 
+      <LabStage />
+
       {/* Full-bleed rail. --rail-gutter resolves to the same gutter the max-w-6xl
           sections use — half the leftover width plus their own px-8 — so the
           first card lines up with the heading above while
@@ -55,7 +65,7 @@ export function LabStrip() {
           as well as ps: without it snap-mandatory snaps the first card to the
           viewport edge on load and eats the alignment. */}
       <ul
-        className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 ps-(--rail-gutter) pe-5 scroll-ps-(--rail-gutter) [--rail-gutter:max(1.25rem,calc((100%_-_72rem)/2_+_2rem))] sm:pe-8 sm:[--rail-gutter:max(2rem,calc((100%_-_72rem)/2_+_2rem))]"
+        className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 ps-(--rail-gutter) pe-5 scroll-ps-(--rail-gutter) [--rail-gutter:max(1.25rem,calc((100%_-_72rem)/2_+_2rem))] sm:pe-8 sm:[--rail-gutter:max(2rem,calc((100%_-_72rem)/2_+_2rem))] lg:hidden"
         style={{ scrollbarWidth: "thin" }}
       >
         {labs.map((lab) => (
@@ -83,7 +93,7 @@ export function LabStrip() {
               </h3>
               <p className="spec mt-0.5">{lab.vibe}</p>
               <p className="text-muted-foreground mt-2 text-sm leading-snug">
-                {lab.bestFor}
+                {labBestFor(lab, locale)}
               </p>
             </Link>
           </li>

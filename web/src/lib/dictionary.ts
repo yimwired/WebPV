@@ -23,21 +23,21 @@ const en = {
   hero: {
     name: "Nuttapon Yimnoi (Film)",
     location: "Bangkok",
-    headline: "I build trading systems, AI agents and the tools around them.",
-    sub: "{projects} projects shipped and in use, all designed and built solo, from the first sketch to the thing that runs while I sleep.",
-    viewWork: "See the work",
-    contact: "Get in touch",
+    headline: "I build websites you can try before you hire me.",
+    sub: "{labs} working examples, all of them live. Pick the one that fits and I turn it into your site, on my own from the first call to launch.",
+    tryLabs: "Try the examples",
+    seePricing: "See prices",
     facts: [
+      { value: "{labs}", label: "Live styles to try first" },
+      { value: "{fromPrice}", label: "Baht starting price" },
+      { value: "30", label: "Days of free fixes after launch" },
       { value: "{projects}", label: "Projects shipped" },
-      { value: "12", label: "Strategy engines in AURUM" },
-      { value: "11", label: "AI agents in the fleet" },
-      { value: "4", label: "Platforms published to" },
     ],
   },
   work: {
     label: "projects",
     title: "Built, shipped, still running",
-    sub: "Each one is in daily use, not a demo. Open any of them for how it was built and what it does.",
+    sub: "Beyond websites: systems in daily use, not demos. Open any of them for how it was built and what it does.",
     caseStudy: "Read the build",
   },
   lab: {
@@ -45,6 +45,9 @@ const en = {
     sub: "Each is a working page, not a theme with the colours swapped: the tour panel quotes real totals, the shop page knows whether it is open right now. Pick the one that fits your business and your content goes in it.",
     seeAll: "All {count} in The Lab",
     railEnd: "directions to browse",
+    pick: "Pick a direction",
+    bestFor: "Best for",
+    tryLive: "Try it live",
     proof: [
       {
         value: "41 ms",
@@ -65,8 +68,8 @@ const en = {
   about: {
     label: "What I work with",
     title: "One person, the whole stack.",
-    p1: "I'm Film. I build trading bots, AI assistants, dashboards and content pipelines, and I own each project from the first sketch to the thing running in production.",
-    p2: "My default is to ship: small, real, improving over time. Whether it's an automated strategy or a short-form video system, the goal is the same. Make it work, then make it better.",
+    p1: "I'm Film. I build websites for businesses, and the systems I use every day: trading bots, AI assistants, dashboards and content pipelines. I own each project from the first sketch to the thing running in production.",
+    p2: "My default is to ship: small, real, improving over time. Whether it's a shop's website or an automated strategy, the goal is the same. Make it work, then make it better.",
     stats: [
       { value: "{projects}", label: "Projects shipped" },
       { value: "Solo", label: "Design, build and run" },
@@ -626,28 +629,31 @@ const th: typeof en = {
     location: "กรุงเทพฯ",
     // The zero-width spaces are deliberate: they mark where a line may break
     // inside a Thai run, for engines with no Thai dictionary loaded.
-    headline: "ผมสร้าง​ระบบเทรด เอเจนต์ AI และ​เครื่องมือ​รอบๆ มัน",
-    sub: "ผลงาน {projects} ชิ้นที่ส่งแล้วและมีคนใช้จริง ทำเองคนเดียวทุกตัว ตั้งแต่สเก็ตช์แรกจนถึงวันที่มันทำงานเองตอนผมหลับ",
-    viewWork: "ดูผลงาน",
-    contact: "ทักมาคุยกัน",
+    headline: "ผมทำเว็บ​ที่กดเล่นได้จริง ลองก่อน​แล้วค่อยจ้าง",
+    sub: "ตัวอย่าง {labs} แบบเปิดใช้งานอยู่จริงทุกอัน เลือกแบบที่ใช่ แล้วผมปรับให้เป็นเว็บของคุณ ทำเองคนเดียวตั้งแต่คุยงานจนเว็บขึ้น",
+    tryLabs: "ลองเล่นตัวอย่าง",
+    seePricing: "ดูราคา",
     facts: [
+      { value: "{labs}", label: "แบบให้กดลองก่อนจ้าง" },
+      { value: "{fromPrice}", label: "บาท ราคาเริ่มต้น" },
+      { value: "30", label: "วัน แก้ฟรีหลังส่งงาน" },
       { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
-      { value: "12", label: "strategy engine ใน AURUM" },
-      { value: "11", label: "AI agent ในกองยาน" },
-      { value: "4", label: "แพลตฟอร์มที่โพสต์ขึ้น" },
     ],
   },
   work: {
     label: "โปรเจกต์",
     title: "สร้างเสร็จ ส่งขึ้นใช้ และยังรันอยู่",
-    sub: "ทุกตัวใช้งานจริงทุกวัน ไม่ใช่ตัวอย่างโชว์ กดเข้าไปดูได้ว่าสร้างยังไงและทำอะไรได้บ้าง",
+    sub: "นอกจากเว็บ ผมสร้างระบบที่ใช้งานจริงทุกวันด้วย ไม่ใช่ตัวอย่างโชว์ กดเข้าไปดูได้ว่าสร้างยังไงและทำอะไรได้บ้าง",
     caseStudy: "ดูเบื้องหลัง",
   },
   lab: {
-    title: "{labs} แบบ สร้างขึ้นมาจริงทุกอัน",
+    title: "{labs} แบบ สร้างขึ้นมา​จริงทุกอัน",
     sub: "ทุกอันเป็นเว็บที่ทำงานได้จริง ไม่ใช่ธีมที่เปลี่ยนแค่สี ตัวจองทัวร์คิดเงินได้จริง หน้าร้านอาหารรู้ว่าตอนนี้เปิดหรือปิด เลือกอันที่เข้ากับธุรกิจคุณ แล้วผมเอาเนื้อหาของคุณใส่ลงไปในแบบนั้น",
     seeAll: "ดูครบ {count} แบบใน The Lab",
     railEnd: "แบบให้เลือกดู",
+    pick: "เลือกดูทีละแบบ",
+    bestFor: "เหมาะกับ",
+    tryLive: "กดเล่นของจริง",
     proof: [
       {
         value: "41 ms",
@@ -668,8 +674,8 @@ const th: typeof en = {
   about: {
     label: "เครื่องมือที่ใช้",
     title: "คนเดียว ครบทั้งกอง",
-    p1: "ผมชื่อฟิล์ม สร้างบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดทำโปรเจกต์แบบจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
-    p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นบอทเทรดหรือระบบทำวิดีโอสั้นก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
+    p1: "ผมชื่อฟิล์ม รับทำเว็บไซต์ให้ธุรกิจ และสร้างระบบที่ใช้เองทุกวัน ทั้งบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
+    p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นเว็บร้านค้าหรือบอทเทรดก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
     stats: [
       { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
       { value: "ทำเอง", label: "ออกแบบ สร้าง และดูแลต่อ" },

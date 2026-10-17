@@ -13,8 +13,8 @@ export default function Home() {
           not the focus, so the next Tab goes back into the navbar */}
       <main id="main" tabIndex={-1}>
         <Hero />
-        <Projects />
         <LabStrip />
+        <Projects />
         <About />
         <Footer />
       </main>

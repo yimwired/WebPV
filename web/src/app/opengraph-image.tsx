@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
+import { withCounts } from "@/lib/counts";
 import { SITE_HOST } from "@/lib/site";
 
-export const alt = "Nuttapon Yimnoi (Film), builder of trading systems and AI agents";
+export const alt = "Nuttapon Yimnoi (Film), websites you can try before you hire";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -52,7 +53,7 @@ export default function Image() {
               lineHeight: 1.08,
             }}
           >
-            I build trading systems, AI agents and the tools around them.
+            I build websites you can try before you hire me.
           </div>
         </div>
 
@@ -68,9 +69,8 @@ export default function Image() {
           }}
         >
           <div style={{ display: "flex", gap: "36px" }}>
-            <div>5 systems in production</div>
-            <div>12 strategy engines</div>
-            <div>11 AI agents</div>
+            <div>{withCounts("{labs} live examples")}</div>
+            <div>{withCounts("From {fromPrice} THB")}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
             <div

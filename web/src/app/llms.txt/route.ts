@@ -32,7 +32,7 @@ export function GET() {
 
   const body = `# Film — Nuttapon Yimnoi
 
-> Software engineer. Builds trading systems, AI agents, dashboards and the automation around them, solo and end to end. Five systems in production. Available for freelance work; prices for websites are published, everything else is quoted per project.
+> Web developer and software engineer in Bangkok. Builds websites in Next.js and React, with ${labs.length} live examples a client can try before hiring, and the trading systems, AI agents and dashboards he runs himself, solo and end to end. ${projects.length} projects shipped. Available for freelance work; prices for websites are published, everything else is quoted per project.
 
 Contact: ${CONTACT_EMAIL}
 ${PROFILES.map((p) => `${p.label}: ${p.href}`).join("\n")}

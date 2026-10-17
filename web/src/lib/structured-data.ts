@@ -5,6 +5,7 @@
 //  แก้ประวัติ/ลิงก์โซเชียลที่นี่ที่เดียว
 // ─────────────────────────────────────────────────────────────
 
+import { withCounts } from "@/lib/counts";
 import { dictionary, type CaseStudySlug } from "@/lib/dictionary";
 import { introOffer, pricingTiers } from "@/lib/pricing";
 import { projects } from "@/lib/projects";
@@ -26,12 +27,15 @@ const person = {
   email: `mailto:${CONTACT_EMAIL}`,
   jobTitle: "Software Engineer",
   description:
-    "Builds trading systems, AI agents, dashboards and the automation around them, solo and end to end.",
+    "Builds websites in Next.js and React, and the trading systems, AI agents and automation he runs himself, solo and end to end.",
   knowsAbout: [
+    "Web design and development",
+    "Next.js",
+    "React",
+    "TypeScript",
+    "WebGL",
     "Algorithmic trading",
     "AI agents",
-    "Full-stack web development",
-    "Next.js",
     "Python",
     "Automation",
   ],
@@ -42,9 +46,10 @@ const website = {
   "@type": "WebSite",
   "@id": SITE_ID,
   url: SITE_URL,
-  name: "Film — Trading systems, AI agents and the tools around them",
-  description:
-    "Portfolio of Nuttapon Yimnoi (Film): five systems in production, all designed and built solo.",
+  name: "Film | Websites you can try before you hire",
+  description: withCounts(
+    "Portfolio of Nuttapon Yimnoi (Film): websites with {labs} live examples to try first, and {projects} projects shipped, all designed and built solo.",
+  ),
   inLanguage: ["en", "th"],
   author: { "@id": PERSON_ID },
   publisher: { "@id": PERSON_ID },

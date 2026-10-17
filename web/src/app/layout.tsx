@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { LocaleProvider } from "@/lib/i18n";
 import { MotionProvider } from "@/components/site/motion-provider";
 import "./globals.css";
+import { withCounts } from "@/lib/counts";
 import { SITE_URL } from "@/lib/site";
 import { jsonLdHtml, siteGraph } from "@/lib/structured-data";
 
@@ -16,23 +17,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_TITLE = "Film | Websites you can try before you hire";
+const SHARE_DESCRIPTION = withCounts(
+  "{labs} live examples to try first, then yours, built solo from the first call to launch.",
+);
+
 export const metadata: Metadata = {
-  title: "Film | Trading systems, AI agents and the tools around them",
-  description:
-    "Nuttapon Yimnoi (Film), Bangkok. Five systems in production: a gold trading terminal, an 11-agent AI fleet, dashboards and publishing automation, all built solo.",
-  // update if Vercel assigns a different domain (or a custom domain later)
+  title: SITE_TITLE,
+  description: withCounts(
+    "Nuttapon Yimnoi (Film), Bangkok. Websites in Next.js and React, with {labs} live examples you can try before you hire. Built solo, end to end.",
+  ),
+  // the one place the host is set: SITE_URL in lib/site.ts
   metadataBase: new URL(SITE_URL),
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: "Film | Trading systems, AI agents and the tools around them",
-    description: "Five systems in production, all designed and built solo.",
+    title: SITE_TITLE,
+    description: SHARE_DESCRIPTION,
     url: SITE_URL,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Film | Trading systems, AI agents and the tools around them",
-    description: "Five systems in production, all designed and built solo.",
+    title: SITE_TITLE,
+    description: SHARE_DESCRIPTION,
   },
 };
 

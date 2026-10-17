@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { withCounts } from "@/lib/counts";
@@ -20,12 +21,10 @@ const item: Variants = {
   },
 };
 
-
-
 export function Hero() {
   const { locale, t } = useLocale();
 
-  // the headline count stays honest as projects.ts grows
+  // every count and price here is filled from the data it describes
   const facts = t.hero.facts.map((f) => withCounts(f.value));
 
   return (
@@ -58,24 +57,26 @@ export function Hero() {
           {withCounts(t.hero.sub)}
         </motion.p>
 
+        {/* Try first, then the price: the two questions a buyer arrives with.
+            Getting in touch stays in the navbar, which is always on screen. */}
         <motion.div variants={item} className="mt-9 flex flex-wrap gap-3">
           <a
-            href="#work"
+            href="#lab"
             className="group bg-foreground text-background inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-medium transition-opacity hover:opacity-90"
           >
-            {t.hero.viewWork}
+            {t.hero.tryLabs}
             <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
           </a>
-          <a
-            href="#contact"
+          <Link
+            href="/pricing"
             className="border-line-strong text-foreground/90 hover:border-foreground/40 hover:text-foreground inline-flex h-11 items-center justify-center rounded-md border px-6 text-sm font-medium transition-colors"
           >
-            {t.hero.contact}
-          </a>
+            {t.hero.seePricing}
+          </Link>
         </motion.div>
 
-        {/* Measured facts, not adjectives. Every number is traceable to a
-            project on this page. */}
+        {/* Measured facts, not adjectives. Each one is checkable on this site:
+            the demos in The Lab, the packages on /pricing, the work below. */}
         <motion.dl
           variants={item}
           className="border-line mt-16 grid grid-cols-2 gap-px border-t sm:grid-cols-4"
