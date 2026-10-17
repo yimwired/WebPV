@@ -45,9 +45,6 @@ const en = {
     sub: "Each is a working page, not a theme with the colours swapped: the tour panel quotes real totals, the shop page knows whether it is open right now. Pick the one that fits your business and your content goes in it.",
     seeAll: "All {count} in The Lab",
     railEnd: "directions to browse",
-    pick: "Pick a direction",
-    bestFor: "Best for",
-    tryLive: "Try it live",
     proof: [
       {
         value: "41 ms",
@@ -651,9 +648,6 @@ const th: typeof en = {
     sub: "ทุกอันเป็นเว็บที่ทำงานได้จริง ไม่ใช่ธีมที่เปลี่ยนแค่สี ตัวจองทัวร์คิดเงินได้จริง หน้าร้านอาหารรู้ว่าตอนนี้เปิดหรือปิด เลือกอันที่เข้ากับธุรกิจคุณ แล้วผมเอาเนื้อหาของคุณใส่ลงไปในแบบนั้น",
     seeAll: "ดูครบ {count} แบบใน The Lab",
     railEnd: "แบบให้เลือกดู",
-    pick: "เลือกดูทีละแบบ",
-    bestFor: "เหมาะกับ",
-    tryLive: "กดเล่นของจริง",
     proof: [
       {
         value: "41 ms",
