@@ -304,7 +304,7 @@ export function Showcase() {
                   aria-hidden
                   initial={{ scale: 0.4, opacity: 0 }}
                   whileInView={{ scale: 1, opacity: 1 }}
-                  viewport={{ once: true, margin: "-40px" }}
+                  viewport={{ once: true, margin: "-40px 0px" }}
                   transition={{ type: "spring", stiffness: 420, damping: 24, delay: index * 0.06 }}
                   className="block h-8 w-8 shrink-0"
                 >

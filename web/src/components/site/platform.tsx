@@ -11,7 +11,9 @@ import { cn } from "@/lib/utils";
 import { Sweep } from "./marks";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const once = { once: true, margin: "-80px" } as const;
+// Top and bottom only: side margins cut a phone's screen down to its middle,
+// and the ticks by the tickets' left edge never entered it.
+const once = { once: true, margin: "-80px 0px" } as const;
 
 /** Three of the demos as browser windows, fanned like cards in a hand. */
 function DesignArt() {

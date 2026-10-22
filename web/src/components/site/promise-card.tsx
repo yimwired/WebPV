@@ -14,7 +14,11 @@ import { cn } from "@/lib/utils";
 import { Sweep } from "./marks";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const once = { once: true, margin: "-80px" } as const;
+// Top and bottom only. A margin on the sides too cut a phone's screen down to
+// its middle, and the ticks and the bar near the left edge never entered it,
+// so on a phone they stayed invisible.
+const inViewMargin = "-80px 0px";
+const once = { once: true, margin: inViewMargin } as const;
 
 // The quote in the second step is the real Standard package, split the way
 // /pricing says Standard is paid: half to start, half on launch day.
@@ -32,7 +36,7 @@ function TryArt() {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const frame = useRef<HTMLDivElement>(null);
-  const inView = useInView(frame, { margin: "-80px" });
+  const inView = useInView(frame, { margin: inViewMargin });
   const tabs = resolvedCategories.slice(0, 3).map((category) => category.labs[0]);
   const [active, setActive] = useState(0);
 
