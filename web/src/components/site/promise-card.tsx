@@ -16,7 +16,7 @@ import { pricingTiers } from "@/lib/pricing";
 import { resolvedCategories } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { Scribble, Sweep } from "./marks";
+import { Sweep } from "./marks";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const once = { once: true, margin: "-80px" } as const;
@@ -98,13 +98,15 @@ function TryFreeArt() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={once}
         transition={{ duration: 0.6, ease, delay: 1 }}
-        className="absolute top-[86px] left-[188px]"
+        className="absolute top-[78px] left-[188px]"
       >
-        {/* Playpen draws its 0 and ฿ almost as plainly as a sans, so the lean
-            and the small raised currency sign do the handwriting here, the way
-            fastwork.com sets its "0%". */}
-        <span className="font-hand block origin-bottom-left -rotate-3 -skew-x-6 text-[96px] leading-[0.9] font-light">
-          <span className="me-1 align-[0.62em] text-[0.5em]">฿</span>0
+        {/* Set as a figure, not handwriting: the arrow is the pen here, and
+            the number it lands on reads like the total on a receipt. */}
+        <span className="block text-[92px] leading-[0.9] font-light tracking-[-0.04em] tabular-nums">
+          <span className="text-muted-foreground me-1 align-[0.6em] text-[0.42em] font-normal tracking-normal">
+            ฿
+          </span>
+          0
         </span>
         <span className="text-muted-foreground mt-2 block text-[13px]">
           {t.promise.rows.tryFirst.to}
@@ -133,7 +135,9 @@ function QuoteArt() {
         <span className="bg-surface text-muted-foreground grid h-8 w-8 shrink-0 place-items-center rounded-full">
           <UserRound className="h-4 w-4" />
         </span>
-        <p className="rounded-[18px] rounded-tl-md bg-sky-100 px-4 py-2.5 text-[14px] leading-snug text-sky-950">
+        {/* A client's message, so it keeps the same pale blue and blue ink in
+            either theme, the way a chat app's colours do: 14.0:1. */}
+        <p className="rounded-[18px] rounded-tl-md bg-[oklch(0.93_0.025_255)] px-4 py-2.5 text-[14px] leading-snug text-[oklch(0.225_0.05_261.7)]">
           {copy.message}
         </p>
       </motion.div>
@@ -224,10 +228,9 @@ const rowLink =
   "group text-foreground mt-5 inline-flex items-center gap-1 py-1 text-[15px] font-medium underline decoration-1 underline-offset-4";
 
 /**
- * The light card that rises over the pile of worries and answers them, the
- * way fastwork.com's fee card comes up over its sticky notes. It starts a
- * little narrower than the screen, so the dark ground shows round it, and
- * widens to the full width as it comes up.
+ * The card that rises over the ledger of worries and spells out the two terms
+ * that rule most of them out. It starts a little narrower than the screen, so
+ * the deep blue shows round it, and widens to the full width as it comes up.
  */
 export function PromiseCard() {
   const { t } = useLocale();
@@ -252,18 +255,14 @@ export function PromiseCard() {
         style={{ scale, borderRadius: radius }}
         className="bg-card text-card-foreground relative z-10 -mt-28 origin-top rounded-[32px] px-5 pt-20 pb-10 sm:-mt-40 sm:px-10 sm:pt-28 sm:pb-16"
       >
+        {/* The whole process in three steps, the first one gilded: it is the
+            step nobody else offers, and the one the two rows below expand. */}
         <h2
           id="promise-title"
           className="mx-auto max-w-4xl text-center text-[32px] leading-[1.18] font-medium tracking-[-0.025em] text-balance sm:text-[46px] lg:text-[52px]"
         >
-          <span className="text-muted-foreground block">
-            {t.promise.titleMuted}
-          </span>{" "}
-          <span className="block">
-            {t.promise.title.lead}
-            <Scribble>{t.promise.title.mark}</Scribble>
-            {t.promise.title.tail}
-          </span>
+          <Sweep>{t.promise.title.mark}</Sweep>
+          {t.promise.title.rest}
         </h2>
 
         <div className="divide-line mx-auto mt-10 max-w-[1080px] divide-y sm:mt-16">

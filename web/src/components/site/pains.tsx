@@ -1,136 +1,60 @@
 "use client";
 
-import { useRef, type PointerEvent } from "react";
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-/**
- * Where each sticky note lands, as a share of the stage: `x`/`y` on a phone,
- * `sx`/`sy` from sm up. The colours are paper, so they stay the same in
- * either theme, and the ink on them is the same near-black for the same
- * reason (11:1 or better on the palest of them).
- */
-const spots = [
-  { x: 2, y: 1, sx: 4, sy: 10, rotate: -4, paper: "#b8f0c4" },
-  { x: 50, y: 0, sx: 35, sy: 3, rotate: 3, paper: "#d8c9ff" },
-  { x: 4, y: 22, sx: 66, sy: 8, rotate: -2, paper: "#ffb8ab" },
-  { x: 49, y: 21, sx: 13, sy: 47, rotate: 3, paper: "#ffe68f" },
-  { x: 2, y: 43, sx: 43, sy: 43, rotate: -3, paper: "#aef3e6" },
-  { x: 50, y: 42, sx: 71, sy: 50, rotate: 4, paper: "#ffd3a6" },
-  { x: 25, y: 63, sx: 28, sy: 62, rotate: -2, paper: "#ffc9e6" },
-];
+const ease = [0.22, 1, 0.36, 1] as const;
 
-const stage: Variants = {
+const sheet: Variants = {
   hidden: {},
-  shown: { transition: { staggerChildren: 0.08 } },
+  shown: { transition: { staggerChildren: 0.32, delayChildren: 0.15 } },
 };
 
-// fastwork.com's "stick": each note lands slightly large and settles flat.
-const note: Variants = {
-  hidden: { opacity: 0, scale: 1.14 },
-  shown: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.56, ease: [0.33, 1, 0.68, 1] },
-  },
+const row: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  shown: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
+};
+
+const answer: Variants = {
+  hidden: { opacity: 0, x: -6 },
+  shown: { opacity: 1, x: 0, transition: { duration: 0.4, ease, delay: 0.75 } },
 };
 
 /**
- * A note a mouse can pick up and move. Touch is left alone on purpose: on a
- * phone the notes fill the width of the screen, and capturing touches would
- * stop the page scrolling for anyone whose thumb starts on one.
+ * The pen stroke through a worry is `.strike`'s background (globals.css), and
+ * crossing out is that background growing from nothing to the full width.
+ * A background rather than an overlaid line because a long worry wraps on a
+ * phone, and a cloned background strikes every line it wraps onto. Growing a
+ * background is not a transform, so MotionConfig's reduced setting would leave
+ * it running; under reduce the stroke is simply there.
  */
-function StickyNote({
-  text,
-  spot,
-  lift,
-}: {
-  text: string;
-  spot: (typeof spots)[number];
-  lift: () => number;
-}) {
-  const offset = useRef({ x: 0, y: 0 });
-  const grab = useRef<{ x: number; y: number } | null>(null);
-
-  const onPointerDown = (event: PointerEvent<HTMLLIElement>) => {
-    if (event.pointerType === "touch" || event.button !== 0) return;
-    const element = event.currentTarget;
-    element.setPointerCapture(event.pointerId);
-    element.style.zIndex = String(lift());
-    element.dataset.dragging = "";
-    grab.current = {
-      x: event.clientX - offset.current.x,
-      y: event.clientY - offset.current.y,
-    };
-  };
-
-  const onPointerMove = (event: PointerEvent<HTMLLIElement>) => {
-    if (!grab.current) return;
-    offset.current = {
-      x: event.clientX - grab.current.x,
-      y: event.clientY - grab.current.y,
-    };
-    // The individual `translate` property composes with the transform Motion
-    // writes (the tilt and the landing scale), so neither overwrites the other.
-    event.currentTarget.style.translate = `${offset.current.x}px ${offset.current.y}px`;
-  };
-
-  const onPointerUp = (event: PointerEvent<HTMLLIElement>) => {
-    if (!grab.current) return;
-    grab.current = null;
-    delete event.currentTarget.dataset.dragging;
-  };
-
-  return (
-    <motion.li
-      variants={note}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      className={cn(
-        "absolute flex aspect-square w-[47%] flex-col p-[clamp(12px,2.6vw,20px)] select-none sm:w-[29%]",
-        "left-(--x) top-(--y) sm:left-(--sx) sm:top-(--sy)",
-        "shadow-[0_2px_4px_rgb(0_0_0/0.08)] transition-shadow duration-200",
-        "pointer-fine:cursor-grab data-[dragging]:cursor-grabbing data-[dragging]:shadow-[0_12px_28px_rgb(0_0_0/0.22)]",
-      )}
-      style={
-        {
-          "--x": `${spot.x}%`,
-          "--y": `${spot.y}%`,
-          "--sx": `${spot.sx}%`,
-          "--sy": `${spot.sy}%`,
-          rotate: `${spot.rotate}deg`,
-          backgroundColor: spot.paper,
-        } as React.CSSProperties
-      }
-    >
-      <p className="font-hand text-[clamp(15px,2.2vw,21px)] leading-[1.3] tracking-[-0.01em] text-pretty text-[rgb(0_0_0/0.82)]">
-        {text}
-      </p>
-    </motion.li>
-  );
-}
+const strike = (reduceMotion: boolean | null): Variants => ({
+  hidden: { backgroundSize: "0% 0.5em" },
+  shown: {
+    backgroundSize: "100% 0.5em",
+    transition: reduceMotion ? { duration: 0 } : { duration: 0.55, ease, delay: 0.3 },
+  },
+});
 
 /**
- * The worries people bring to hiring someone for a website, as a pile of
- * sticky notes on fastwork.com's dark ground. The bottom of the pile runs
- * under the light card that answers them (see promise.tsx).
+ * The worries people bring to hiring someone for a website, written down on a
+ * ruled sheet and crossed out one at a time, each with a note in the margin
+ * saying what rules it out. Every note is a term from /pricing, not a new
+ * promise. The sheet stays ivory in either theme, like paper would, and its
+ * blank bottom lines run under the card that follows (see promise-card.tsx).
  */
 export function Pains() {
   const { t } = useLocale();
-  // Each note picked up goes on top of the pile.
-  const topLayer = useRef(spots.length);
-  const lift = () => ++topLayer.current;
+  const reduceMotion = useReducedMotion();
 
   return (
     <section
       data-nav-tone="dark"
       aria-labelledby="pains-title"
-      className="dark bg-background text-foreground overflow-hidden"
+      className="dark bg-background text-foreground overflow-hidden px-4 sm:px-6"
     >
-      <div className="mx-auto max-w-3xl px-5 pt-24 text-center sm:pt-32">
+      <div className="mx-auto max-w-3xl pt-24 text-center sm:pt-32">
         <h2
           id="pains-title"
           className="text-[34px] leading-[1.15] font-medium tracking-[-0.025em] text-balance sm:text-[48px] lg:text-[54px]"
@@ -140,18 +64,48 @@ export function Pains() {
         <p className="text-muted-foreground mt-4 text-[17px]">{t.pains.sub}</p>
       </div>
 
-      <motion.ul
-        aria-label={t.pains.notesLabel}
-        variants={stage}
-        initial="hidden"
-        whileInView="shown"
-        viewport={{ once: true, amount: 0.25 }}
-        className="relative isolate mx-auto mt-12 aspect-[390/640] w-full max-w-[820px] sm:mt-14 sm:aspect-[820/560]"
-      >
-        {t.pains.notes.map((text, i) => (
-          <StickyNote key={text} text={text} spot={spots[i]} lift={lift} />
-        ))}
-      </motion.ul>
+      <div className="paper bg-background text-foreground relative mx-auto mt-12 max-w-[780px] rounded-t-[28px] px-5 pt-6 pb-[150px] sm:mt-14 sm:px-10 sm:pt-8 sm:pb-[210px]">
+        {/* The margin rule of a ledger page: numbers to its left, entries to its right. */}
+        <span
+          aria-hidden
+          className="bg-brand/35 absolute top-0 bottom-0 left-[52px] w-px sm:left-[84px]"
+        />
+
+        <motion.ol
+          aria-label={t.pains.notesLabel}
+          variants={sheet}
+          initial="hidden"
+          whileInView="shown"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          {t.pains.notes.map((note, i) => (
+            <motion.li
+              key={note.worry}
+              variants={row}
+              className="border-line grid grid-cols-[32px_1fr] items-baseline gap-x-4 border-b py-4 sm:grid-cols-[44px_1fr_auto] sm:gap-x-6 sm:py-5"
+            >
+              <span className="text-muted-foreground font-mono text-[12px] tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p className="text-[16px] leading-snug text-pretty sm:text-[18px]">
+                <motion.span variants={strike(reduceMotion)} className="strike">
+                  {note.worry}
+                </motion.span>
+                <span className="sr-only">: </span>
+              </p>
+              <motion.p
+                variants={answer}
+                className={cn(
+                  "font-hand text-brand col-start-2 mt-1.5 -rotate-1 text-[16px] leading-tight",
+                  "sm:col-start-3 sm:mt-0 sm:text-end sm:text-[17px]",
+                )}
+              >
+                {note.answer}
+              </motion.p>
+            </motion.li>
+          ))}
+        </motion.ol>
+      </div>
     </section>
   );
 }

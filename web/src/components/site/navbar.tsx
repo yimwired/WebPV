@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/lib/i18n";
+import { GlassLens, useSupportsLens } from "./glass";
 import { LanguageSwitch } from "./language-switch";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -73,6 +74,8 @@ export function Navbar() {
   const pathname = usePathname();
   const onHome = pathname === "/";
   const ground = useGroundUnderNav();
+  const lens = useSupportsLens();
+  const bar = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   // section anchors only exist on the home page, so they need it as a prefix
@@ -126,8 +129,9 @@ export function Navbar() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4",
-        // Scopes the dark tokens to the bar while it crosses a dark section,
-        // which is how fastwork.com's pill changes with the page under it.
+        // Scopes the dark tokens to the bar while it crosses a dark section.
+        // That is the glass's adaptive layer: the same tokens retint it from
+        // ivory to deep blue, so its text never loses the ground under it.
         ground === "dark" && "dark",
       )}
     >
@@ -141,11 +145,17 @@ export function Navbar() {
         {t.nav.skipToContent}
       </a>
 
-      {/* The ground and the text swap in the same frame, with no fade. Fading
+      {/* The tint and the text swap in the same frame, with no fade. Fading
           either one passes through a moment where ink and ground are nearly
           the same colour: a 500ms fade on the ground alone left white text on
-          a still-white pill every time the bar crossed into a dark section. */}
-      <div className="border-line bg-background text-foreground shadow-float dark:bg-surface mx-auto flex h-14 max-w-[1040px] items-center justify-between gap-3 rounded-full border ps-5 pe-1.5 sm:h-16 sm:pe-2">
+          a still-white pill every time the bar crossed into a dark section.
+          Everything on the glass is in the foreground colour, never muted
+          grey: see the note on `.glass` in globals.css for the arithmetic. */}
+      <div
+        ref={bar}
+        data-lens={lens ? "" : undefined}
+        className="glass text-foreground mx-auto flex h-14 max-w-[1040px] items-center justify-between gap-3 rounded-full ps-5 pe-1.5 sm:h-16 sm:pe-2"
+      >
         {/* The wordmark is four characters, so its text box misses the 24px
             target floor. Padding gives it a real target and the matching
             negative margin keeps it optically on the pill's inner edge. */}
@@ -160,7 +170,7 @@ export function Navbar() {
           {links.map((link) =>
             renderLink(
               link,
-              "text-muted-foreground hover:text-foreground rounded-full px-3.5 py-2 text-[15px] transition-colors",
+              "text-foreground hover:bg-foreground/[0.07] rounded-full px-3.5 py-2 text-[15px] transition-colors",
             ),
           )}
         </nav>
@@ -191,6 +201,8 @@ export function Navbar() {
         </div>
       </div>
 
+      <GlassLens measure={bar} />
+
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -200,8 +212,11 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              className="bg-background/90 fixed inset-0 -z-10 lg:hidden"
+              className="bg-background/80 fixed inset-0 -z-10 lg:hidden"
             />
+            {/* Glass too, but dense and without the lens: the lens map is cut
+                to the bar's proportions, and this sheet sits over whole
+                paragraphs of page text rather than a band of pictures. */}
             <motion.nav
               key="sheet"
               id="mobile-nav"
@@ -209,12 +224,12 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.98 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="border-line bg-background text-foreground shadow-float dark:bg-surface mx-auto mt-2 flex max-w-[1040px] origin-top flex-col gap-1 rounded-[28px] border p-3 lg:hidden"
+              className="glass glass-dense text-foreground mx-auto mt-2 flex max-w-[1040px] origin-top flex-col gap-1 rounded-[28px] p-3 lg:hidden"
             >
               {links.map((link) =>
                 renderLink(
                   link,
-                  "text-foreground/85 hover:text-foreground rounded-2xl px-4 py-3 text-lg transition-colors",
+                  "text-foreground hover:bg-foreground/[0.07] rounded-2xl px-4 py-3 text-lg transition-colors",
                 ),
               )}
               <a

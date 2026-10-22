@@ -25,12 +25,33 @@ const item: Variants = {
   },
 };
 
+/**
+ * A pen arrow for the margin note: a short stroke bowing outward, with its
+ * head at the far end. Drawn pointing right; the left one is mirrored.
+ */
+function NoteArrow({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 56 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={cn("h-[18px] w-[44px] shrink-0", className)}
+    >
+      <path d="M3 15C17 6 35 5 51 11" />
+      <path d="M43 5L51 11L42 16" />
+    </svg>
+  );
+}
+
 export function Hero() {
   const { locale, t } = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
   const isThai = locale === "th";
   const wrap = (text: string) => (isThai ? thaiWrap(text) : text);
-  const { lead, hand, tail } = t.hero.headline;
 
   return (
     <section
@@ -43,8 +64,7 @@ export function Hero() {
           The headline does not fade in, and that is a performance decision
           rather than a stylistic one. It is the largest thing above the fold,
           so the browser times the page by it, and an entrance driven by
-          Motion has to wait for hydration before it can run. The handwritten
-          word animates in CSS instead, which starts with the first paint.
+          Motion has to wait for hydration before it can run.
         */}
         {/* Thai runs a size smaller: at the English size its first line
             overflows the 640px column and the headline takes three lines. */}
@@ -56,11 +76,7 @@ export function Hero() {
               : "text-[40px] leading-[1.06] sm:text-[56px] lg:text-[66px]",
           )}
         >
-          {wrap(lead)}
-          <span className="font-hand hand-write text-brand relative mx-[0.04em] -rotate-3 text-[1.12em] leading-none font-medium">
-            {hand}
-          </span>
-          {wrap(tail)}
+          {wrap(t.hero.headline)}
         </h1>
 
         <motion.div
@@ -76,23 +92,24 @@ export function Hero() {
             {withCounts(t.hero.sub)}
           </motion.p>
 
-          {/* fastwork.com counts down to its launch in four tiles; these four
-              are the numbers a buyer checks, each one filled from the data it
-              describes. The label is the term and the number its value, so
-              the order is flipped on screen and not in the markup. */}
+          {/* The four numbers a buyer checks, read off one plate like the
+              spec line on a drawing, each filled from the data it describes.
+              The label is the term and the number its value, so the order is
+              flipped on screen and not in the markup. Two by two on a phone,
+              hence the dividers that change sides at sm. */}
           <motion.dl
             variants={item}
-            className="mt-9 grid w-full max-w-[34rem] grid-cols-2 gap-2 sm:grid-cols-4"
+            className="border-line bg-card mt-9 grid w-full max-w-[34rem] grid-cols-2 rounded-[22px] border sm:grid-cols-4"
           >
             {t.hero.facts.map((fact) => (
               <div
                 key={fact.label}
-                className="bg-surface flex flex-col-reverse items-center justify-center rounded-[20px] px-3 py-4 sm:aspect-square sm:py-0"
+                className="border-line flex flex-col-reverse items-center justify-center px-3 py-4 even:border-s sm:border-s sm:py-5 sm:first:border-s-0 [&:nth-child(n+3)]:border-t sm:[&:nth-child(n+3)]:border-t-0"
               >
                 <dt className="text-muted-foreground mt-1.5 text-[13px] leading-snug">
                   {fact.label}
                 </dt>
-                <dd className="text-[34px] leading-none tracking-tight tabular-nums sm:text-[38px]">
+                <dd className="text-[30px] leading-none tracking-tight tabular-nums sm:text-[34px]">
                   {withCounts(fact.value)}
                 </dd>
               </div>
@@ -118,6 +135,25 @@ export function Hero() {
             </Link>
           </motion.div>
         </motion.div>
+
+        {/* A note in the margin, in Film's hand, pointing at the cards: out to
+            both sides where they float beside the text, down where a phone
+            stacks them underneath. Decorative, since the showcase that
+            follows lists every one of these demos properly. */}
+        <p
+          aria-hidden
+          className="font-hand hand-write text-brand mt-8 -rotate-2 text-[19px] leading-none sm:text-[21px]"
+        >
+          <span className="hidden items-center gap-3 lg:flex">
+            <NoteArrow className="-scale-x-100" />
+            {t.hero.note.wide}
+            <NoteArrow />
+          </span>
+          <span className="flex items-center gap-2 lg:hidden">
+            {t.hero.note.narrow}
+            <NoteArrow className="rotate-[70deg]" />
+          </span>
+        </p>
 
         <HeroCardBand />
       </div>

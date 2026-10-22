@@ -8,10 +8,9 @@ import { Projects } from "@/components/site/projects";
 import { About } from "@/components/site/about";
 import { Footer } from "@/components/site/footer";
 
-// The order follows fastwork.com's selling page, which Film asked the home
-// page to look like (2026-10-17): headline in a cloud of work, the work by
-// kind, the worries on a dark ground, the light card that answers them, what
-// comes with it, then the proof and the way in.
+// Headline in a cloud of work, the work by kind, the usual worries crossed out
+// on a dark ground, the card that answers them, what comes with it, then the
+// proof and the way in. Light and deep blue sections alternate down the page.
 export default function Home() {
   return (
     <div className="font-site">

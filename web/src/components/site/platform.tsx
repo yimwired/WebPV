@@ -32,9 +32,9 @@ function DesignArt() {
             whileInView={{ opacity: 1, x: frame.x, y: frame.y, rotate: frame.rotate }}
             viewport={once}
             transition={{ duration: 0.8, ease, delay: 0.1 + i * 0.1 }}
-            className="shadow-float absolute w-[min(62%,340px)] overflow-hidden rounded-[12px] bg-white"
+            className="bg-card shadow-float absolute w-[min(62%,340px)] overflow-hidden rounded-[12px]"
           >
-            <div className="flex items-center gap-1.5 border-b border-black/5 px-3 py-2">
+            <div className="border-line flex items-center gap-1.5 border-b px-3 py-2">
               <span className="h-2 w-2 rounded-full bg-[#ff6159]" />
               <span className="h-2 w-2 rounded-full bg-[#ffbd2e]" />
               <span className="h-2 w-2 rounded-full bg-[#28c941]" />
@@ -67,7 +67,7 @@ function LiveArt() {
 
   return (
     <div className="absolute inset-0 flex flex-col justify-center gap-6 px-6 sm:px-8">
-      <div className="flex h-11 items-center gap-2 rounded-full bg-white px-4 text-[14px] text-slate-700 shadow-sm">
+      <div className="bg-card flex h-11 items-center gap-2 rounded-full px-4 text-[14px] shadow-sm">
         <Lock className="h-3.5 w-3.5 text-emerald-700" />
         <span>yourshop.co.th</span>
       </div>
@@ -107,14 +107,12 @@ function LiveArt() {
                   {score.value}
                 </span>
               </div>
-              <span className="mt-2 text-[12px] leading-tight text-slate-700">
-                {score.label}
-              </span>
+              <span className="mt-2 text-[12px] leading-tight">{score.label}</span>
             </div>
           );
         })}
       </div>
-      <p className="text-center text-[12px] text-slate-600">
+      <p className="text-muted-foreground text-center text-[12px]">
         {copy.caption.replace("{routes}", String(lighthouse.routes))}
       </p>
     </div>
@@ -138,24 +136,24 @@ function YoursArt() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={once}
         transition={{ duration: 0.7, ease, delay: 0.1 }}
-        className="shadow-float w-full max-w-[300px] rounded-[18px] bg-white p-4 text-slate-800"
+        className="bg-card shadow-float w-full max-w-[300px] rounded-[18px] p-4"
       >
         <div className="flex items-center justify-between gap-3">
           <span className="flex items-center gap-2 text-[15px] font-medium">
-            <Folder className="h-4 w-4 text-slate-500" />
+            <Folder className="text-muted-foreground h-4 w-4" />
             your-shop
           </span>
-          <span className="flex items-center gap-1.5 text-[12px] text-slate-600">
+          <span className="text-muted-foreground flex items-center gap-1.5 text-[12px]">
             {copy.owner}
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-900">
+            <span className="border-brand/50 text-brand rounded-full border px-2 py-0.5 font-medium">
               {copy.you}
             </span>
           </span>
         </div>
-        <ul className="mt-3 divide-y divide-slate-100 rounded-[12px] border border-slate-100 text-[13px]">
+        <ul className="border-line divide-line mt-3 divide-y rounded-[12px] border text-[13px]">
           {files.map((file) => (
             <li key={file.name} className="flex items-center gap-2 px-3 py-2">
-              <file.icon className="h-3.5 w-3.5 text-slate-500" />
+              <file.icon className="text-muted-foreground h-3.5 w-3.5" />
               {file.name}
             </li>
           ))}
@@ -182,7 +180,7 @@ function FixesArt() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={once}
             transition={{ duration: 0.5, ease, delay: 0.1 + i * 0.15 }}
-            className="flex items-center gap-3 rounded-[14px] bg-white px-4 py-3 text-[14px] text-slate-800 shadow-sm"
+            className="bg-card flex items-center gap-3 rounded-[14px] px-4 py-3 text-[14px] shadow-sm"
           >
             <motion.span
               initial={{ scale: 0.3, opacity: 0 }}
@@ -212,7 +210,7 @@ function Cell({
   className,
 }: {
   art: ReactNode;
-  /** the pastel ground under the illustration */
+  /** the sheet the illustration is drawn on, always light whatever the theme */
   paper: string;
   title: { mark: string; rest: string };
   body: string;
@@ -220,11 +218,13 @@ function Cell({
 }) {
   return (
     <div className={cn("flex flex-col", className)}>
-      {/* Illustration only: everything it shows is said in the text below. */}
+      {/* Illustration only: everything it shows is said in the text below.
+          `paper` brings the light tokens back inside this dark section, so the
+          interface drawn on the sheet keeps its own contrast. */}
       <div
         aria-hidden
-        className="grain relative h-[260px] overflow-hidden rounded-[28px] sm:h-[300px]"
-        style={{ background: paper }}
+        className="paper blueprint text-foreground relative h-[260px] overflow-hidden rounded-[28px] sm:h-[300px]"
+        style={{ backgroundColor: paper }}
       >
         {art}
       </div>
@@ -240,10 +240,11 @@ function Cell({
 }
 
 /**
- * What a client gets besides the design, as fastwork.com's "One platform"
- * section shows its features: pastel panels on the dark ground, each with a
- * small working-looking piece of interface. Laid out as a bento rather than
- * their zigzag, since the card above already alternates picture and text.
+ * What a client gets besides the design: four drawings on drafting paper, set
+ * on the deep blue, each with a small working-looking piece of interface. A
+ * bento rather than a zigzag, since the card above already alternates picture
+ * and text. The four papers stay in the ivory and pale blue family, so the
+ * section reads as one set of plans rather than four colours.
  */
 export function Platform() {
   const { t } = useLocale();
@@ -266,13 +267,13 @@ export function Platform() {
         <Cell
           className="lg:col-span-2"
           art={<DesignArt />}
-          paper="linear-gradient(135deg, #f9e7c4 0%, #e6f0e4 55%, #cfe6ee 100%)"
+          paper="oklch(0.948 0.018 86)"
           title={cells.design.title}
           body={cells.design.body}
         />
         <Cell
           art={<LiveArt />}
-          paper="linear-gradient(160deg, #f1f5fb 0%, #dfe8f4 100%)"
+          paper="oklch(0.935 0.02 255)"
           title={cells.live.title}
           body={cells.live.body
             .replace("{performance}", String(lighthouse.lowest.performance))
@@ -280,14 +281,14 @@ export function Platform() {
         />
         <Cell
           art={<YoursArt />}
-          paper="linear-gradient(140deg, #fbe4dc 0%, #f7ecd9 100%)"
+          paper="oklch(0.935 0.028 84)"
           title={cells.yours.title}
           body={cells.yours.body}
         />
         <Cell
           className="lg:col-span-2"
           art={<FixesArt />}
-          paper="linear-gradient(135deg, #fde2d2 0%, #f4ebe6 50%, #dbe9f6 100%)"
+          paper="oklch(0.945 0.012 250)"
           title={cells.fixes.title}
           body={cells.fixes.body}
         />

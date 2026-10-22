@@ -21,12 +21,13 @@ const en = {
     toggleTheme: "Switch between dark and light",
   },
   hero: {
-    // The headline is cut in three so the middle word can be set in
-    // handwriting. Spaces belong to the pieces, since Thai joins them with none.
-    headline: {
-      lead: "Websites you can ",
-      hand: "try",
-      tail: " before you hire",
+    headline: "Websites you can try before you hire",
+    // The handwritten margin note under the buttons. `wide` sits between two
+    // arrows pointing out at the cards either side; `narrow` points down at
+    // the row of cards a phone shows underneath.
+    note: {
+      wide: "these are real sites, click one",
+      narrow: "real sites, tap one",
     },
     sub: "{labs} live examples to click through. Pick one and I build it into your site myself, start to finish.",
     tryLabs: "Try the examples",
@@ -40,13 +41,7 @@ const en = {
     scrollHint: "Scroll down",
   },
   showcase: {
-    // `text` is what a screen reader hears. On screen the "o" of "shop" is a
-    // row of round thumbnails, which would otherwise be read as "sh p".
-    title: {
-      text: "Every kind of shop, already built",
-      lead: "Every kind of sh",
-      tail: "p, already built",
-    },
+    title: "Every kind of shop, already built",
     sub: "Pick the one closest to yours. Each opens a working site you can click through, with the package that builds it.",
     tablistLabel: "Kinds of business",
     categories: {
@@ -59,10 +54,11 @@ const en = {
     },
     examplesCount: "{count} examples",
     exampleCount: "1 example",
+    // Read along a dotted leader to the figure, like a parts list.
     stats: {
-      from: "starting price",
-      time: "to launch",
-      examples: "to try",
+      from: "Starting price",
+      time: "Time to launch",
+      examples: "Examples to try",
     },
     live: "Live",
     examples: "Examples",
@@ -71,22 +67,23 @@ const en = {
     seeAll: "All {count} in The Lab",
   },
   pains: {
-    title: "Hiring a web developer is hard enough...",
-    sub: "So I took the guesswork out.",
-    notesLabel: "Common worries about hiring someone to build a website",
+    title: "Seven ways hiring a web developer goes wrong",
+    sub: "I've ruled out every one of them. Here's how.",
+    notesLabel: "Common worries about hiring someone to build a website, each with what rules it out",
+    // Each answer is a term already on /pricing (payment split, fixed packages,
+    // revision rounds, 30 days of fixes), not a new promise. Keep it that way.
     notes: [
-      "I paid the deposit. Then they stopped replying.",
-      "The quote doubled halfway through.",
-      "I can't picture it until I see it.",
-      "Every small change costs extra.",
-      "Fine on a laptop, broken on my phone.",
-      "The site went down. Who do I even call?",
-      "It looks like the template next door.",
+      { worry: "I paid the deposit. Then they stopped replying.", answer: "half up front, half on launch day" },
+      { worry: "The quote doubled halfway through.", answer: "a fixed package price" },
+      { worry: "I can't picture it until I see it.", answer: "try the real thing first" },
+      { worry: "Every small change costs extra.", answer: "revision rounds included" },
+      { worry: "Fine on a laptop, broken on my phone.", answer: "checked on a phone before launch" },
+      { worry: "The site went down. Who do I even call?", answer: "me, with 30 days of free fixes" },
+      { worry: "It looks like the template next door.", answer: "your words, your photos" },
     ],
   },
   promise: {
-    titleMuted: "Others send you a mockup.",
-    title: { lead: "I let you ", mark: "try the real thing", tail: "." },
+    title: { mark: "Try first.", rest: " Agree the price. Then I build." },
     rows: {
       tryFirst: {
         title: { lead: "Try every one first, ", mark: "for free", tail: "" },
@@ -183,6 +180,14 @@ const en = {
     sending: "Sending",
     success: "Got it. I read every message and reply from yimwired@gmail.com.",
     error: "That didn't send. Email me directly and it'll reach me.",
+    // Shown under a field when the form is sent with it empty or malformed.
+    errors: {
+      name: "Tell me what to call you.",
+      email: "I need an email to reply to.",
+      emailShape: "That doesn't look like a full email address.",
+      message: "A line or two is enough, but say something.",
+    },
+    dismiss: "Dismiss",
     copyEmail: "Copy email",
     copied: "Copied",
   },
@@ -715,10 +720,10 @@ const th: typeof en = {
   hero: {
     // The zero-width spaces are deliberate: they mark where a line may break
     // inside a Thai run, for engines with no Thai dictionary loaded.
-    headline: {
-      lead: "ผมทำเว็บ​ที่",
-      hand: "กดเล่น",
-      tail: "ได้จริง ลองก่อน​แล้วค่อยจ้าง",
+    headline: "ผมทำเว็บ​ที่กดเล่นได้จริง ลองก่อน​แล้วค่อยจ้าง",
+    note: {
+      wide: "การ์ดพวกนี้คือเว็บจริง ลองกดดูสักอัน",
+      narrow: "เว็บจริงทั้งนั้น แตะดูสักอัน",
     },
     sub: "ตัวอย่าง {labs} แบบ กดเล่นได้ทุกอัน ถูกใจแบบไหน ผมทำเป็นเว็บของคุณเองตั้งแต่ต้นจนจบ",
     tryLabs: "ลองเล่นตัวอย่าง",
@@ -732,11 +737,7 @@ const th: typeof en = {
     scrollHint: "เลื่อนลง",
   },
   showcase: {
-    title: {
-      text: "ธุรกิจแบบไหน ก็มีเว็บให้ลองแล้ว",
-      lead: "ธุรกิจ",
-      tail: "แบบไหน ก็มีเว็บ​ให้ลองแล้ว",
-    },
+    title: "ธุรกิจแบบไหน ก็มีเว็บ​ให้ลองแล้ว",
     sub: "เลือกแบบที่ใกล้กับธุรกิจคุณที่สุด แต่ละแบบเปิดเป็นเว็บที่กดเล่นได้จริง พร้อมบอกแพ็กเกจที่ใช้ทำ",
     tablistLabel: "ประเภทธุรกิจ",
     categories: {
@@ -752,7 +753,7 @@ const th: typeof en = {
     stats: {
       from: "ราคาเริ่มต้น",
       time: "ใช้เวลาทำ",
-      examples: "แบบให้ลอง",
+      examples: "ตัวอย่างให้ลอง",
     },
     live: "ใช้งานได้",
     examples: "ตัวอย่าง",
@@ -761,22 +762,21 @@ const th: typeof en = {
     seeAll: "ดูครบ {count} แบบใน The Lab",
   },
   pains: {
-    title: "จ้างคนทำเว็บ ก็ปวดหัวพอแล้ว...",
-    sub: "ผมเลยตัดเรื่องที่ต้องลุ้นออกไปให้หมด",
-    notesLabel: "เรื่องที่คนจ้างทำเว็บกังวลกันบ่อย",
+    title: "จ้างทำเว็บ พังได้ 7 แบบ",
+    sub: "แต่ละข้อ ผมกันไว้แล้ว",
+    notesLabel: "เรื่องที่คนจ้างทำเว็บกังวลกันบ่อย พร้อมวิธีที่กันไว้",
     notes: [
-      "โอนมัดจำไปแล้ว ติดต่อไม่ได้อีกเลย",
-      "ทำไปครึ่งทาง ราคาขึ้นอีกเท่าตัว",
-      "นึกภาพไม่ออก จนกว่าจะเห็นของจริง",
-      "ขอแก้นิดเดียว ก็คิดเงินเพิ่ม",
-      "ในคอมสวย เปิดในมือถือพัง",
-      "เว็บล่ม แล้วจะโทรหาใคร",
-      "หน้าตาเหมือนเทมเพลตร้านข้างๆ",
+      { worry: "โอนมัดจำไปแล้ว ติดต่อไม่ได้อีกเลย", answer: "จ่ายครึ่งเดียว อีกครึ่งวันเว็บขึ้น" },
+      { worry: "ทำไปครึ่งทาง ราคาขึ้นอีกเท่าตัว", answer: "ราคาแพ็กเกจตายตัว" },
+      { worry: "นึกภาพไม่ออก จนกว่าจะเห็นของจริง", answer: "ลองของจริงก่อนจ้าง" },
+      { worry: "ขอแก้นิดเดียว ก็คิดเงินเพิ่ม", answer: "รอบแก้รวมในราคาแล้ว" },
+      { worry: "ในคอมสวย เปิดในมือถือพัง", answer: "เช็คบนมือถือก่อนเว็บขึ้น" },
+      { worry: "เว็บล่ม แล้วจะโทรหาใคร", answer: "ทักผม แก้ฟรี 30 วัน" },
+      { worry: "หน้าตาเหมือนเทมเพลตร้านข้างๆ", answer: "ใช้คำและรูปของคุณเอง" },
     ],
   },
   promise: {
-    titleMuted: "ที่อื่นส่งภาพตัวอย่างมาให้ดู",
-    title: { lead: "ผมให้", mark: "ลองของจริง", tail: "ก่อน" },
+    title: { mark: "ลองก่อน", rest: " ตกลงราคา แล้วผมค่อยเริ่มทำ" },
     rows: {
       tryFirst: {
         title: { lead: "ลองเล่นก่อนได้", mark: "ฟรี", tail: " ทุกแบบ" },
@@ -873,6 +873,13 @@ const th: typeof en = {
     sending: "กำลังส่ง",
     success: "ได้รับแล้ว อ่านเองทุกฉบับ เดี๋ยวตอบกลับจาก yimwired@gmail.com",
     error: "ส่งไม่ผ่าน ส่งเมลมาตรงๆ ได้เลย ถึงมือแน่นอน",
+    errors: {
+      name: "ใส่ชื่อก่อน จะได้รู้ว่าเรียกว่าอะไร",
+      email: "ใส่อีเมลไว้ ผมจะได้ตอบกลับ",
+      emailShape: "อีเมลนี้ดูยังไม่ครบ ลองเช็คอีกที",
+      message: "เล่าสั้นๆ สักบรรทัดก็พอ",
+    },
+    dismiss: "ปิด",
     copyEmail: "คัดลอกอีเมล",
     copied: "คัดลอกแล้ว",
   },

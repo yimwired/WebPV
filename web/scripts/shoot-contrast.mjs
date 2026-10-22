@@ -37,6 +37,16 @@ const seedTheme = (context) =>
     }
   }, THEME);
 
+/**
+ * Headless Chromium reports `prefers-reduced-transparency: reduce` by default,
+ * and the site honours it by making its glass solid (the navbar and the form
+ * messages, see globals.css). So unless asked otherwise this measures the
+ * glass a visitor actually sees, which is also the harder case: text on glass
+ * sits on whatever scrolls underneath. TRANSPARENCY=reduce measures the solid
+ * fallback instead. Found 2026-10-22, when the first pass measured only that.
+ */
+const TRANSPARENCY = process.env.TRANSPARENCY === "reduce" ? "reduce" : "no-preference";
+
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
   viewport: { width: WIDTH, height: HEIGHT },
@@ -44,6 +54,10 @@ const ctx = await browser.newContext({
 });
 await seedTheme(ctx);
 const page = await ctx.newPage();
+const cdp = await ctx.newCDPSession(page);
+await cdp.send("Emulation.setEmulatedMedia", {
+  features: [{ name: "prefers-reduced-transparency", value: TRANSPARENCY }],
+});
 const reader = await ctx.newPage();
 await reader.goto("about:blank");
 
@@ -297,7 +311,7 @@ for (let y = 0; y < height; y += STEP) {
 }
 
 const failures = results.filter((r) => r.ratio < r.floor);
-console.log(`${ROUTE} at ${WIDTH}x${HEIGHT} in ${LOCALE} ${THEME}: measured ${results.length} text nodes, ${failures.length} below floor`);
+console.log(`${ROUTE} at ${WIDTH}x${HEIGHT} in ${LOCALE} ${THEME}, transparency ${TRANSPARENCY}: measured ${results.length} text nodes, ${failures.length} below floor`);
 for (const f of failures)
   console.log(
     `  ${f.ratio}:1 (needs ${f.floor}) ${f.size}px ${JSON.stringify(f.text)} colour ${f.color} on rgb(${f.plate})`,

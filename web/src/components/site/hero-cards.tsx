@@ -34,10 +34,9 @@ interface CardSpot {
   depth: number;
 }
 
-// Two columns a side, the outer one cut by the screen edge, the way
-// fastwork.com frames its headline. Overlaps are deliberate: depth by one
-// card hiding another, not by blur. The inner edges stay 370px or more from
-// the centre line, clear of the 640px text column.
+// Two columns a side, the outer one cut by the screen edge. Overlaps are
+// deliberate: depth by one card hiding another, not by blur. The inner edges
+// stay 370px or more from the centre line, clear of the 640px text column.
 const desktopSpots: CardSpot[] = [
   { slug: "counter", shape: "portrait", x: -610, y: -26, width: 200, rotate: -2.5, depth: 140 },
   { slug: "slab", shape: "wide", x: -790, y: 168, width: 236, rotate: 3, depth: 220 },
@@ -122,7 +121,7 @@ function LabCard({ spot }: { spot: CardSpot }) {
         <p className="text-muted-foreground mt-0.5 flex items-center gap-1.5 text-[11.5px] leading-tight">
           <span
             aria-hidden
-            className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
+            className="bg-brand h-1.5 w-1.5 shrink-0 rounded-full"
           />
           <span className="truncate">{labKind(lab, locale)}</span>
         </p>

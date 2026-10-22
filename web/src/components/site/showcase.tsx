@@ -40,51 +40,21 @@ function LabPicture({
 }
 
 /**
- * The round thumbnails that stand in for a letter of the heading, as
- * fastwork.com does with its "pe(o)ple". They pop in one after another the
- * first time the heading is on screen.
+ * One kind of business, laid out as a spec sheet: the lead example large, what
+ * it is for, and the three figures a buyer weighs, read along dotted leaders
+ * the way a parts list is. Then every example in the kind, and the packages
+ * that build it.
  */
-function ThumbnailRow() {
-  const leads = resolvedCategories.map((category) => category.labs[0]);
-
-  return (
-    <span className="mx-[0.06em] inline-flex items-center align-[-0.08em]">
-      {leads.map((lab, i) => (
-        <motion.span
-          key={lab.slug}
-          initial={{ scale: 0.4, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ type: "spring", stiffness: 420, damping: 24, delay: i * 0.06 }}
-          className={cn(
-            "ring-background relative inline-block h-[0.78em] w-[0.78em] rounded-full ring-[3px]",
-            i > 0 && "-ms-[0.22em]",
-          )}
-          style={{ zIndex: leads.length - i }}
-        >
-          <LabPicture
-            lab={lab}
-            src={labStillSrc(lab.slug)}
-            sizes="48px"
-            className="h-full w-full rounded-full"
-          />
-        </motion.span>
-      ))}
-    </span>
-  );
-}
-
-/** One kind of business, laid out the way fastwork.com lays out a seller's profile. */
 function CategoryCard({ category }: { category: ResolvedCategory }) {
   const { locale, t } = useLocale();
   const lead = category.labs[0];
   const cheapest = category.packages[0].tier;
   const count = category.labs.length;
 
-  const stats = [
-    { value: `฿${cheapest.price}`, label: t.showcase.stats.from },
-    { value: t.pricing.tiers[cheapest.id].timeline, label: t.showcase.stats.time },
-    { value: String(count), label: t.showcase.stats.examples },
+  const specs = [
+    { label: t.showcase.stats.from, value: `฿${cheapest.price}` },
+    { label: t.showcase.stats.time, value: t.pricing.tiers[cheapest.id].timeline },
+    { label: t.showcase.stats.examples, value: String(count) },
   ];
 
   return (
@@ -94,92 +64,75 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease }}
     >
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr] lg:gap-8">
+      <div className="grid gap-7 lg:grid-cols-[1.12fr_1fr] lg:gap-10">
         <div>
+          <Link
+            href={`/labs/${lead.slug}`}
+            aria-label={t.showcase.openDemo.replace("{name}", lead.name)}
+            className="group relative block"
+          >
+            <LabPicture
+              lab={lead}
+              src={labCardSrc(lead.slug)}
+              sizes="(max-width: 1024px) 100vw, 600px"
+              className="aspect-[16/10] rounded-[20px] transition-transform duration-500 group-hover:scale-[1.01]"
+            />
+            <span className="bg-card text-foreground shadow-float absolute top-3 left-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium">
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+              {t.showcase.live}
+            </span>
+          </Link>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {category.labs.map((lab) => (
+              <li
+                key={lab.slug}
+                className="border-line-strong rounded-full border px-3 py-1 text-[13px]"
+              >
+                {labKind(lab, locale)}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex flex-col">
           <p className="text-muted-foreground text-[15px]">
             {t.showcase.categories[category.id]} ·{" "}
             {count === 1
               ? t.showcase.exampleCount
               : t.showcase.examplesCount.replace("{count}", String(count))}
           </p>
+          <h3 className="mt-2 text-[28px] leading-tight font-medium tracking-tight sm:text-[32px]">
+            {lead.name}
+          </h3>
+          <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-2 text-[13px]">
+            <Link
+              href={`/labs/${lead.slug}`}
+              className="hover:text-foreground -my-1 py-1 underline underline-offset-2"
+            >
+              /labs/{lead.slug}
+            </Link>
+            <span aria-hidden>·</span>
+            <span>{labKind(lead, locale)}</span>
+          </p>
+          <p className="text-muted-foreground mt-4 max-w-md text-[15px] leading-relaxed text-pretty">
+            {labBestFor(lead, locale)}
+          </p>
 
-          <div className="mt-4 flex items-start gap-4">
-            <div className="relative h-[72px] w-[72px] shrink-0 sm:h-[84px] sm:w-[84px]">
-              <LabPicture
-                lab={lead}
-                src={labStillSrc(lead.slug)}
-                sizes="84px"
-                className="h-full w-full rounded-full"
-              />
-              <span
-                aria-hidden
-                className="border-background absolute right-0 bottom-0.5 h-[18px] w-[18px] rounded-full border-[3px] bg-emerald-600"
-              />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-[26px] leading-tight font-medium tracking-tight sm:text-[30px]">
-                {lead.name}
-              </h3>
-              <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-2 text-[13px]">
-                <Link
-                  href={`/labs/${lead.slug}`}
-                  className="hover:text-foreground -my-1 py-1 underline underline-offset-2"
-                >
-                  /labs/{lead.slug}
-                </Link>
-                <span aria-hidden>·</span>
-                <span>{labKind(lead, locale)}</span>
-              </p>
-              <p className="text-muted-foreground mt-3 max-w-md text-[15px] leading-relaxed text-pretty">
-                {labBestFor(lead, locale)}
-              </p>
-            </div>
-          </div>
-
-          <dl className="border-line mt-5 inline-grid grid-cols-3 rounded-[16px] border py-3 sm:ms-[100px]">
-            {stats.map((stat) => (
+          <dl className="border-line mt-6 border-t">
+            {specs.map((spec) => (
               <div
-                key={stat.label}
-                className="border-line flex flex-col-reverse items-center border-s px-4 text-center first:border-s-0 sm:px-5"
+                key={spec.label}
+                className="border-line flex items-baseline gap-3 border-b py-3"
               >
-                <dt className="text-muted-foreground mt-0.5 text-[12px] leading-tight whitespace-nowrap">
-                  {stat.label}
-                </dt>
-                <dd className="text-[15px] leading-tight font-medium whitespace-nowrap sm:text-base">
-                  {stat.value}
-                </dd>
+                <dt className="text-muted-foreground shrink-0 text-[14px]">{spec.label}</dt>
+                <span
+                  aria-hidden
+                  className="border-line-strong min-w-4 flex-1 -translate-y-1 border-b border-dotted"
+                />
+                <dd className="shrink-0 text-[15px] font-medium tabular-nums">{spec.value}</dd>
               </div>
             ))}
           </dl>
-        </div>
-
-        <div>
-          <Link
-            href={`/labs/${lead.slug}`}
-            aria-label={t.showcase.openDemo.replace("{name}", lead.name)}
-            className="group block"
-          >
-            <LabPicture
-              lab={lead}
-              src={labCardSrc(lead.slug)}
-              sizes="(max-width: 1024px) 100vw, 560px"
-              className="aspect-[2.6/1] rounded-[16px] transition-transform duration-500 group-hover:scale-[1.01]"
-            />
-          </Link>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {category.labs.map((lab) => (
-              <span
-                key={lab.slug}
-                className="border-line-strong rounded-full border px-3 py-1 text-[13px]"
-              >
-                {labKind(lab, locale)}
-              </span>
-            ))}
-            <span className="text-muted-foreground ms-auto flex items-center gap-1.5 text-[13px]">
-              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              {t.showcase.live}
-            </span>
-          </div>
         </div>
       </div>
 
@@ -261,10 +214,10 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
 /**
  * Every listed lab, grouped by the business a visitor would say they run.
  *
- * fastwork.com pins its version and lets the scroll walk the rail. This one
- * does not: the home page Lab was a pinned stage for a day and Film had it
- * taken out because getting past it took four screens of scrolling. The rail
- * is ordinary tabs, worked by click, arrow keys, Home and End.
+ * The kinds are tabs across the top, each carrying a round still of its lead
+ * example, worked by click, arrow keys, Home and End. Nothing pins: the home
+ * page Lab was a pinned stage for a day and Film had it taken out because
+ * getting past it took four screens of scrolling.
  */
 export function Showcase() {
   const { locale, t } = useLocale();
@@ -272,14 +225,6 @@ export function Showcase() {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const active = resolvedCategories[activeIndex];
   const isThai = locale === "th";
-  const wrap = (text: string) => (isThai ? thaiWrap(text) : text);
-
-  // The word the thumbnails sit inside ("sh…p", "ธุรกิจ…แบบไหน") must never
-  // break across lines, or the row lands at the start of the next line and
-  // the word reads as two.
-  const { lead, tail } = t.showcase.title;
-  const leadCut = lead.lastIndexOf(" ") + 1;
-  const tailCut = tail.includes(" ") ? tail.indexOf(" ") : tail.length;
 
   const select = (index: number) => {
     setActiveIndex(index);
@@ -309,35 +254,29 @@ export function Showcase() {
       <Reveal className="mx-auto max-w-3xl text-center">
         <h2
           className={cn(
-            "text-[34px] font-medium tracking-[-0.025em] sm:text-[48px] lg:text-[54px]",
+            "text-[34px] font-medium tracking-[-0.025em] text-balance sm:text-[48px] lg:text-[54px]",
             isThai ? "leading-[1.25]" : "leading-[1.1]",
           )}
         >
-          <span className="sr-only">{t.showcase.title.text}</span>
-          <span aria-hidden>
-            {wrap(lead.slice(0, leadCut))}
-            <span className="whitespace-nowrap">
-              {lead.slice(leadCut)}
-              <ThumbnailRow />
-              {tail.slice(0, tailCut)}
-            </span>
-            {wrap(tail.slice(tailCut))}
-          </span>
+          {isThai ? thaiWrap(t.showcase.title) : t.showcase.title}
         </h2>
         <p className="text-muted-foreground mx-auto mt-5 max-w-[40rem] text-[17px] leading-relaxed text-pretty">
           {t.showcase.sub}
         </p>
       </Reveal>
 
-      <div className="mx-auto mt-12 grid max-w-[1320px] gap-6 lg:mt-16 lg:grid-cols-[300px_1fr] lg:items-center lg:gap-10">
+      {/* The tab row is allowed wider than the panel under it: at 1180px the
+          six kinds wrapped five and one, which left the last tab stranded. */}
+      <div className="mx-auto mt-10 max-w-[1280px] lg:mt-14">
         <div
           role="tablist"
           aria-label={t.showcase.tablistLabel}
           onKeyDown={onKeyDown}
-          className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-col lg:items-start lg:gap-4 lg:overflow-visible lg:px-0"
+          className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:justify-center lg:overflow-visible lg:px-0"
         >
           {resolvedCategories.map((category, index) => {
             const selected = index === activeIndex;
+            const lead = category.labs[0];
             return (
               <button
                 key={category.id}
@@ -352,13 +291,29 @@ export function Showcase() {
                 tabIndex={selected ? 0 : -1}
                 onClick={() => select(index)}
                 className={cn(
-                  "h-10 shrink-0 rounded-full px-4 text-[15px] font-medium whitespace-nowrap transition-[color,background-color,font-size] duration-300",
-                  "lg:h-auto lg:rounded-md lg:bg-transparent lg:px-0 lg:text-start lg:leading-tight lg:whitespace-normal",
+                  "flex h-12 shrink-0 items-center gap-2 rounded-full border ps-1.5 pe-4 text-[15px] font-medium whitespace-nowrap transition-[color,background-color,border-color] duration-200",
                   selected
-                    ? "bg-foreground text-background lg:text-foreground lg:text-[30px]"
-                    : "bg-surface text-muted-foreground hover:text-foreground lg:text-[24px] lg:font-normal",
+                    ? "bg-foreground text-background border-transparent"
+                    : "bg-card text-foreground border-line hover:border-line-control",
                 )}
               >
+                {/* The stills arrive one after another the first time the row
+                    is on screen: a small sign that each tab holds real work. */}
+                <motion.span
+                  aria-hidden
+                  initial={{ scale: 0.4, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ type: "spring", stiffness: 420, damping: 24, delay: index * 0.06 }}
+                  className="block h-8 w-8 shrink-0"
+                >
+                  <LabPicture
+                    lab={lead}
+                    src={labStillSrc(lead.slug)}
+                    sizes="32px"
+                    className="h-full w-full rounded-full"
+                  />
+                </motion.span>
                 {t.showcase.categories[category.id]}
               </button>
             );
@@ -369,11 +324,9 @@ export function Showcase() {
           role="tabpanel"
           id="showcase-panel"
           aria-labelledby={`showcase-tab-${active.id}`}
-          className="bg-surface rounded-[36px] p-2 sm:rounded-[40px]"
+          className="border-line bg-card shadow-float mx-auto mt-6 max-w-[1180px] rounded-[32px] border p-5 sm:mt-8 sm:p-8"
         >
-          <div className="border-line bg-background rounded-[28px] border p-5 sm:rounded-[32px] sm:p-8">
-            <CategoryCard key={active.id} category={active} />
-          </div>
+          <CategoryCard key={active.id} category={active} />
         </div>
       </div>
 

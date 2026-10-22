@@ -19,16 +19,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// The face fastwork.com sets its selling page in. It carries Thai as well as
-// Latin, so Thai copy no longer falls back to whatever the visitor's OS has.
+// The site's own face. It carries Thai as well as Latin, so Thai copy no
+// longer falls back to whatever the visitor's OS has.
 const googleSans = Google_Sans({
   variable: "--font-site",
   subsets: ["latin", "thai"],
 });
 
-// The handwriting: one word in the hero headline and the sticky notes. `block`
-// rather than `swap`, because the fallback for `cursive` on Windows is Comic
-// Sans, and a word that appears a moment late beats a word that changes face.
+// The handwriting: the margin notes, the hero's and the ones written beside the
+// crossed-out worries. `block` rather than `swap`, because the fallback for
+// `cursive` on Windows is Comic Sans, and a note that appears a moment late
+// beats a note that changes face.
 const playpen = Playpen_Sans_Thai({
   variable: "--font-hand",
   subsets: ["latin", "thai"],
@@ -66,8 +67,8 @@ export const metadata: Metadata = {
 // .dark block, the light one matches :root.
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#131922" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1f44" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f3ea" },
   ],
 };
 
