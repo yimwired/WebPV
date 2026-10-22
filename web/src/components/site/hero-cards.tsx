@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { labBySlug, labKind } from "@/lib/labs";
@@ -167,8 +167,36 @@ function DriftLane({
 // technology and out of the tab order, because the showcase right after the
 // hero lists every one of these demos properly.
 
+/** Tailwind's `lg`: where the lanes move from under the buttons to beside the headline. */
+const WIDE = "(min-width: 64rem)";
+
+function subscribeToWidth(onChange: () => void) {
+  const query = window.matchMedia(WIDE);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+/**
+ * Which arrangement this screen shows, or null on the server and through
+ * hydration. Both used to go into the HTML, CSS hiding one: 88 cards to parse
+ * and hydrate on every visit, 64 of them invisible on a phone, and the home
+ * page's blocking time two to three times main's. Now the cards for this
+ * screen are drawn once the page is live, and fade in as they always did.
+ */
+function useArrangement(): "wide" | "narrow" | null {
+  return useSyncExternalStore(
+    subscribeToWidth,
+    () => (window.matchMedia(WIDE).matches ? "wide" : "narrow"),
+    () => null,
+  );
+}
+
 /** The demos drifting up either side of the headline, from lg up. */
 export function HeroDrift() {
+  const arrangement = useArrangement();
+  // An overlay, so drawing it late moves nothing.
+  if (arrangement !== "wide") return null;
+
   return (
     <div
       aria-hidden
@@ -192,16 +220,24 @@ export function HeroDrift() {
 
 /** Below lg: three narrow lanes drifting inside a window under the buttons. */
 export function HeroDriftBand() {
+  const arrangement = useArrangement();
+
+  // The window is in the hero's flow, so it is there from the first paint,
+  // empty, and only its cards arrive late: the headline above it never moves.
   return (
     <div
       aria-hidden
-      className="drift-fade drift-in relative mx-auto mt-12 grid h-72 w-full max-w-md grid-cols-3 gap-2.5 overflow-hidden lg:hidden"
+      className="drift-fade relative mx-auto mt-12 h-72 w-full max-w-md overflow-hidden lg:hidden"
       // No pointer to wake a card on a phone, so the band rests less faded.
       style={{ "--drift-rest": 0.6 } as CSSProperties}
     >
-      {phoneLanes.map((lane, i) => (
-        <DriftLane key={i} lane={lane} width={120} compact />
-      ))}
+      {arrangement === "narrow" && (
+        <div className="drift-in grid h-full grid-cols-3 gap-2.5">
+          {phoneLanes.map((lane, i) => (
+            <DriftLane key={i} lane={lane} width={120} compact />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
