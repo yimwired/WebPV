@@ -17,11 +17,16 @@ export const CONTACT_EMAIL = "yimwired@gmail.com";
 /**
  * The Fastwork listing. Same packages, same prices as /pricing: the
  * platform is there for clients who would rather pay into escrow than
- * transfer to a stranger, and it takes 18% for that.
- * ลิงก์ร้านบน Fastwork ราคาเท่ากับ /pricing เป๊ะ
+ * transfer to a stranger.
+ *
+ * null while there is no shop to send anyone to. Film left fastwork.co
+ * on 2026-10-17 and can no longer take orders there, so the old gig link
+ * would hand a client to a shop nobody answers. The new profile on
+ * fastwork.com goes public around 2026-11-16: put its link here and the
+ * escrow line on /pricing comes back on its own.
+ * ลิงก์ร้านบน Fastwork ราคาเท่ากับ /pricing เป๊ะ (null = ซ่อนบรรทัดนั้น)
  */
-export const FASTWORK_URL =
-  "https://fastwork.co/user/yimwired/web-development-95050179";
+export const FASTWORK_URL: string | null = null;
 
 /** Profiles that prove the same person owns this site elsewhere. */
 export const PROFILES = [
