@@ -21,6 +21,11 @@ export const ALL_LAYERS: LayerState = {
 /**
  * Whether this browser can run an SVG filter as a backdrop filter.
  *
+ * Only Chromium can. Firefox and Safari parse the value and draw nothing, and
+ * `CSS.supports` only asks whether it parses, so those two engines are ruled
+ * out by name first: Gecko by "Firefox/", and WebKit without Blink by
+ * "AppleWebKit/" with no "Chrome/", which is also every browser on iOS.
+ *
  * Read through `useSyncExternalStore` rather than an effect: the server has no
  * `CSS` object, the answer never changes for the life of the page, and the
  * project's lint rules reject the `useEffect` + `setState` shape this would
@@ -28,7 +33,12 @@ export const ALL_LAYERS: LayerState = {
  * fallback everywhere and Chromium upgrades on hydration.
  */
 const subscribe = () => () => {};
-const clientSnapshot = () => CSS.supports("backdrop-filter", "url(#prism-lens)");
+const clientSnapshot = () => {
+  const agent = navigator.userAgent;
+  const drawsNoLens =
+    /Firefox\//.test(agent) || (/AppleWebKit\//.test(agent) && !/Chrome\//.test(agent));
+  return !drawsNoLens && CSS.supports("backdrop-filter", "url(#prism-lens)");
+};
 const serverSnapshot = () => false;
 
 export function useSupportsSvgBackdrop() {

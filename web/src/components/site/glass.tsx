@@ -9,13 +9,23 @@ const LENS_ID = "site-lens";
  * Whether this browser paints an SVG filter used as a backdrop filter.
  *
  * Only Chromium does. Firefox and Safari parse `backdrop-filter: url()` and
- * then draw nothing through it, so `[data-lens]` is set only when this says
- * yes. Read through `useSyncExternalStore`, as /labs/prism does: the server has
- * no `CSS` object and the answer never changes, so the server snapshot is the
+ * then draw nothing through it, and `CSS.supports` only asks whether a value
+ * parses, so on its own it says yes to both and they would lose even the plain
+ * blur. They are ruled out by engine first: Gecko by "Firefox/", and WebKit
+ * without Blink by "AppleWebKit/" with no "Chrome/", which is also every
+ * browser on iOS. `[data-lens]` is set only when this says yes.
+ *
+ * Read through `useSyncExternalStore`, as /labs/prism does: the server has no
+ * `CSS` object and the answer never changes, so the server snapshot is the
  * plain blur everywhere and Chromium upgrades on hydration.
  */
 const subscribe = () => () => {};
-const clientSnapshot = () => CSS.supports("backdrop-filter", `url(#${LENS_ID})`);
+const clientSnapshot = () => {
+  const agent = navigator.userAgent;
+  const drawsNoLens =
+    /Firefox\//.test(agent) || (/AppleWebKit\//.test(agent) && !/Chrome\//.test(agent));
+  return !drawsNoLens && CSS.supports("backdrop-filter", `url(#${LENS_ID})`);
+};
 const serverSnapshot = () => false;
 
 export function useSupportsLens() {
