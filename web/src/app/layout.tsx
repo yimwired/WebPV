@@ -29,11 +29,15 @@ const googleSans = Google_Sans({
 // The handwriting: the margin notes, the hero's and the ones written beside the
 // crossed-out worries. `block` rather than `swap`, because the fallback for
 // `cursive` on Windows is Comic Sans, and a note that appears a moment late
-// beats a note that changes face.
+// beats a note that changes face. Not preloaded: its two files are 308KB, three
+// quarters of what the home page preloaded, and every first visit fetched them
+// ahead of the headline for notes that sit beside the content. A note now asks
+// for its face when it is laid out.
 const playpen = Playpen_Sans_Thai({
   variable: "--font-hand",
   subsets: ["latin", "thai"],
   display: "block",
+  preload: false,
 });
 
 const SITE_TITLE = "Film | Websites you can try before you hire";
