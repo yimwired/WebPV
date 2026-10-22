@@ -179,9 +179,9 @@ function subscribeToWidth(onChange: () => void) {
 /**
  * Which arrangement this screen shows, or null on the server and through
  * hydration. Both used to go into the HTML, CSS hiding one: 88 cards to parse
- * and hydrate on every visit, 64 of them invisible on a phone, and the home
- * page's blocking time two to three times main's. Now the cards for this
- * screen are drawn once the page is live, and fade in as they always did.
+ * and hydrate on every visit, 64 of them invisible on a phone, and nearly half
+ * the home page's HTML. Now the cards for this screen are drawn once the page
+ * is live, and fade in as they always did.
  */
 function useArrangement(): "wide" | "narrow" | null {
   return useSyncExternalStore(
