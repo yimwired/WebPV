@@ -40,7 +40,7 @@ Languages: English and Thai, every page in both.
 
 ## Pages
 
-${line("Home", "/", "Overview, the five projects, background and contact.")}
+${line("Home", "/", `Overview, the ${projects.length} projects, background and contact.`)}
 ${line("Services", "/services", "What Film takes on: websites and landing pages, automation and bots, dashboards and internal tools, and AI wired into real workflows.")}
 ${line("Pricing", "/pricing", "Fixed prices for three website packages plus a quoted tier. Automation, dashboards and AI are quoted per project.")}
 
