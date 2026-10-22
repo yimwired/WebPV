@@ -14,7 +14,7 @@ import { Check, ChevronRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { prefersReducedMotion } from "@/lib/reduced-motion";
 import { labCardSrc } from "@/lib/lab-images";
-import { pricingTiers } from "@/lib/pricing";
+import { pricedTier, priceValue } from "@/lib/pricing";
 import { resolvedCategories } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -25,8 +25,7 @@ const once = { once: true, margin: "-80px" } as const;
 
 // The quote in the second step is the real Standard package, split the way
 // /pricing says Standard is paid: half to start, half on launch day.
-const standard = pricingTiers.find((tier) => tier.id === "standard");
-const standardTotal = Number(standard?.price?.replaceAll(",", "") ?? 0);
+const standardTotal = priceValue(pricedTier("standard"));
 const formatBaht = (amount: number) => `฿${amount.toLocaleString("en-US")}`;
 
 const TAB_INTERVAL_MS = 2600;

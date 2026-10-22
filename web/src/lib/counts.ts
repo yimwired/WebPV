@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { labs } from "./labs";
-import { pricingTiers } from "./pricing";
+import { isPriced, priceValue, pricingTiers } from "./pricing";
 import { projects } from "./projects";
 
 /**
@@ -14,11 +14,7 @@ import { projects } from "./projects";
  * purpose: it covers three projects and then ends, and a figure quoted on the
  * home page should still be true the day after it does.
  */
-const fromPrice = Math.min(
-  ...pricingTiers
-    .filter((tier) => tier.price !== null)
-    .map((tier) => Number(tier.price?.replaceAll(",", ""))),
-).toLocaleString("en-US");
+const fromPrice = Math.min(...pricingTiers.filter(isPriced).map(priceValue)).toLocaleString("en-US");
 
 export function withCounts(copy: string): string {
   return copy

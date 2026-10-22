@@ -64,7 +64,7 @@ const en = {
     examples: "Examples",
     packages: "Packages",
     openDemo: "Open {name}",
-    seeAll: "All {count} in The Lab",
+    seeAll: "All {labs} in The Lab",
   },
   pains: {
     title: "Seven ways hiring a web developer goes wrong",
@@ -772,7 +772,7 @@ const th: typeof en = {
     examples: "ตัวอย่าง",
     packages: "แพ็กเกจ",
     openDemo: "เปิด {name}",
-    seeAll: "ดูครบ {count} แบบใน The Lab",
+    seeAll: "ดูครบ {labs} แบบใน The Lab",
   },
   pains: {
     title: "จ้างทำเว็บ พังได้ 7 แบบ",

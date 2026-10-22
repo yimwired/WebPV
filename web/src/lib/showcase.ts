@@ -6,13 +6,13 @@
 // ─────────────────────────────────────────────────────────────
 
 import { labBySlug, labs, type Lab } from "./labs";
-import { pricingTiers, type PricingTier, type PricingTierId } from "./pricing";
+import { pricedTier, priceValue, type PricedTier, type PricingTierId } from "./pricing";
 
 export interface ShowcaseCategory {
   id: "food" | "tours" | "shops" | "events" | "premium" | "studios";
   /** labs dressed as this kind of business; the first one leads the card */
   labs: string[];
-  /** the packages that suit it, cheapest first, each with the lab it would look like */
+  /** the packages that suit it, each with the lab it would look like; only priced tiers */
   packages: { tier: PricingTierId; lab: string }[];
 }
 
@@ -81,23 +81,19 @@ export type ShowcaseCategoryId = ShowcaseCategory["id"];
 export interface ResolvedCategory {
   id: ShowcaseCategoryId;
   labs: Lab[];
-  packages: { tier: PricingTier; lab: Lab }[];
+  /** cheapest first, so the first one is the card's starting price */
+  packages: { tier: PricedTier; lab: Lab }[];
 }
 
-function tierById(id: PricingTierId): PricingTier {
-  const tier = pricingTiers.find((item) => item.id === id);
-  if (!tier) throw new Error(`No pricing tier called "${id}"`);
-  return tier;
-}
-
+// A tier quoted per project (Custom) fails the build here: the card states a
+// starting price in baht and would otherwise print "฿null".
 export const resolvedCategories: ResolvedCategory[] = showcaseCategories.map(
   (category) => ({
     id: category.id,
     labs: category.labs.map(labBySlug),
-    packages: category.packages.map((item) => ({
-      tier: tierById(item.tier),
-      lab: labBySlug(item.lab),
-    })),
+    packages: category.packages
+      .map((item) => ({ tier: pricedTier(item.tier), lab: labBySlug(item.lab) }))
+      .sort((a, b) => priceValue(a.tier) - priceValue(b.tier)),
   }),
 );
 

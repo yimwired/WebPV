@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { labBestFor, labKind, labs, type Lab } from "@/lib/labs";
+import { withCounts } from "@/lib/counts";
+import { labBestFor, labKind, type Lab } from "@/lib/labs";
 import { labCardSrc, labStillSrc } from "@/lib/lab-images";
 import { resolvedCategories, type ResolvedCategory } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
@@ -59,7 +60,6 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
 
   return (
     <motion.div
-      key={category.id}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease }}
@@ -335,7 +335,7 @@ export function Showcase() {
           href="/labs"
           className="group text-foreground inline-flex items-center gap-1.5 py-1 text-[15px] font-medium"
         >
-          {t.showcase.seeAll.replace("{count}", String(labs.length))}
+          {withCounts(t.showcase.seeAll)}
           <ArrowUpRight
             aria-hidden
             className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
