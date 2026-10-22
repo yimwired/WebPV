@@ -80,16 +80,8 @@
    `.paper` is the light palette again, for a sheet that stays white inside a
    dark section (the ledger of worries, the drawings in the platform panels):
    their text keeps the ratios below instead of inheriting midnight's. */
-/* A lab paints its own ground and says so in its page.tsx, as
-   `viewport.colorScheme`, which Next writes as <meta name="color-scheme">. The
-   page around the demo follows that meta rather than the site theme: the
-   root's background is what fills the scrollbar's track and the gap an
-   overscroll opens, and its color-scheme styles the native controls. Without
-   it a dark lab under the light default had a pearl stripe for a scrollbar
-   and white date pickers, and a light one in the dark theme the reverse. */
 :root,
-.paper,
-:root:has(meta[name="color-scheme"][content="light"]) {
+.paper {
   /* Native controls and scrollbars follow the page; `.dark` flips it back. */
   color-scheme: light;
 
@@ -156,8 +148,7 @@
   --sidebar-ring: var(--brand);
 }
 
-.dark,
-:root:has(meta[name="color-scheme"][content="dark"]) {
+.dark {
   /* Tells the browser to render its own chrome dark too: scrollbars, the
      autofill background on the contact form, and native form controls. Without
      it they stay light and read as a rendering bug on a dark page. */
@@ -232,6 +223,36 @@ html.dark {
 
 html.dark .dark {
   --background: oklch(0.165 0.045 266);
+}
+
+/* A lab paints its own ground and says which way it goes in its page.tsx, as
+   `viewport.colorScheme`, which Next writes as <meta name="color-scheme">. The
+   page around the demo follows that rather than the site theme: the root's
+   background fills the scrollbar's track and the gap an overscroll opens, its
+   color-scheme styles native controls, and the body's ink is what a lab
+   inherits wherever it sets none. Without this a dark lab under the light
+   default had a pearl stripe for a scrollbar and white date pickers, and a
+   light lab in the dark theme the reverse.
+
+   Plain neutrals rather than the site's tokens: the labs never use the
+   palette, and most dark ones are painted near black, not midnight. These
+   stay separate rules on purpose: listed beside `:root` or `.dark`, the
+   build folds them into one :is() that takes the :has() selector's weight,
+   and that weight beat `html.dark .dark` across the whole site. */
+:root:has(meta[name="color-scheme"][content="dark"]) {
+  color-scheme: dark;
+  --background: oklch(0.16 0.006 270);
+  --foreground: oklch(0.97 0 0);
+  --line-strong: oklch(1 0 0 / 18%);
+  --line-control: oklch(1 0 0 / 40%);
+}
+
+:root:has(meta[name="color-scheme"][content="light"]) {
+  color-scheme: light;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.2 0 0);
+  --line-strong: oklch(0 0 0 / 18%);
+  --line-control: oklch(0 0 0 / 40%);
 }
 
 @layer base {
