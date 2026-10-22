@@ -78,7 +78,7 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
               className="aspect-[16/10] rounded-[20px] transition-transform duration-500 group-hover:scale-[1.01]"
             />
             <span className="bg-card text-foreground shadow-float absolute top-3 left-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium">
-              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+              <span aria-hidden className="bg-brand h-1.5 w-1.5 rounded-full" />
               {t.showcase.live}
             </span>
           </Link>

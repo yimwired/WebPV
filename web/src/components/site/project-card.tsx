@@ -9,11 +9,13 @@ import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./reveal";
 
-// Green for running, as on every "live" dot on the page.
+// Running is gold, the one accent, which the palette keeps for state; the rest
+// fade in ink. A green or amber dot would be a second accent and a second
+// warm colour beside the gold.
 const statusDot: Record<Project["status"], string> = {
-  live: "bg-emerald-500",
-  active: "bg-emerald-500",
-  building: "bg-amber-500",
+  live: "bg-brand",
+  active: "bg-brand",
+  building: "bg-foreground/40",
   paused: "bg-foreground/25",
 };
 
