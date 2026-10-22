@@ -17,19 +17,35 @@ const NAV_LINE = 44;
 type Ground = "light" | "dark";
 
 /**
- * Whether the navbar is passing over one of the sections that stay dark in
- * either theme (they carry `data-nav-tone="dark"`). The observer's root is cut
- * down to a one pixel band at the pill's height, so it reports exactly the
- * sections crossing that line, with no scroll listener involved.
+ * The ground of the topmost zone crossing the navbar's line, or light where
+ * none does. The latest in document order is the one on top: it is either
+ * nested inside the others or painted after them.
+ */
+function topmostGround(crossing: Set<HTMLElement>): Ground {
+  let top: HTMLElement | undefined;
+  for (const zone of crossing) {
+    if (!top || top.compareDocumentPosition(zone) & Node.DOCUMENT_POSITION_FOLLOWING) top = zone;
+  }
+  return top?.dataset.navTone === "dark" ? "dark" : "light";
+}
+
+/**
+ * What the navbar is passing over. Sections that stay dark in either theme
+ * carry `data-nav-tone="dark"`; a pearl surface over one of them carries
+ * `data-nav-tone="light"`: the ledger sheet inside one, and the card that rises
+ * 160px into the section above it, which left the bar dark over white for as
+ * long as the overlap lasted. The observer's root is cut down to a one pixel
+ * band at the pill's height, so it reports exactly the zones crossing that
+ * line, with no scroll listener involved.
  */
 function useGroundUnderNav(): Ground {
   const [ground, setGround] = useState<Ground>("light");
 
   useEffect(() => {
-    const zones = document.querySelectorAll("[data-nav-tone='dark']");
+    const zones = document.querySelectorAll<HTMLElement>("[data-nav-tone]");
     if (zones.length === 0) return;
 
-    const crossing = new Set<Element>();
+    const crossing = new Set<HTMLElement>();
     let observer: IntersectionObserver | undefined;
     let frame = 0;
 
@@ -42,10 +58,11 @@ function useGroundUnderNav(): Ground {
       observer = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            if (entry.isIntersecting) crossing.add(entry.target);
-            else crossing.delete(entry.target);
+            const zone = entry.target as HTMLElement;
+            if (entry.isIntersecting) crossing.add(zone);
+            else crossing.delete(zone);
           }
-          setGround(crossing.size > 0 ? "dark" : "light");
+          setGround(topmostGround(crossing));
         },
         { rootMargin: `-${NAV_LINE}px 0px -${below}px 0px` },
       );

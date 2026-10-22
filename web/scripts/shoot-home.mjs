@@ -1,9 +1,11 @@
-// Checks two small behaviours on the home page that no other script covers:
+// Checks small behaviours on the home page that no other script covers:
 // the hero's "Scroll down" hint fades out over the first 160px of scroll and
-// comes back at the top (components/site/hero.tsx), and switching language
-// while the ledger of worries is on screen writes the ledger out again, rows
-// and crossings, instead of swapping in text that never animated
-// (components/site/pains.tsx).
+// comes back at the top (components/site/hero.tsx); switching language while
+// the ledger of worries is on screen writes the ledger out again, rows and
+// crossings, instead of swapping in text that never animated
+// (components/site/pains.tsx); and the navbar (components/site/navbar.tsx)
+// takes the tone of the topmost ground under its line, pearl sheets inside a
+// dark section included, while its empty edges let the page take the pointer.
 //
 // The ledger is keyed by locale, so a switch mounts a fresh list that is
 // already in view. The way that fails is a list that mounts hidden and stays
@@ -209,6 +211,55 @@ for (const reducedMotion of ["no-preference", "reduce"]) {
   const thai = await waitForLedger(page, true);
   check(isSettled(thai), "reduced motion: the Thai ledger ends fully shown", `${thai.rows} rows`);
   check(errors.length === 0, "reduced motion: no page errors", errors.slice(0, 2).join(" | "));
+  await context.close();
+}
+
+// --- The navbar's tone and its empty edges --------------------------------
+
+{
+  const { context, page, errors } = await open("no-preference");
+  // The line the navbar reads its ground at, from navbar.tsx.
+  const NAV_LINE = 44;
+  const spots = await page.evaluate(() => {
+    const top = (element) => element.getBoundingClientRect().top + scrollY;
+    const pains = document.querySelector('section[aria-labelledby="pains-title"]');
+    const card = document.querySelector('section[aria-labelledby="promise-title"] > [data-nav-tone]');
+    const platform = document.querySelector('section[aria-labelledby="platform-title"]');
+    return [
+      ["the hero", 200, "light"],
+      ["the dark section's title", top(pains) + 80, "dark"],
+      ["the pearl ledger inside it", top(pains.querySelector(".paper")) + 120, "light"],
+      ["the card risen into its foot", top(card) + 40, "light"],
+      ["the next dark section", top(platform) + 80, "dark"],
+    ];
+  });
+  for (const [where, y, expected] of spots) {
+    await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y - NAV_LINE);
+    await page
+      .waitForFunction(
+        (want) => document.querySelector("header").classList.contains("dark") === (want === "dark"),
+        expected,
+        { polling: "raf", timeout: 3000 },
+      )
+      .catch(() => {});
+    const tone = await page.evaluate(() => (document.querySelector("header").classList.contains("dark") ? "dark" : "light"));
+    check(tone === expected, `the navbar is ${expected} over ${where}`, tone);
+  }
+
+  // Beside the pill at 1440px the header is empty: the page underneath, not
+  // the header, has to be what a pointer there lands on.
+  const beside = await page.evaluate(() => {
+    const hit = document.elementFromPoint(100, 40);
+    return { inHeader: Boolean(hit?.closest("header")), tag: hit?.tagName.toLowerCase() };
+  });
+  check(!beside.inHeader, "the empty strip beside the pill lets the pointer through", beside.tag);
+  const link = await page.getByRole("link", { name: "Pricing" }).first().boundingBox();
+  const onLink = await page.evaluate(
+    ([x, y]) => document.elementFromPoint(x, y)?.closest("a")?.textContent?.trim(),
+    [link.x + link.width / 2, link.y + link.height / 2],
+  );
+  check(onLink === "Pricing", "the pill's links still take the pointer", onLink);
+  check(errors.length === 0, "no page errors", errors.slice(0, 2).join(" | "));
   await context.close();
 }
 

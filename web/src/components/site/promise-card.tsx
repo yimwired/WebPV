@@ -296,6 +296,7 @@ export function PromiseCard() {
     <section aria-labelledby="promise-title" className="bg-zone-dark">
       <motion.div
         ref={card}
+        data-nav-tone="light"
         style={{ scale, borderRadius: radius }}
         className="bg-card text-card-foreground relative z-10 -mt-28 origin-top rounded-[32px] px-5 pt-20 pb-16 sm:-mt-40 sm:px-10 sm:pt-28 sm:pb-24"
       >

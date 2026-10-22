@@ -64,7 +64,10 @@ export function Pains() {
         <p className="text-muted-foreground mt-4 text-[17px]">{t.pains.sub}</p>
       </div>
 
-      <div className="paper bg-background text-foreground relative mx-auto mt-12 max-w-[780px] rounded-t-[28px] px-5 pt-6 pb-[150px] sm:mt-14 sm:px-10 sm:pt-8 sm:pb-[210px]">
+      <div
+        data-nav-tone="light"
+        className="paper bg-background text-foreground relative mx-auto mt-12 max-w-[780px] rounded-t-[28px] px-5 pt-6 pb-[150px] sm:mt-14 sm:px-10 sm:pt-8 sm:pb-[210px]"
+      >
         {/* The margin rule of a ledger page: numbers to its left, entries to its right. */}
         <span
           aria-hidden
