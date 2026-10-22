@@ -118,16 +118,17 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
             {labBestFor(lead, locale)}
           </p>
 
-          <dl className="border-line mt-6 border-t">
+          {/* Leaders only, no rule under each row: with both, every row carried two
+              kinds of line, the faint dots read as scratches, and the last rule sat
+              over the next block's as if a row were missing. The dots stand on the
+              baseline, where a parts list puts them, rather than through the words. */}
+          <dl className="border-line mt-6 border-t pt-2">
             {specs.map((spec) => (
-              <div
-                key={spec.label}
-                className="border-line flex items-baseline gap-3 border-b py-3"
-              >
+              <div key={spec.label} className="flex items-baseline gap-3 py-2.5">
                 <dt className="text-muted-foreground shrink-0 text-[14px]">{spec.label}</dt>
                 <span
                   aria-hidden
-                  className="border-line-strong min-w-4 flex-1 -translate-y-1 border-b border-dotted"
+                  className="border-line-strong min-w-4 flex-1 border-b-2 border-dotted"
                 />
                 <dd className="shrink-0 text-[15px] font-medium tabular-nums">{spec.value}</dd>
               </div>
