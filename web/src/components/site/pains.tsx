@@ -45,7 +45,7 @@ const strike = (reduceMotion: boolean | null): Variants => ({
  * blank bottom lines run under the card that follows (see promise-card.tsx).
  */
 export function Pains() {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const reduceMotion = useReducedMotion();
 
   return (
@@ -71,7 +71,10 @@ export function Pains() {
           className="bg-brand/35 absolute top-0 bottom-0 left-[52px] w-px sm:left-[84px]"
         />
 
+        {/* Keyed by language, so switching it writes the sheet out again,
+            crossings and all, instead of swapping in text that never animated. */}
         <motion.ol
+          key={locale}
           aria-label={t.pains.notesLabel}
           variants={sheet}
           initial="hidden"
