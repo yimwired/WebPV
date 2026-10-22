@@ -163,6 +163,24 @@ function DriftLane({
   );
 }
 
+/**
+ * Marks a drift window `data-offscreen` while it is scrolled out of sight,
+ * which pauses its lanes (globals.css). An animation without end otherwise
+ * keeps the browser ticking through every frame of the rest of the page:
+ * about a tenth of the main thread's work while a phone scrolls the home page
+ * (2026-10-23). `content-visibility: auto` saved as much, but the cards it
+ * skipped fetched their pages again whenever the hero came back. A ref
+ * rather than state, so pausing never renders the cards.
+ */
+function pauseOffscreen(frame: HTMLDivElement | null) {
+  if (!frame) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    frame.toggleAttribute("data-offscreen", !entry.isIntersecting);
+  });
+  observer.observe(frame);
+  return () => observer.disconnect();
+}
+
 // Both arrangements below are decorative on purpose: hidden from assistive
 // technology and out of the tab order, because the showcase right after the
 // hero lists every one of these demos properly.
@@ -199,6 +217,7 @@ export function HeroDrift() {
 
   return (
     <div
+      ref={pauseOffscreen}
       aria-hidden
       className="drift-fade drift-in pointer-events-none absolute inset-0 z-0 hidden overflow-hidden lg:block"
     >
@@ -226,6 +245,7 @@ export function HeroDriftBand() {
   // empty, and only its cards arrive late: the headline above it never moves.
   return (
     <div
+      ref={pauseOffscreen}
       aria-hidden
       className="drift-fade relative mx-auto mt-12 h-72 w-full max-w-md overflow-hidden lg:hidden"
       // No pointer to wake a card on a phone, so the band rests less faded.

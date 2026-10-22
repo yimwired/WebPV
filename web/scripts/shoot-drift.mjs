@@ -1,8 +1,9 @@
 // Checks the home page's drifting lanes of demos (components/site/hero-cards.tsx):
 // that they move, that they move UP and at a drifting pace rather than a scroll,
 // that hovering a lane stops it and lights the card under the pointer, that the
-// others keep going meanwhile, that they rest under reduced motion, and that the
-// phone band rises without pushing the page sideways.
+// others keep going meanwhile, that they rest under reduced motion, that they
+// hold still while scrolled out of sight and set off again on the way back, and
+// that the phone band rises without pushing the page sideways.
 //
 // Every motion check reads a signed value: a lane running backwards would pass
 // "did it move?" and fail "did y decrease?". Positions come from the track's
@@ -101,6 +102,22 @@ async function open(reducedMotion, width = 1440, height = 900) {
   const after = await laneOffsets(page);
   check(before.length === 3, "three lanes on a phone", `${before.length}`);
   check(before.every((y, i) => after[i] - y < -5), "the phone lanes rise", before.map((y, i) => (after[i] - y).toFixed(1)).join(", "));
+
+  const driftOver = async (ms) => {
+    const start = await laneOffsets(page);
+    await page.waitForTimeout(ms);
+    const end = await laneOffsets(page);
+    return start.map((y, i) => end[i] - y);
+  };
+  await page.evaluate(() => window.scrollTo({ top: 3000, behavior: "instant" }));
+  await page.waitForTimeout(500);
+  const away = await driftOver(1500);
+  check(away.every((distance) => Math.abs(distance) < 0.5), "the lanes hold still once scrolled away", away.map((d) => d.toFixed(2)).join(", "));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(500);
+  const back = await driftOver(1500);
+  check(back.every((distance) => distance < -3), "and rise again back at the top", back.map((d) => d.toFixed(1)).join(", "));
+
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   check(overflow <= 0, "no sideways scroll at 390", `${overflow}px`);
   await context.close();

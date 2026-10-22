@@ -440,6 +440,11 @@ html.dark .dark {
   mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
 }
 
+/* Scrolled out of sight, the lanes hold still; hero-cards.tsx says why. */
+.drift-fade[data-offscreen] .drift-track {
+  animation-play-state: paused;
+}
+
 @keyframes drift-in {
   from {
     opacity: 0;
@@ -448,6 +453,74 @@ html.dark .dark {
 
 .drift-in {
   animation: drift-in 1.2s ease-out 0.2s both;
+}
+
+/* Two things on the home page follow the scroll: the hero's "Scroll down"
+   fades over the first 160px, and the promise card grows from 94% to full
+   width, losing its corners, as its top climbs to 15% of the screen. Both are
+   scroll-driven animations, run by the browser with no script per frame.
+   They were Framer Motion's useScroll, which measured the page on every frame
+   of a swipe and forced a layout each time: the costliest script while a
+   phone scrolled this page. A browser without scroll timelines leaves the
+   hint where it is and the card at full width with its corners, as both
+   already were under reduced motion.
+   `animation-timeline` comes after the shorthand, which would reset it. */
+@supports (animation-timeline: scroll()) {
+  .scroll-hint {
+    animation: scroll-hint-fade linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 160px;
+  }
+
+  /* The card's scale runs on the compositor; its corners are painted, so
+     they are a second animation rather than holding the scale back to the
+     main thread with them. The range is Framer's old ["start end",
+     "start 0.15"]: from the card's top meeting the bottom of the screen to
+     that top reaching 15% from the top, which is 85vh into its entry. */
+  .promise-rise {
+    animation:
+      promise-scale linear both,
+      promise-corners linear both;
+    animation-timeline: view(), view();
+    animation-range: entry 0% entry 85vh;
+  }
+}
+
+@keyframes scroll-hint-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes promise-scale {
+  from {
+    transform: scale(0.94);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes promise-corners {
+  0%,
+  70% {
+    border-radius: 32px;
+  }
+  to {
+    border-radius: 0;
+  }
+}
+
+/* The global reduced-motion rule above shortens every animation to 0.01ms,
+   which for a scroll-driven one means nothing sensible. Under reduce the card
+   rests, and the hint still fades: opacity is not movement. */
+@media (prefers-reduced-motion: reduce) {
+  .promise-rise {
+    animation: none !important;
+  }
+  .scroll-hint {
+    animation-duration: auto !important;
+  }
 }
 
 /* Key words are gilded once they are on screen: the ink slides off and a
@@ -587,9 +660,17 @@ html.dark .dark {
    SVG filter as a backdrop: Firefox and Safari parse `url()` here and then
    draw nothing through it, which is worse than plain blur. Nothing follows
    the `url()`: a blur written after it was not applied, so the frost is inside
-   the filter and the saturation boost comes first. */
-.glass[data-lens] {
-  backdrop-filter: saturate(1.5) url(#site-lens);
+   the filter and the saturation boost comes first.
+
+   And only under a fine pointer. A phone or tablet redraws the filter under
+   the bar on every frame of a swipe, and on the home page that was the
+   largest cost of scrolling it: without the lens the compositor's share fell
+   by about 45% (2026-10-23, Pixel 7 emulated). On a bar that small the bent
+   rim barely reads, and touch screens get what iPhones always had, the blur. */
+@media (pointer: fine) {
+  .glass[data-lens] {
+    backdrop-filter: saturate(1.5) url(#site-lens);
+  }
 }
 
 /* The specular rim: a one pixel ring cut out of a vertical gradient, so the
