@@ -1,17 +1,19 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   motion,
+  useInView,
   useReducedMotion,
   useScroll,
   useTransform,
 } from "framer-motion";
-import { ChevronRight, UserRound } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { prefersReducedMotion } from "@/lib/reduced-motion";
-import { labStillSrc } from "@/lib/lab-images";
+import { labCardSrc } from "@/lib/lab-images";
 import { pricingTiers } from "@/lib/pricing";
 import { resolvedCategories } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
@@ -21,102 +23,94 @@ import { Sweep } from "./marks";
 const ease = [0.22, 1, 0.36, 1] as const;
 const once = { once: true, margin: "-80px" } as const;
 
-// The quote in the second illustration is the real Standard package, split
-// the way /pricing says Standard is paid: half to start, half on launch day.
+// The quote in the second step is the real Standard package, split the way
+// /pricing says Standard is paid: half to start, half on launch day.
 const standard = pricingTiers.find((tier) => tier.id === "standard");
 const standardTotal = Number(standard?.price?.replaceAll(",", "") ?? 0);
 const formatBaht = (amount: number) => `฿${amount.toLocaleString("en-US")}`;
 
-/** Three demos, a hand-drawn arrow, and what it costs to try all of them. */
-function TryFreeArt() {
+const TAB_INTERVAL_MS = 2600;
+
+/**
+ * A browser with three demos open, flicking between its tabs on its own, over
+ * the line that says what trying all of them costs. The tabs only turn while
+ * the window is on screen, and not at all under reduced motion.
+ */
+function TryArt() {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();
-  const faces = resolvedCategories.slice(0, 3).map((category) => category.labs[0]);
+  const frame = useRef<HTMLDivElement>(null);
+  const inView = useInView(frame, { margin: "-80px" });
+  const tabs = resolvedCategories.slice(0, 3).map((category) => category.labs[0]);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion || !inView) return;
+    const timer = window.setInterval(
+      () => setActive((index) => (index + 1) % tabs.length),
+      TAB_INTERVAL_MS,
+    );
+    return () => window.clearInterval(timer);
+  }, [reduceMotion, inView, tabs.length]);
 
   return (
-    <div aria-hidden className="relative mx-auto h-[210px] w-full max-w-[420px]">
-      <div className="absolute top-2 left-0 flex items-center gap-2.5">
-        <span className="flex">
-          {faces.map((lab, i) => (
-            <motion.span
+    <div ref={frame} aria-hidden className="mx-auto w-full max-w-[360px]">
+      <div className="border-line bg-card shadow-float overflow-hidden rounded-[16px] border">
+        <div className="bg-surface flex gap-1 px-2 pt-2">
+          {tabs.map((lab, i) => (
+            <span
               key={lab.slug}
-              initial={{ scale: 0.4, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={once}
-              transition={{ type: "spring", stiffness: 420, damping: 24, delay: i * 0.08 }}
               className={cn(
-                "ring-card relative h-8 w-8 overflow-hidden rounded-full ring-2",
-                i > 0 && "-ms-2.5",
+                "flex min-w-0 flex-1 items-center gap-1.5 rounded-t-[9px] px-2.5 py-1.5 text-[11.5px] transition-colors duration-300",
+                i === active ? "bg-card text-foreground" : "text-muted-foreground",
               )}
-              style={{
-                zIndex: faces.length - i,
-                backgroundImage: `url(${labStillSrc(lab.slug)})`,
-                backgroundSize: "cover",
-                backgroundPosition: "top",
-              }}
+            >
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-300",
+                  i === active ? "bg-brand" : "bg-line-strong",
+                )}
+              />
+              <span className="truncate">{lab.name}</span>
+            </span>
+          ))}
+        </div>
+        <div className="relative aspect-[16/10]">
+          {tabs.map((lab, i) => (
+            <Image
+              key={lab.slug}
+              src={labCardSrc(lab.slug)}
+              alt=""
+              fill
+              sizes="360px"
+              className={cn(
+                "object-cover object-top transition-opacity duration-500",
+                i === active ? "opacity-100" : "opacity-0",
+              )}
             />
           ))}
-        </span>
-        <span className="text-muted-foreground text-[13px]">
-          {withCounts(t.promise.rows.tryFirst.from)}
-        </span>
+        </div>
       </div>
 
-      <svg
-        viewBox="0 0 160 120"
-        className="text-foreground absolute top-[46px] left-[14px] h-[120px] w-[160px] overflow-visible"
-      >
-        <motion.path
-          d="M4 2C1 52 30 92 140 96"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          // Drawing a line is not a transform, so MotionConfig's reduced
-          // setting leaves it running; it finishes at once here instead.
-          initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={once}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.9, ease, delay: 0.3 }}
-        />
-        <motion.path
-          d="M127 85L142 96L127 107"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={once}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.2, delay: 1.1 }}
-        />
-      </svg>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={once}
-        transition={{ duration: 0.6, ease, delay: 1 }}
-        className="absolute top-[78px] left-[188px]"
-      >
-        {/* Set as a figure, not handwriting: the arrow is the pen here, and
-            the number it lands on reads like the total on a receipt. */}
-        <span className="block text-[92px] leading-[0.9] font-light tracking-[-0.04em] tabular-nums">
-          <span className="text-muted-foreground me-1 align-[0.6em] text-[0.42em] font-normal tracking-normal">
-            ฿
-          </span>
-          0
+      {/* A line off a receipt rather than a headline number: the total for
+          trying every demo, read across a dotted leader. */}
+      <div className="mt-5 flex items-baseline gap-2 text-[14px]">
+        <span className="text-muted-foreground">
+          {withCounts(t.promise.rows.tryFirst.from)}
         </span>
-        <span className="text-muted-foreground mt-2 block text-[13px]">
-          {t.promise.rows.tryFirst.to}
+        <span className="border-line-strong mb-1 flex-1 border-b border-dotted" />
+        <span className="text-[22px] leading-none font-medium tabular-nums">
+          ฿0
         </span>
-      </motion.div>
+      </div>
+      <p className="text-muted-foreground mt-1.5 text-end text-[12.5px]">
+        {t.promise.rows.tryFirst.to}
+      </p>
     </div>
   );
 }
 
-/** A client's first message, then the quote that answers it, deposit paid. */
+/** The quote that answers a first message: the real package, deposit paid. */
 function QuoteArt() {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();
@@ -124,113 +118,163 @@ function QuoteArt() {
   const half = standardTotal / 2;
 
   return (
-    <div aria-hidden className="mx-auto w-full max-w-[440px]">
-      <motion.div
-        initial={{ opacity: 0, x: -16 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={once}
-        transition={{ duration: 0.5, ease }}
-        className="flex items-start gap-2.5"
-      >
-        <span className="bg-surface text-muted-foreground grid h-8 w-8 shrink-0 place-items-center rounded-full">
-          <UserRound className="h-4 w-4" />
-        </span>
-        {/* A client's message, so it keeps the same pale blue and blue ink in
-            either theme, the way a chat app's colours do: 14.0:1. */}
-        <p className="rounded-[18px] rounded-tl-md bg-[oklch(0.93_0.025_255)] px-4 py-2.5 text-[14px] leading-snug text-[oklch(0.225_0.05_261.7)]">
-          {copy.message}
+    <div
+      aria-hidden
+      className="border-line bg-card shadow-float mx-auto w-full max-w-[360px] rounded-[16px] border p-5"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-muted-foreground text-[12px]">{copy.quote}</p>
+          <p className="mt-0.5 text-[15px] font-medium">{copy.tier}</p>
+        </div>
+        <p className="text-[26px] leading-none tracking-tight tabular-nums">
+          {formatBaht(standardTotal)}
         </p>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={once}
-        transition={{ duration: 0.6, ease, delay: 0.35 }}
-        className="border-line bg-card shadow-float ms-10 mt-4 rounded-[20px] border p-5"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-muted-foreground text-[12px]">{copy.quote}</p>
-            <p className="mt-0.5 text-[15px] font-medium">{copy.tier}</p>
-          </div>
-          <p className="text-[26px] leading-none tracking-tight tabular-nums">
-            {formatBaht(standardTotal)}
-          </p>
+      <div className="bg-surface mt-4 h-1.5 overflow-hidden rounded-full">
+        <motion.div
+          initial={{ width: "0%" }}
+          whileInView={{ width: "50%" }}
+          viewport={once}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.8, ease, delay: 0.5 }}
+          className="bg-brand h-full rounded-full"
+        />
+      </div>
+
+      <dl className="mt-4 space-y-2.5 text-[13px]">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-muted-foreground">{copy.deposit}</dt>
+          <dd className="flex items-center gap-2.5">
+            <span className="tabular-nums">{formatBaht(half)}</span>
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[12px] font-medium text-emerald-800">
+              {copy.paid}
+            </span>
+          </dd>
         </div>
-
-        <div className="bg-surface mt-4 h-1.5 overflow-hidden rounded-full">
-          <motion.div
-            initial={{ width: "0%" }}
-            whileInView={{ width: "50%" }}
-            viewport={once}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.8, ease, delay: 0.9 }}
-            className="bg-brand h-full rounded-full"
-          />
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-muted-foreground">{copy.launch}</dt>
+          <dd className="flex items-center gap-2.5">
+            <span className="tabular-nums">{formatBaht(half)}</span>
+            <span className="bg-surface text-muted-foreground rounded-full px-2 py-0.5 text-[12px] font-medium">
+              {copy.due}
+            </span>
+          </dd>
         </div>
-
-        <dl className="mt-4 space-y-2.5 text-[13px]">
-          <div className="flex items-center justify-between gap-3">
-            <dt className="text-muted-foreground">{copy.deposit}</dt>
-            <dd className="flex items-center gap-2.5">
-              <span className="tabular-nums">{formatBaht(half)}</span>
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[12px] font-medium text-emerald-800">
-                {copy.paid}
-              </span>
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <dt className="text-muted-foreground">{copy.launch}</dt>
-            <dd className="flex items-center gap-2.5">
-              <span className="tabular-nums">{formatBaht(half)}</span>
-              <span className="bg-surface text-muted-foreground rounded-full px-2 py-0.5 text-[12px] font-medium">
-                {copy.due}
-              </span>
-            </dd>
-          </div>
-        </dl>
-      </motion.div>
+      </dl>
     </div>
   );
 }
 
-function PromiseRow({
+/** The build, ticked off in order: the terms that come with every package. */
+function BuildArt() {
+  const { t } = useLocale();
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <ol
+      aria-hidden
+      className="border-line bg-card shadow-float divide-line mx-auto w-full max-w-[360px] divide-y rounded-[16px] border px-5 py-2"
+    >
+      {t.promise.rows.build.checklist.map((line, i) => (
+        <li key={line} className="flex items-center gap-3 py-3 text-[14px]">
+          <motion.span
+            initial={{ scale: 0.4, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={once}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { type: "spring", stiffness: 420, damping: 22, delay: 0.3 + i * 0.32 }
+            }
+            className="bg-brand text-card grid h-5 w-5 shrink-0 place-items-center rounded-full"
+          >
+            <Check className="h-3 w-3" strokeWidth={3} />
+          </motion.span>
+          {line}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Step({
+  index,
+  label,
   art,
   title,
   body,
   link,
 }: {
+  index: number;
+  label: string;
   art: ReactNode;
   title: { lead: string; mark: string; tail: string };
   body: string;
   link: ReactNode;
 }) {
   return (
-    <div className="grid items-center gap-10 py-14 sm:py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
-      {art}
-      <div>
-        <h3 className="text-[26px] leading-[1.2] font-medium tracking-[-0.02em] text-balance sm:text-[32px]">
-          {title.lead}
-          <Sweep>{title.mark}</Sweep>
-          {title.tail}
-        </h3>
-        <p className="text-muted-foreground mt-4 max-w-xl text-[17px] leading-relaxed text-pretty">
-          {body}
-        </p>
-        {link}
+    <motion.li
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={once}
+      transition={{ duration: 0.6, ease, delay: index * 0.12 }}
+      className="flex flex-col"
+    >
+      {/* The step's number and name on a gold rule that runs on into the
+          next column, so the three read as one line of work. */}
+      <div className="flex items-center gap-3">
+        <span className="text-brand font-mono text-[12px] tracking-[0.04em] tabular-nums">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="text-[14px] font-medium">{label}</span>
+        <span aria-hidden className="bg-brand/35 h-px flex-1" />
       </div>
-    </div>
+
+      {/* One height for all three pictures, so the titles under them line up. */}
+      <div className="mt-8 flex items-center lg:min-h-[336px]">{art}</div>
+
+      <h3 className="mt-8 text-[23px] leading-[1.25] font-medium tracking-[-0.02em] text-balance sm:text-[26px]">
+        {title.lead}
+        <Sweep>{title.mark}</Sweep>
+        {title.tail}
+      </h3>
+      <p className="text-muted-foreground mt-3 text-[16px] leading-relaxed text-pretty">
+        {body}
+      </p>
+      {link}
+    </motion.li>
   );
 }
 
-// py-1 lifts the target past the 24px floor; mt-5 keeps it where mt-6 had it.
-const rowLink =
-  "group text-foreground mt-5 inline-flex items-center gap-1 py-1 text-[15px] font-medium underline decoration-1 underline-offset-4";
+// py-1 lifts the target past the 24px floor.
+const stepLink =
+  "group text-foreground mt-4 inline-flex w-fit items-center gap-1 py-1 text-[15px] font-medium underline decoration-1 underline-offset-4";
+
+function StepLink({ href, children }: { href: string; children: ReactNode }) {
+  const chevron = (
+    <ChevronRight
+      aria-hidden
+      className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+    />
+  );
+  return href.startsWith("#") ? (
+    <a href={href} className={stepLink}>
+      {children}
+      {chevron}
+    </a>
+  ) : (
+    <Link href={href} className={stepLink}>
+      {children}
+      {chevron}
+    </Link>
+  );
+}
 
 /**
- * The card that rises over the ledger of worries and spells out the two terms
- * that rule most of them out. It starts a little narrower than the screen, so
- * the deep blue shows round it, and widens to the full width as it comes up.
+ * The card that rises over the ledger of worries and lays out the heading's
+ * three steps side by side. It starts a little narrower than the screen, so
+ * the ground shows round it, and widens to the full width as it comes up.
  */
 export function PromiseCard() {
   const { t } = useLocale();
@@ -247,16 +291,17 @@ export function PromiseCard() {
     prefersReducedMotion() || progress < 0.7 ? 32 : 32 * ((1 - progress) / 0.3),
   );
   const rows = t.promise.rows;
+  const [tryLabel, priceLabel, buildLabel] = t.promise.steps;
 
   return (
     <section aria-labelledby="promise-title" className="bg-zone-dark">
       <motion.div
         ref={card}
         style={{ scale, borderRadius: radius }}
-        className="bg-card text-card-foreground relative z-10 -mt-28 origin-top rounded-[32px] px-5 pt-20 pb-10 sm:-mt-40 sm:px-10 sm:pt-28 sm:pb-16"
+        className="bg-card text-card-foreground relative z-10 -mt-28 origin-top rounded-[32px] px-5 pt-20 pb-16 sm:-mt-40 sm:px-10 sm:pt-28 sm:pb-24"
       >
         {/* The whole process in three steps, the first one gilded: it is the
-            step nobody else offers, and the one the two rows below expand. */}
+            step nobody else offers. The columns below take them in order. */}
         <h2
           id="promise-title"
           className="mx-auto max-w-4xl text-center text-[32px] leading-[1.18] font-medium tracking-[-0.025em] text-balance sm:text-[46px] lg:text-[52px]"
@@ -265,36 +310,32 @@ export function PromiseCard() {
           {t.promise.title.rest}
         </h2>
 
-        <div className="divide-line mx-auto mt-10 max-w-[1080px] divide-y sm:mt-16">
-          <PromiseRow
-            art={<TryFreeArt />}
+        <ol className="mx-auto mt-14 grid max-w-[1180px] gap-x-10 gap-y-20 sm:mt-20 lg:grid-cols-3">
+          <Step
+            index={0}
+            label={tryLabel}
+            art={<TryArt />}
             title={rows.tryFirst.title}
             body={rows.tryFirst.body}
-            link={
-              <a href="#showcase" className={rowLink}>
-                {t.hero.tryLabs}
-                <ChevronRight
-                  aria-hidden
-                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                />
-              </a>
-            }
+            link={<StepLink href="#showcase">{t.hero.tryLabs}</StepLink>}
           />
-          <PromiseRow
+          <Step
+            index={1}
+            label={priceLabel}
             art={<QuoteArt />}
             title={rows.fixedPrice.title}
             body={withCounts(rows.fixedPrice.body)}
-            link={
-              <Link href="/pricing" className={rowLink}>
-                {t.hero.seePricing}
-                <ChevronRight
-                  aria-hidden
-                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                />
-              </Link>
-            }
+            link={<StepLink href="/pricing">{t.hero.seePricing}</StepLink>}
           />
-        </div>
+          <Step
+            index={2}
+            label={buildLabel}
+            art={<BuildArt />}
+            title={rows.build.title}
+            body={rows.build.body}
+            link={<StepLink href="#contact">{t.nav.cta}</StepLink>}
+          />
+        </ol>
       </motion.div>
     </section>
   );

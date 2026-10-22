@@ -84,6 +84,8 @@ const en = {
   },
   promise: {
     title: { mark: "Try first.", rest: " Agree the price. Then I build." },
+    // The heading's three steps again, as the labels over its three columns.
+    steps: ["Try first", "Agree the price", "Then I build"],
     rows: {
       tryFirst: {
         title: { lead: "Try every one first, ", mark: "for free", tail: "" },
@@ -94,13 +96,24 @@ const en = {
       fixedPrice: {
         title: { lead: "A price agreed ", mark: "before anything starts", tail: "" },
         body: "Fixed packages from {fromPrice} baht. The number you agree to is the number on the invoice.",
-        message: "Hi! Can I get the Counter style for my cafe?",
         quote: "Quote",
         tier: "Standard package",
         deposit: "Deposit",
         launch: "On launch day",
         paid: "Paid",
         due: "Due at launch",
+      },
+      // Every line here is a term already on /pricing and in the ledger of
+      // worries above, not a new promise.
+      build: {
+        title: { lead: "Then I build it, ", mark: "start to finish", tail: "" },
+        body: "Your words and photos go in, revisions come with the package, and every page is checked on a phone before it goes live. The second half is due on launch day, and fixes stay free for 30 days after.",
+        checklist: [
+          "Your words and photos in",
+          "Revision rounds included",
+          "Checked on a phone",
+          "Live, then 30 days of free fixes",
+        ],
       },
     },
   },
@@ -777,6 +790,7 @@ const th: typeof en = {
   },
   promise: {
     title: { mark: "ลองก่อน", rest: " ตกลงราคา แล้วผมค่อยเริ่มทำ" },
+    steps: ["ลองก่อน", "ตกลงราคา", "ลงมือทำ"],
     rows: {
       tryFirst: {
         title: { lead: "ลองเล่นก่อนได้", mark: "ฟรี", tail: " ทุกแบบ" },
@@ -787,13 +801,22 @@ const th: typeof en = {
       fixedPrice: {
         title: { lead: "ราคาตกลงกัน", mark: "ก่อนเริ่มงาน", tail: "" },
         body: "แพ็กเกจราคาชัดเจน เริ่มต้น {fromPrice} บาท ตกลงกันไว้เท่าไหร่ ใบแจ้งหนี้ก็เท่านั้น",
-        message: "สวัสดี อยากได้แบบ Counter ไปทำเว็บร้านกาแฟ",
         quote: "ใบเสนอราคา",
         tier: "แพ็กเกจ Standard",
         deposit: "มัดจำ",
         launch: "วันเว็บขึ้น",
         paid: "จ่ายแล้ว",
         due: "จ่ายวันเว็บขึ้น",
+      },
+      build: {
+        title: { lead: "ผมลงมือทำเอง ", mark: "จนเว็บขึ้น", tail: "" },
+        body: "ส่งข้อความกับรูปมา แก้ได้ตามรอบที่รวมในแพ็กเกจ ทุกหน้าเช็คบนมือถือก่อนขึ้นจริง อีกครึ่งจ่ายวันเว็บขึ้น หลังจากนั้นแก้ฟรีอีก 30 วัน",
+        checklist: [
+          "ข้อความกับรูปของคุณ",
+          "รอบแก้รวมในราคาแล้ว",
+          "เช็คบนมือถือก่อนขึ้น",
+          "ขึ้นเว็บ แล้วแก้ฟรี 30 วัน",
+        ],
       },
     },
   },

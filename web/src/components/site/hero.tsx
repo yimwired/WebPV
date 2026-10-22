@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown, ChevronsDown, ReceiptText } from "lucide-react";
@@ -8,7 +7,7 @@ import { withCounts } from "@/lib/counts";
 import { useLocale } from "@/lib/i18n";
 import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
-import { HeroCardBand, HeroCardCloud } from "./hero-cards";
+import { HeroDrift, HeroDriftBand } from "./hero-cards";
 import { pillPrimary, pillSecondary } from "./pill";
 
 const container: Variants = {
@@ -49,16 +48,11 @@ function NoteArrow({ className }: { className?: string }) {
 
 export function Hero() {
   const { locale, t } = useLocale();
-  const sectionRef = useRef<HTMLElement>(null);
   const isThai = locale === "th";
   const wrap = (text: string) => (isThai ? thaiWrap(text) : text);
 
   return (
-    <section
-      ref={sectionRef}
-      id="top"
-      className="relative isolate overflow-hidden"
-    >
+    <section id="top" className="relative isolate overflow-hidden">
       <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-[640px] flex-col items-center justify-center px-5 pt-28 pb-16 text-center lg:pb-20">
         {/*
           The headline does not fade in, and that is a performance decision
@@ -137,8 +131,8 @@ export function Hero() {
         </motion.div>
 
         {/* A note in the margin, in Film's hand, pointing at the cards: out to
-            both sides where they float beside the text, down where a phone
-            stacks them underneath. Decorative, since the showcase that
+            both sides where they drift beside the text, down where a phone
+            shows them underneath. Decorative, since the showcase that
             follows lists every one of these demos properly. */}
         <p
           aria-hidden
@@ -155,10 +149,10 @@ export function Hero() {
           </span>
         </p>
 
-        <HeroCardBand />
+        <HeroDriftBand />
       </div>
 
-      <HeroCardCloud target={sectionRef} />
+      <HeroDrift />
 
       <p
         aria-hidden

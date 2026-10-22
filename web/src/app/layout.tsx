@@ -67,8 +67,8 @@ export const metadata: Metadata = {
 // .dark block, the light one matches :root.
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b1f44" },
-    { media: "(prefers-color-scheme: light)", color: "#f7f3ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1734" },
+    { media: "(prefers-color-scheme: light)", color: "#faf9f7" },
   ],
 };
 

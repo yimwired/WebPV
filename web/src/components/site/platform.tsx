@@ -267,7 +267,7 @@ export function Platform() {
         <Cell
           className="lg:col-span-2"
           art={<DesignArt />}
-          paper="oklch(0.948 0.018 86)"
+          paper="oklch(0.982 0.003 95)"
           title={cells.design.title}
           body={cells.design.body}
         />
@@ -281,14 +281,14 @@ export function Platform() {
         />
         <Cell
           art={<YoursArt />}
-          paper="oklch(0.935 0.028 84)"
+          paper="oklch(0.955 0.022 85)"
           title={cells.yours.title}
           body={cells.yours.body}
         />
         <Cell
           className="lg:col-span-2"
           art={<FixesArt />}
-          paper="oklch(0.945 0.012 250)"
+          paper="oklch(0.95 0.012 258)"
           title={cells.fixes.title}
           body={cells.fixes.body}
         />

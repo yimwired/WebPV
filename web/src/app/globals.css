@@ -64,45 +64,51 @@
 }
 
 /* ── Palette ────────────────────────────────────────────────────────────────
-   Deep blue and ivory, with brass as the one accent (Film's call, 2026-10-18).
-   Ivory paper and blue ink by default; whole sections can be set in the deep
-   blue (`.dark` on a section scopes these tokens to it), which is also the
-   ground of the dark theme. Chroma stays at 0.13 or under everywhere: what
-   reads as expensive here is restraint, not saturation. Every ratio below was
-   computed from the painted colour, alpha composited in sRGB over the ground
-   it is quoted against, the way the browser composites it.
+   Midnight blue and pearl white, with gold as the one accent. Film asked for
+   deep blue and ivory (2026-10-18), then found that build one-toned and asked
+   for something richer that contrasts the way the earlier white and navy did
+   (2026-10-22): the page, its wells and the accent had all been the same warm
+   yellow. Now the grounds are close to neutral, the blue goes deeper, and gold
+   is the only warm colour on the page, so it reads as metal rather than as
+   more of the paper. Whole sections can be set in midnight (`.dark` on a
+   section scopes these tokens to it), which is also the ground of the dark
+   theme. Chroma stays at 0.13 or under everywhere: what reads as expensive
+   here is restraint, not saturation. Every ratio below was computed from the
+   painted colour, alpha composited in sRGB over the ground it is quoted
+   against, the way the browser composites it.
 
-   `.paper` is the light palette again, for a sheet that stays ivory inside a
+   `.paper` is the light palette again, for a sheet that stays white inside a
    dark section (the ledger of worries, the drawings in the platform panels):
-   their text keeps the ratios below instead of inheriting the deep blue's. */
+   their text keeps the ratios below instead of inheriting midnight's. */
 :root,
 .paper {
   /* Native controls and scrollbars follow the page; `.dark` flips it back. */
   color-scheme: light;
 
-  /* #F7F3EA ivory. Paper rather than white, so the page has a temperature. */
-  --background: oklch(0.965 0.013 86.8);
-  /* #0E1B33, a blue near enough to black to carry body text: 15.5:1 on the
-     page, 16.9:1 on --card, 14.1:1 on --surface. */
-  --foreground: oklch(0.225 0.05 261.7);
-  /* #FFFDF8, one step lighter than the page, for cards that float on it. */
-  --card: oklch(0.994 0.007 88.6);
-  --card-foreground: oklch(0.225 0.05 261.7);
-  --popover: oklch(0.994 0.007 88.6);
-  --popover-foreground: oklch(0.225 0.05 261.7);
-  --primary: oklch(0.225 0.05 261.7);
-  --primary-foreground: oklch(0.965 0.013 86.8);
-  --secondary: oklch(0.933 0.02 84.6);
-  --secondary-foreground: oklch(0.225 0.05 261.7);
-  --muted: oklch(0.933 0.02 84.6);
-  /* #4F5B72. 6.17:1 on the page, 6.72:1 on --card, 5.61:1 on --surface. */
-  --muted-foreground: oklch(0.47 0.04 263.3);
-  --accent: oklch(0.933 0.02 84.6);
-  --accent-foreground: oklch(0.225 0.05 261.7);
-  /* #A8321F, for form errors. 6.04:1 on the page, 5.48:1 on --surface. */
+  /* #FAF9F7 pearl. White with the faintest warmth, so pure white cards still
+     lift off it and the gold stays the only warm thing on the page. */
+  --background: oklch(0.982 0.003 95);
+  /* #0D162C, a midnight blue near enough to black to carry body text: 17.1:1
+     on the page, 18.0:1 on --card, 15.9:1 on --surface. */
+  --foreground: oklch(0.205 0.045 265);
+  /* #FFFFFF, one step lighter than the page, for cards that float on it. */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.205 0.045 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.205 0.045 265);
+  --primary: oklch(0.205 0.045 265);
+  --primary-foreground: oklch(0.982 0.003 95);
+  --secondary: oklch(0.958 0.007 258);
+  --secondary-foreground: oklch(0.205 0.045 265);
+  --muted: oklch(0.958 0.007 258);
+  /* #535D6E. 6.32:1 on the page, 6.65:1 on --card, 5.87:1 on --surface. */
+  --muted-foreground: oklch(0.475 0.03 262);
+  --accent: oklch(0.958 0.007 258);
+  --accent-foreground: oklch(0.205 0.045 265);
+  /* #A8321F, for form errors. 6.35:1 on the page, 5.91:1 on --surface. */
   --destructive: oklch(0.493 0.157 31.8);
-  --border: oklch(0.225 0.05 261.7 / 11%);
-  --input: oklch(0.225 0.05 261.7 / 20%);
+  --border: oklch(0.205 0.045 265 / 11%);
+  --input: oklch(0.205 0.045 265 / 20%);
   --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -111,32 +117,34 @@
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
 
-  /* #80612A brass. Gold itself is 1.2 to 1.4:1 on ivory, so on the light
-     ground the accent is the darkest brass that still reads as gold: 5.18:1
-     on the page, 5.64:1 on --card, 4.70:1 on --surface, against the 4.5 text
-     asks for and the 3.0 a focus ring needs. */
-  --brand: oklch(0.513 0.082 79.4);
-  --line: oklch(0.225 0.05 261.7 / 11%);
-  --line-strong: oklch(0.225 0.05 261.7 / 20%);
+  /* #8C6522 old gold. Gold itself is under 2:1 on white, so on the light
+     ground the accent is the darkest gold that still reads as metal: 4.99:1
+     on the page, 5.25:1 on --card, 4.64:1 on --surface, against the 4.5 text
+     asks for and the 3.0 a focus ring needs. Next to neutral white it reads
+     as gold; the brass before it, on ivory, read as brown. */
+  --brand: oklch(0.535 0.096 77);
+  --line: oklch(0.205 0.045 265 / 11%);
+  --line-strong: oklch(0.205 0.045 265 / 20%);
   /* Only for a boundary that IDENTIFIES a control (input, select, textarea).
      WCAG 1.4.11 wants 3:1 there, and --line-strong is 1.5:1: fine as a
-     decorative rule, invisible as the edge of a text field. 3.2:1 on the
-     page, 3.1:1 on --surface. Do not use it for decorative hairlines. */
-  --line-control: oklch(0.225 0.05 261.7 / 50%);
-  /* #EFE8DA, ivory one step deeper: wells, chips and form fields. */
-  --surface: oklch(0.933 0.02 84.6);
-  /* The deep blue of the dark sections, as a plain colour that does not change
-     with the theme: for the ground showing around a card that does. Same
-     value as --background in .dark. */
-  --zone-dark: oklch(0.247 0.075 261.4);
+     decorative rule, invisible as the edge of a text field. 3.4:1 on the
+     page, 3.3:1 on --surface. Do not use it for decorative hairlines. */
+  --line-control: oklch(0.205 0.045 265 / 50%);
+  /* #EEF1F6, a cool mist: wells, chips and form fields. Cool on purpose, so
+     the light sections carry some of the blue instead of a second warm tone. */
+  --surface: oklch(0.958 0.007 258);
+  /* Midnight, the ground of the dark sections, as a plain colour that does not
+     change with the theme: for the ground showing around a card that does.
+     Same value as --background in .dark. */
+  --zone-dark: oklch(0.215 0.058 266);
 
-  --sidebar: oklch(0.994 0.007 88.6);
-  --sidebar-foreground: oklch(0.225 0.05 261.7);
-  --sidebar-primary: oklch(0.225 0.05 261.7);
-  --sidebar-primary-foreground: oklch(0.965 0.013 86.8);
-  --sidebar-accent: oklch(0.933 0.02 84.6);
-  --sidebar-accent-foreground: oklch(0.225 0.05 261.7);
-  --sidebar-border: oklch(0.225 0.05 261.7 / 11%);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.205 0.045 265);
+  --sidebar-primary: oklch(0.205 0.045 265);
+  --sidebar-primary-foreground: oklch(0.982 0.003 95);
+  --sidebar-accent: oklch(0.958 0.007 258);
+  --sidebar-accent-foreground: oklch(0.205 0.045 265);
+  --sidebar-border: oklch(0.205 0.045 265 / 11%);
   --sidebar-ring: var(--brand);
 }
 
@@ -146,57 +154,75 @@
      it they stay light and read as a rendering bug on a dark page. */
   color-scheme: dark;
 
-  /* #0B1F44. Chroma 0.075: plainly blue rather than a blue-tinted grey. */
-  --background: oklch(0.247 0.075 261.4);
-  /* The ivory of the light page: 14.7:1 here, 12.3:1 on --surface. */
-  --foreground: oklch(0.965 0.013 86.8);
-  /* #142C5C, one step up from the page. */
-  --card: oklch(0.304 0.091 262.4);
-  --card-foreground: oklch(0.965 0.013 86.8);
-  --popover: oklch(0.304 0.091 262.4);
-  --popover-foreground: oklch(0.965 0.013 86.8);
-  --primary: oklch(0.965 0.013 86.8);
-  --primary-foreground: oklch(0.247 0.075 261.4);
-  --secondary: oklch(0.304 0.091 262.4);
-  --secondary-foreground: oklch(0.965 0.013 86.8);
-  --muted: oklch(0.304 0.091 262.4);
-  /* #A7B6D4. 7.95:1 on the page, 6.66:1 on --surface. */
-  --muted-foreground: oklch(0.775 0.046 264.3);
-  --accent: oklch(0.304 0.091 262.4);
-  --accent-foreground: oklch(0.965 0.013 86.8);
-  /* #FF9E8A. 8.12:1 on the page, 6.80:1 on --surface. */
+  /* #0D1734 midnight. Chroma 0.058: plainly blue rather than a blue-tinted
+     grey, and darker than the #0B1F44 it replaces, which is where the depth
+     comes from. */
+  --background: oklch(0.215 0.058 266);
+  /* The pearl of the light page, a shade warmer: 16.3:1 here, 14.1:1 on
+     --surface. */
+  --foreground: oklch(0.972 0.006 92);
+  /* #172446, one step up from the page. */
+  --card: oklch(0.27 0.066 266);
+  --card-foreground: oklch(0.972 0.006 92);
+  --popover: oklch(0.27 0.066 266);
+  --popover-foreground: oklch(0.972 0.006 92);
+  --primary: oklch(0.972 0.006 92);
+  --primary-foreground: oklch(0.215 0.058 266);
+  --secondary: oklch(0.27 0.066 266);
+  --secondary-foreground: oklch(0.972 0.006 92);
+  --muted: oklch(0.27 0.066 266);
+  /* #AAB6CD. 8.65:1 on the page, 7.47:1 on --surface. */
+  --muted-foreground: oklch(0.775 0.035 262);
+  --accent: oklch(0.27 0.066 266);
+  --accent-foreground: oklch(0.972 0.006 92);
+  /* #FF9E8A. 8.84:1 on the page, 7.63:1 on --surface. */
   --destructive: oklch(0.793 0.12 32.4);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: var(--brand);
 
-  /* #D9AE4E. On the deep blue the accent can be gold proper: 7.82:1 on the
-     page, 6.55:1 on --surface. See :root for why the light value is brass. */
-  --brand: oklch(0.772 0.124 84.8);
+  /* #E3BD70 champagne. On midnight the accent can be gold proper: 9.90:1 on
+     the page, 8.55:1 on --surface. See :root for why the light value is
+     darker. */
+  --brand: oklch(0.815 0.105 84);
   --line: oklch(1 0 0 / 10%);
   --line-strong: oklch(1 0 0 / 18%);
-  /* See the note in :root. Ivory at 40%: 3.3:1 on the page, 3.1:1 on
+  /* See the note in :root. Pearl at 40%: 3.6:1 on the page, 3.5:1 on
      --surface. */
-  --line-control: oklch(0.965 0.013 86.8 / 40%);
+  --line-control: oklch(0.972 0.006 92 / 40%);
   /* Opaque, one step above the page. Panels are lifted by tone; the two
      glass pieces (navbar, form messages) are the only translucent surfaces. */
-  --surface: oklch(0.304 0.091 262.4);
+  --surface: oklch(0.27 0.066 266);
 
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.304 0.091 262.4);
-  --sidebar-foreground: oklch(0.965 0.013 86.8);
+  --sidebar: oklch(0.27 0.066 266);
+  --sidebar-foreground: oklch(0.972 0.006 92);
   /* shadcn ships a blue-violet here (oklch(0.488 0.243 264.376)). Removed: the
-     site has one accent and it is brass. Nothing consumes it -- no sidebar
+     site has one accent and it is gold. Nothing consumes it -- no sidebar
      component exists -- so this falls back to the :root value. */
-  --sidebar-primary-foreground: oklch(0.965 0.013 86.8);
-  --sidebar-accent: oklch(0.304 0.091 262.4);
-  --sidebar-accent-foreground: oklch(0.965 0.013 86.8);
+  --sidebar-primary-foreground: oklch(0.972 0.006 92);
+  --sidebar-accent: oklch(0.27 0.066 266);
+  --sidebar-accent-foreground: oklch(0.972 0.006 92);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: var(--brand);
+}
+
+/* In the dark theme the whole page is already midnight, so a section that is
+   dark on purpose would disappear into it and the page would read as one
+   tone, which is what Film saw in the ivory build. Those sections go a step
+   deeper instead (#060D22): their pearl sheets and the cards rising over them
+   keep the rhythm the light theme gets from pearl against midnight. Text only
+   gains here: pearl 17.8:1, muted 9.5:1, champagne 10.8:1. */
+html.dark {
+  --zone-dark: oklch(0.165 0.045 266);
+}
+
+html.dark .dark {
+  --background: oklch(0.165 0.045 266);
 }
 
 @layer base {
@@ -346,21 +372,70 @@
   animation: hand-write 0.9s cubic-bezier(0.45, 0, 0.15, 1) 0.6s both;
 }
 
+/* The demos beside the headline drift upward without end, faded until a
+   pointer finds one (Film's idea, 2026-10-22, in place of cards scattered at
+   angles round the headline). A lane holds its cards twice and slides by
+   exactly one set, so the loop has no seam; each card carries its own bottom
+   spacing instead of the lane having a `gap`, which would leave the two sets
+   half a gap out of step. Hovering a lane stops it, so a moving card can still
+   be clicked. Under reduced motion the shared rule above ends the animation
+   at once and the lanes rest where they started. */
+@keyframes drift-up {
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+.drift-track {
+  animation: drift-up 80s linear infinite;
+}
+
+.drift-lane:hover .drift-track {
+  animation-play-state: paused;
+}
+
+.drift-card {
+  opacity: var(--drift-rest, 0.42);
+  transition: opacity 0.3s ease-out;
+}
+
+.drift-card:hover {
+  opacity: 1;
+}
+
+/* Lanes rise out of the page and sink back into it, rather than being cut by
+   the edges of the hero. */
+.drift-fade {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+}
+
+@keyframes drift-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.drift-in {
+  animation: drift-in 1.2s ease-out 0.2s both;
+}
+
 /* Key words are gilded once they are on screen: the ink slides off and a
-   brass leaf with a lighter band across its middle slides on. One metal, not
+   gold leaf with a lighter band across its middle slides on. One metal, not
    a rainbow. Each stop clears 4.5:1 on the ground it is used on: the light
-   theme's deep and bright brass are 6.86 and 5.18:1 on the page (6.24 and
-   4.70 on --surface), the dark theme's gold 6.18 and 10.55:1 on the deep blue. */
+   theme's deep and bright gold are 6.57 and 4.99:1 on the page (6.11 and
+   4.64 on --surface), the dark theme's champagne 7.28 and 12.93:1 on
+   midnight. */
 :root {
-  --sweep-1: oklch(0.447 0.075 78.6);
+  --sweep-1: oklch(0.47 0.085 74);
   --sweep-2: var(--brand);
-  --sweep-3: oklch(0.447 0.075 78.6);
+  --sweep-3: oklch(0.47 0.085 74);
 }
 
 .dark {
-  --sweep-1: oklch(0.707 0.12 80.7);
-  --sweep-2: oklch(0.859 0.103 87.7);
-  --sweep-3: oklch(0.707 0.12 80.7);
+  --sweep-1: oklch(0.73 0.115 80);
+  --sweep-2: oklch(0.895 0.085 90);
+  --sweep-3: oklch(0.73 0.115 80);
 }
 
 /* The gradient is three words wide and starts parked on its plain first
@@ -392,12 +467,12 @@
   }
 }
 
-/* A brass pen stroke through a line of text, slightly uneven the way a ruler
+/* A gold pen stroke through a line of text, slightly uneven the way a ruler
    is never quite used. Pains grows the background-size from 0% to cross a
    worry out; `clone` gives every wrapped line its own stroke. The colour is
-   the light theme's brass, fixed, because it only ever sits on `.paper`. */
+   the light theme's gold, fixed, because it only ever sits on `.paper`. */
 .strike {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 12' preserveAspectRatio='none'%3E%3Cpath d='M2 7C70 4 150 8 222 5C252 4 280 5 298 6' fill='none' stroke='%2380612A' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 12' preserveAspectRatio='none'%3E%3Cpath d='M2 7C70 4 150 8 222 5C252 4 280 5 298 6' fill='none' stroke='%238C6522' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 0 58%;
   background-size: 100% 0.5em;
@@ -411,8 +486,8 @@
    and never compete with what is drawn on them. */
 .blueprint {
   background-image:
-    linear-gradient(oklch(0.225 0.05 261.7 / 7%) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(0.225 0.05 261.7 / 7%) 1px, transparent 1px);
+    linear-gradient(oklch(0.205 0.045 265 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.205 0.045 265 / 7%) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: -1px -1px;
 }
@@ -421,8 +496,8 @@
    own blue rather than grey. */
 .shadow-float {
   box-shadow:
-    0 1px 2px oklch(0.225 0.05 261.7 / 6%),
-    0 14px 32px -10px oklch(0.225 0.05 261.7 / 24%);
+    0 1px 2px oklch(0.205 0.045 265 / 6%),
+    0 14px 32px -10px oklch(0.205 0.045 265 / 24%);
 }
 
 /* ── Glass ─────────────────────────────────────────────────────────────────
@@ -433,30 +508,30 @@
    1. refraction  the backdrop bends at the rim (`[data-lens]`, see glass.tsx)
    2. fringe      each colour channel bends a little differently at that rim
    3. specular    a hairline highlight round the edge, brightest at the top
-   4. adaptive    the tint flips with the ground: ivory over light sections,
-                  deep blue over dark ones, because `.dark` swaps these tokens
+   4. adaptive    the tint flips with the ground: pearl over light sections,
+                  midnight over dark ones, because `.dark` swaps these tokens
 
    The tint is opaque enough to be solved against the worst backdrop rather
-   than the usual one. Alpha composites in sRGB, so ivory at 72% over black
-   still lands at (178, 175, 168): 7.8:1 for the ink, and only 3.1:1 for
+   than the usual one. Alpha composites in sRGB, so pearl at 72% over black
+   still lands at (180, 179, 178): 8.6:1 for the ink, and only 3.2:1 for
    --muted-foreground, which is why nothing on the glass is set in muted
-   grey. Deep blue at 78% over the ivory panels in the dark sections leaves
-   ivory text at 7.3:1 or better. */
+   grey. Midnight at 78% over the white panels in the dark sections leaves
+   pearl text at 8.1:1 or better. */
 :root {
-  --glass-tint: oklch(0.965 0.013 86.8 / 72%);
+  --glass-tint: oklch(0.982 0.003 95 / 72%);
   --glass-sheen: oklch(1 0 0 / 22%);
   --glass-rim: oklch(1 0 0 / 90%);
   --glass-rim-soft: oklch(1 0 0 / 22%);
-  --glass-shade: oklch(0.225 0.05 261.7 / 9%);
+  --glass-shade: oklch(0.205 0.045 265 / 9%);
   --glass-shadow:
-    0 1px 2px oklch(0.225 0.05 261.7 / 6%),
-    0 12px 32px -14px oklch(0.225 0.05 261.7 / 34%);
+    0 1px 2px oklch(0.205 0.045 265 / 6%),
+    0 12px 32px -14px oklch(0.205 0.045 265 / 34%);
   /* what the glass falls back to when it cannot or should not be seen through */
   --glass-solid: var(--card);
 }
 
 .dark {
-  --glass-tint: oklch(0.247 0.075 261.4 / 78%);
+  --glass-tint: oklch(0.215 0.058 266 / 78%);
   --glass-sheen: oklch(1 0 0 / 5%);
   --glass-rim: oklch(1 0 0 / 34%);
   --glass-rim-soft: oklch(1 0 0 / 7%);
@@ -519,17 +594,17 @@
 /* A denser sheet for glass that carries a list of links, like the phone menu:
    it sits over whole paragraphs of page text, not over a band of cards. */
 .glass-dense {
-  --glass-tint: oklch(0.965 0.013 86.8 / 90%);
+  --glass-tint: oklch(0.982 0.003 95 / 90%);
 }
 
 .dark .glass-dense,
 .glass-dense.dark {
-  --glass-tint: oklch(0.247 0.075 261.4 / 92%);
+  --glass-tint: oklch(0.215 0.058 266 / 92%);
 }
 
 /* Messages that something needs fixing carry a warm cast, so they read as a
    warning before they are read at all. A field's message sits on the form's
-   own card, where --destructive measures 5.8:1 on the light plate and 7.0:1
+   own card, where --destructive measures 5.9:1 on the light plate and 6.9:1
    on the dark one. The toast floats over anything, so its text stays in the
    foreground colour and only its icon takes the warning colour. */
 .glass-warn {

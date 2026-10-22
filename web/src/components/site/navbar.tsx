@@ -156,14 +156,14 @@ export function Navbar() {
         data-lens={lens ? "" : undefined}
         className="glass text-foreground mx-auto flex h-14 max-w-[1040px] items-center justify-between gap-3 rounded-full ps-5 pe-1.5 sm:h-16 sm:pe-2"
       >
-        {/* The wordmark is four characters, so its text box misses the 24px
+        {/* The wordmark is three characters, so its text box misses the 24px
             target floor. Padding gives it a real target and the matching
             negative margin keeps it optically on the pill's inner edge. */}
         <a
           href={onHome ? "#top" : "/"}
           className="-mx-2 -my-3 rounded-full px-2 py-3 text-[17px] font-semibold tracking-tight"
         >
-          Film
+          Yim
         </a>
 
         <nav className="hidden items-center gap-0.5 lg:flex">
