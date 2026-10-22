@@ -33,7 +33,7 @@ const declared = readdirSync(LABS_DIR, { withFileTypes: true })
     return { slug: entry.name, scheme };
   });
 
-for (const { slug, scheme } of declared.filter((lab) => !lab.scheme)) {
+for (const { slug } of declared.filter((lab) => !lab.scheme)) {
   check(false, `/labs/${slug} declares its ground`, "no viewport.colorScheme in page.tsx");
 }
 
