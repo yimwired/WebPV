@@ -20,10 +20,14 @@ const geistMono = Geist_Mono({
 });
 
 // The site's own face. It carries Thai as well as Latin, so Thai copy no
-// longer falls back to whatever the visitor's OS has.
+// longer falls back to whatever the visitor's OS has. next/font holds no
+// metrics for it and so writes no adjusted fallback face: without the list
+// below the stack ended at "Google Sans", and until the file arrived the
+// browser set the page in its default serif (Times New Roman on Windows).
 const googleSans = Google_Sans({
   variable: "--font-site",
   subsets: ["latin", "thai"],
+  fallback: ["system-ui", "Arial", "sans-serif"],
 });
 
 // The handwriting: the margin notes, the hero's and the ones written beside the
