@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { IBM_Plex_Sans_Thai_Looped } from "next/font/google";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 import { ThockDemo } from "@/components/labs/thock/thock-demo";
@@ -20,6 +21,8 @@ export const metadata = pageMetadata({
     "A ball of keycaps in raw WebGL2, no three.js and no images. Drag it and it spins on, hover a key and it lifts. Press a key on your own keyboard, in English or Thai, and the same key on the ball presses down and sends a ripple around it. Four colourways, and the click of a real Cherry MX Blue switch.",
   path: "/labs/thock",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function ThockPage() {
   return (

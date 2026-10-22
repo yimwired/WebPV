@@ -11,7 +11,7 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
 export function LabsGallery() {
   return (
-    <main className="bg-background text-foreground min-h-dvh">
+    <main className="font-site bg-background text-foreground min-h-dvh">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <motion.div
           initial={{ opacity: 0, y: 12 }}

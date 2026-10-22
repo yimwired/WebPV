@@ -57,7 +57,7 @@ const shootBoth = async (route, label, { fullPage = false } = {}) => {
 
 const CASE_STUDIES = [
   "aurum",
-  "you-are-the-virus",
+  "pet-travel",
   "product-dashboard",
   "affiliate",
   "jarvis-moon",

@@ -21,52 +21,155 @@ const en = {
     toggleTheme: "Switch between dark and light",
   },
   hero: {
-    name: "Nuttapon Yimnoi (Film)",
-    location: "Bangkok",
-    headline: "I build trading systems, AI agents and the tools around them.",
-    sub: "{projects} projects shipped and in use, all designed and built solo, from the first sketch to the thing that runs while I sleep.",
-    viewWork: "See the work",
-    contact: "Get in touch",
+    headline: "Websites you can try before you hire",
+    // The handwritten margin note under the buttons. `wide` sits between two
+    // arrows pointing out at the cards either side; `narrow` points down at
+    // the row of cards a phone shows underneath.
+    note: {
+      wide: "these are real sites, click one",
+      narrow: "real sites, tap one",
+    },
+    sub: "{labs} live examples to click through. Pick one and I build it into your site myself, start to finish.",
+    tryLabs: "Try the examples",
+    seePricing: "See prices",
     facts: [
-      { value: "{projects}", label: "Projects shipped" },
-      { value: "12", label: "Strategy engines in AURUM" },
-      { value: "11", label: "AI agents in the fleet" },
-      { value: "4", label: "Platforms published to" },
+      { value: "{labs}", label: "live examples" },
+      { value: "{fromPrice}", label: "baht to start" },
+      { value: "30", label: "days of free fixes" },
+      { value: "{projects}", label: "projects shipped" },
     ],
+    scrollHint: "Scroll down",
+  },
+  showcase: {
+    title: "Every kind of shop, already built",
+    sub: "Pick the one closest to yours. Each opens a working site you can click through, with the package that builds it.",
+    tablistLabel: "Kinds of business",
+    categories: {
+      food: "Food and drink",
+      tours: "Tours and bookings",
+      shops: "Shops and sellers",
+      events: "Events and weddings",
+      premium: "Premium products",
+      studios: "Studios and courses",
+    },
+    examplesCount: "{count} examples",
+    exampleCount: "1 example",
+    // Read along a dotted leader to the figure, like a parts list.
+    stats: {
+      from: "Starting price",
+      time: "Time to launch",
+      examples: "Examples to try",
+    },
+    live: "Live",
+    examples: "Examples",
+    packages: "Packages",
+    openDemo: "Open {name}",
+    seeAll: "All {labs} in The Lab",
+  },
+  pains: {
+    title: "Seven ways hiring a web developer goes wrong",
+    sub: "I've ruled out every one of them. Here's how.",
+    notesLabel: "Common worries about hiring someone to build a website, each with what rules it out",
+    // Each answer is a term already on /pricing (payment split, fixed packages,
+    // revision rounds, 30 days of fixes), not a new promise. Keep it that way.
+    notes: [
+      { worry: "I paid the deposit. Then they stopped replying.", answer: "half up front, half on launch day" },
+      { worry: "The quote doubled halfway through.", answer: "a fixed package price" },
+      { worry: "I can't picture it until I see it.", answer: "try the real thing first" },
+      { worry: "Every small change costs extra.", answer: "revision rounds included" },
+      { worry: "Fine on a laptop, broken on my phone.", answer: "checked on a phone before launch" },
+      { worry: "The site went down. Who do I even call?", answer: "me, with 30 days of free fixes" },
+      { worry: "It looks like the template next door.", answer: "your words, your photos" },
+    ],
+  },
+  promise: {
+    title: { mark: "Try first.", rest: " Agree the price. Then I build." },
+    // The heading's three steps again, as the labels over its three columns.
+    steps: ["Try first", "Agree the price", "Then I build"],
+    rows: {
+      tryFirst: {
+        title: { lead: "Try every one first, ", mark: "for free", tail: "" },
+        body: "Each example is a working site. Book the tour, fill the cart, see the restaurant say whether it is open right now. Then decide.",
+        from: "{labs} examples",
+        to: "to try them all",
+      },
+      fixedPrice: {
+        title: { lead: "A price agreed ", mark: "before anything starts", tail: "" },
+        body: "Fixed packages from {fromPrice} baht. The number you agree to is the number on the invoice.",
+        quote: "Quote",
+        tier: "Standard package",
+        deposit: "Deposit",
+        launch: "On launch day",
+        paid: "Paid",
+        due: "Due at launch",
+      },
+      // Every line here is a term already on /pricing and in the ledger of
+      // worries above, not a new promise.
+      build: {
+        title: { lead: "Then I build it, ", mark: "start to finish", tail: "" },
+        body: "Your words and photos go in, revisions come with the package, and every page is checked on a phone before it goes live. The second half is due on launch day, and fixes stay free for 30 days after.",
+        checklist: [
+          "Your words and photos in",
+          "Revision rounds included",
+          "Checked on a phone",
+          "Live, then 30 days of free fixes",
+        ],
+      },
+    },
+  },
+  platform: {
+    title: "Everything between hello and launch",
+    cells: {
+      design: {
+        title: { mark: "Designed", rest: " for your business" },
+        body: "Start from an example, then it becomes yours: your words, your photos, in Thai, English or both.",
+      },
+      live: {
+        title: { mark: "Live", rest: " on your own domain" },
+        // {performance} and {accessibility} come from lib/lighthouse.ts, the lowest
+        // score across the measured pages.
+        body: "Quick on a phone, and measured rather than promised: on Lighthouse this site scores {performance} or better for speed and {accessibility} for accessibility.",
+        scores: {
+          performance: "Performance",
+          accessibility: "Accessibility",
+          bestPractices: "Best practices",
+          seo: "SEO",
+        },
+        caption: "Phone run, lowest of {routes} pages",
+      },
+      yours: {
+        title: { mark: "Yours", rest: " to keep, code included" },
+        body: "The code, the domain and the hosting sit in your name. Leave whenever you like and take all of it.",
+        owner: "Owner",
+        you: "you",
+      },
+      fixes: {
+        title: { mark: "Fixed", rest: " free for 30 days" },
+        body: "Anything that does not work the way we agreed gets mended free for a month after launch.",
+        fixed: "Fixed",
+        tickets: [
+          "Menu overlaps on a small phone",
+          "Sale price shows without the discount",
+          "Thai heading breaks mid-word",
+        ],
+      },
+    },
   },
   work: {
     label: "projects",
     title: "Built, shipped, still running",
-    sub: "Each one is in daily use, not a demo. Open any of them for how it was built and what it does.",
+    sub: "Beyond websites: systems in daily use, not demos. Open any of them for how it was built and what it does.",
     caseStudy: "Read the build",
-  },
-  lab: {
-    title: "{labs} directions, every one built",
-    sub: "Each is a working page, not a theme with the colours swapped: the tour panel quotes real totals, the shop page knows whether it is open right now. Pick the one that fits your business and your content goes in it.",
-    seeAll: "All {count} in The Lab",
-    railEnd: "directions to browse",
-    proof: [
-      {
-        value: "41 ms",
-        label:
-          "The e-ink latency Sable reproduces, full-refresh flicker included.",
-      },
-      {
-        value: "30%",
-        label:
-          "The deposit Longtail quotes live as you add adults, children and hotel pickup.",
-      },
-      {
-        value: "3",
-        label: "Render real-time 3D in the browser, not a video of one.",
-      },
-    ],
   },
   about: {
     label: "What I work with",
     title: "One person, the whole stack.",
-    p1: "I'm Film. I build trading bots, AI assistants, dashboards and content pipelines, and I own each project from the first sketch to the thing running in production.",
-    p2: "My default is to ship: small, real, improving over time. Whether it's an automated strategy or a short-form video system, the goal is the same. Make it work, then make it better.",
+    profile: "Film's profile",
+    name: "Nuttapon Yimnoi",
+    nickname: "Film",
+    location: "Bangkok, Thailand",
+    p1: "I'm Film. I build websites for businesses, and the systems I use every day: trading bots, AI assistants, dashboards and content pipelines. I own each project from the first sketch to the thing running in production.",
+    p2: "My default is to ship: small, real, improving over time. Whether it's a shop's website or an automated strategy, the goal is the same. Make it work, then make it better.",
     stats: [
       { value: "{projects}", label: "Projects shipped" },
       { value: "Solo", label: "Design, build and run" },
@@ -90,6 +193,14 @@ const en = {
     sending: "Sending",
     success: "Got it. I read every message and reply from yimwired@gmail.com.",
     error: "That didn't send. Email me directly and it'll reach me.",
+    // Shown under a field when the form is sent with it empty or malformed.
+    errors: {
+      name: "Tell me what to call you.",
+      email: "I need an email to reply to.",
+      emailShape: "That doesn't look like a full email address.",
+      message: "A line or two is enough, but say something.",
+    },
+    dismiss: "Dismiss",
     copyEmail: "Copy email",
     copied: "Copied",
   },
@@ -420,64 +531,6 @@ const en = {
         },
       ],
     },
-    "you-are-the-virus": {
-      title: "You Are the Virus",
-      subtitle: "A game where the villain is you",
-      imageAlt: "You Are the Virus gameplay",
-      meta: [
-        { k: "Role", v: "Design + build, solo" },
-        { k: "Engine", v: "Godot 4 · GDScript" },
-        { k: "Genre", v: "Side-scroll survival" },
-        { k: "Status", v: "In playtest" },
-      ],
-      sections: [
-        {
-          h: "The idea",
-          p: "Most virus games hand you the cure. This one hands you the virus. You drift through a host's bloodstream, infect cells for DNA, dodge the immune system and evolve. Somewhere along the way you learn the host is a child. Every run ends on the same choice: mutate and win, or self-destruct so the kid lives.",
-        },
-        {
-          h: "The approach",
-          p: "The vessel scrolls past on its own, so the pressure never lets up. Three verbs carry the whole game: infect, evade, evolve. A run starts at a random peripheral entry (hand, foot, nose or mouth), then climbs five tiers of the body toward the brain, and every body part brings its own hazard: mucus that makes you slide, saliva enzymes that chip away at you, capillaries too narrow to hide in.",
-        },
-        {
-          h: "The details that matter",
-          p: "The abilities come from real virology: glycoprotein shift, lytic burst, endocytosis hiding. Each one costs DNA and carries a trade-off, so no build cheeses the game. The HUD is an ECG that reacts to the host's vitals, the audio (12 SFX, 6 tracks) is generated procedurally, and memory fragments drop between levels to reveal exactly who you're killing.",
-        },
-        {
-          h: "Where it is now",
-          p: "The full loop plays end to end: intro, levels, fragments, both endings. The side-scroll rework is going in system by system, and each piece heads straight into playtest. The target is a 10-15 minute run worth replaying for the other ending.",
-        },
-      ],
-    },
-    "llm-fusebox": {
-      title: "fusebox",
-      subtitle: "A spend limit for LLM API calls",
-      imageAlt: "fusebox blocking a call that would exceed its budget",
-      meta: [
-        { k: "Role", v: "Design + build, solo" },
-        { k: "Stack", v: "Python · no runtime dependencies" },
-        { k: "Source", v: "github.com/yimwired/llm-fusebox" },
-        { k: "Status", v: "Published, MIT" },
-      ],
-      sections: [
-        {
-          h: "The problem",
-          p: "A runaway agent loop doesn't look like a bug while it runs. It looks like progress: tool call, tool result, tool call, tool result, each one billing a full context window, all night. You find out from the invoice. The usual defences don't catch it either — a provider-side cap is org-wide and arrives hours late, and a max_tokens ceiling bounds one response, not ten thousand of them.",
-        },
-        {
-          h: "The approach",
-          p: "fusebox is the small, boring piece that was missing: something that knows what the next call will cost and can say no. You declare fuses — fifty cents a call, five dollars a day — then check a call before making it and record what it actually cost. check raises and blocks; record never raises. Blocking belongs before the money moves, because once a response has arrived, throwing an error only discards an answer you already paid for.",
-        },
-        {
-          h: "The details that matter",
-          p: "Cached tokens bill at their own rates: a cache read costs a tenth of a normal input token, a cache write a quarter more. That is exactly where a naive input-plus-output estimate goes wrong, and it goes wrong on the long agent loops most likely to run away. Money is Decimal end to end, because sub-cent charges accumulate over thousands of calls. And no code path silently stops guarding — an unknown model id raises instead of pricing at zero, and an unreadable ledger raises instead of starting from zero. A spend cap that quietly lifts is worse than no cap at all.",
-        },
-        {
-          h: "Where it is now",
-          p: "Published under MIT: 96 tests, green on Python 3.9 through 3.13 across Linux and Windows, and nothing to install alongside it. It started as a night spent reading someone else's cost guard and asking what the general version would look like. The lesson that stuck is that the interesting part of running AI in production isn't the prompt. It's the failure states.",
-        },
-      ],
-    },
     "pet-travel": {
       title: "PET Travel",
       subtitle: "Tour booking for Phuket, on a codebase that had stopped running",
@@ -620,56 +673,148 @@ const th: typeof en = {
     toggleTheme: "สลับธีมมืดกับสว่าง",
   },
   hero: {
-    // Roman spelling on both sides: it is how the name appears on GitHub and
-    // in email, and a guessed Thai spelling of it would be worse than none.
-    name: "Nuttapon Yimnoi (ฟิล์ม)",
-    location: "กรุงเทพฯ",
     // The zero-width spaces are deliberate: they mark where a line may break
     // inside a Thai run, for engines with no Thai dictionary loaded.
-    headline: "ผมสร้าง​ระบบเทรด เอเจนต์ AI และ​เครื่องมือ​รอบๆ มัน",
-    sub: "ผลงาน {projects} ชิ้นที่ส่งแล้วและมีคนใช้จริง ทำเองคนเดียวทุกตัว ตั้งแต่สเก็ตช์แรกจนถึงวันที่มันทำงานเองตอนผมหลับ",
-    viewWork: "ดูผลงาน",
-    contact: "ทักมาคุยกัน",
+    headline: "ผมทำเว็บ​ที่กดเล่นได้จริง ลองก่อน​แล้วค่อยจ้าง",
+    note: {
+      wide: "การ์ดพวกนี้คือเว็บจริง ลองกดดูสักอัน",
+      narrow: "เว็บจริงทั้งนั้น แตะดูสักอัน",
+    },
+    sub: "ตัวอย่าง {labs} แบบ กดเล่นได้ทุกอัน ถูกใจแบบไหน ผมทำเป็นเว็บของคุณเองตั้งแต่ต้นจนจบ",
+    tryLabs: "ลองเล่นตัวอย่าง",
+    seePricing: "ดูราคา",
     facts: [
+      { value: "{labs}", label: "แบบให้ลองเล่น" },
+      { value: "{fromPrice}", label: "บาท ราคาเริ่มต้น" },
+      { value: "30", label: "วัน แก้ฟรีหลังเว็บขึ้น" },
       { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
-      { value: "12", label: "strategy engine ใน AURUM" },
-      { value: "11", label: "AI agent ในกองยาน" },
-      { value: "4", label: "แพลตฟอร์มที่โพสต์ขึ้น" },
     ],
+    scrollHint: "เลื่อนลง",
+  },
+  showcase: {
+    title: "ธุรกิจแบบไหน ก็มีเว็บ​ให้ลองแล้ว",
+    sub: "เลือกแบบที่ใกล้กับธุรกิจคุณที่สุด แต่ละแบบเปิดเป็นเว็บที่กดเล่นได้จริง พร้อมบอกแพ็กเกจที่ใช้ทำ",
+    tablistLabel: "ประเภทธุรกิจ",
+    categories: {
+      food: "ร้านอาหารและคาเฟ่",
+      tours: "ทัวร์และระบบจอง",
+      shops: "ร้านค้าออนไลน์",
+      events: "อีเวนต์และงานแต่ง",
+      premium: "สินค้าพรีเมียม",
+      studios: "สตูดิโอและคอร์สเรียน",
+    },
+    examplesCount: "ตัวอย่าง {count} แบบ",
+    exampleCount: "ตัวอย่าง 1 แบบ",
+    stats: {
+      from: "ราคาเริ่มต้น",
+      time: "ใช้เวลาทำ",
+      examples: "ตัวอย่างให้ลอง",
+    },
+    live: "ใช้งานได้",
+    examples: "ตัวอย่าง",
+    packages: "แพ็กเกจ",
+    openDemo: "เปิด {name}",
+    seeAll: "ดูครบ {labs} แบบใน The Lab",
+  },
+  pains: {
+    title: "จ้างทำเว็บ พังได้ 7 แบบ",
+    sub: "แต่ละข้อ ผมกันไว้แล้ว",
+    notesLabel: "เรื่องที่คนจ้างทำเว็บกังวลกันบ่อย พร้อมวิธีที่กันไว้",
+    notes: [
+      { worry: "โอนมัดจำไปแล้ว ติดต่อไม่ได้อีกเลย", answer: "จ่ายครึ่งเดียว อีกครึ่งวันเว็บขึ้น" },
+      { worry: "ทำไปครึ่งทาง ราคาขึ้นอีกเท่าตัว", answer: "ราคาแพ็กเกจตายตัว" },
+      { worry: "นึกภาพไม่ออก จนกว่าจะเห็นของจริง", answer: "ลองของจริงก่อนจ้าง" },
+      { worry: "ขอแก้นิดเดียว ก็คิดเงินเพิ่ม", answer: "รอบแก้รวมในราคาแล้ว" },
+      { worry: "ในคอมสวย เปิดในมือถือพัง", answer: "เช็คบนมือถือก่อนเว็บขึ้น" },
+      { worry: "เว็บล่ม แล้วจะโทรหาใคร", answer: "ทักผม แก้ฟรี 30 วัน" },
+      { worry: "หน้าตาเหมือนเทมเพลตร้านข้างๆ", answer: "ใช้คำและรูปของคุณเอง" },
+    ],
+  },
+  promise: {
+    title: { mark: "ลองก่อน", rest: " ตกลงราคา แล้วผมค่อยเริ่มทำ" },
+    steps: ["ลองก่อน", "ตกลงราคา", "ลงมือทำ"],
+    rows: {
+      tryFirst: {
+        title: { lead: "ลองเล่นก่อนได้", mark: "ฟรี", tail: " ทุกแบบ" },
+        body: "ทุกแบบเป็นเว็บที่ใช้งานได้จริง ลองจองทัวร์ ใส่ของลงตะกร้า ดูหน้าร้านบอกว่าตอนนี้เปิดหรือปิด แล้วค่อยตัดสินใจ",
+        from: "ตัวอย่าง {labs} แบบ",
+        to: "ลองได้ครบทุกแบบ",
+      },
+      fixedPrice: {
+        title: { lead: "ราคาตกลงกัน", mark: "ก่อนเริ่มงาน", tail: "" },
+        body: "แพ็กเกจราคาชัดเจน เริ่มต้น {fromPrice} บาท ตกลงกันไว้เท่าไหร่ ใบแจ้งหนี้ก็เท่านั้น",
+        quote: "ใบเสนอราคา",
+        tier: "แพ็กเกจ Standard",
+        deposit: "มัดจำ",
+        launch: "วันเว็บขึ้น",
+        paid: "จ่ายแล้ว",
+        due: "จ่ายวันเว็บขึ้น",
+      },
+      build: {
+        title: { lead: "ผมลงมือทำเอง ", mark: "จนเว็บขึ้น", tail: "" },
+        body: "ส่งข้อความกับรูปมา แก้ได้ตามรอบที่รวมในแพ็กเกจ ทุกหน้าเช็คบนมือถือก่อนขึ้นจริง อีกครึ่งจ่ายวันเว็บขึ้น หลังจากนั้นแก้ฟรีอีก 30 วัน",
+        checklist: [
+          "ข้อความกับรูปของคุณ",
+          "รอบแก้รวมในราคาแล้ว",
+          "เช็คบนมือถือก่อนขึ้น",
+          "ขึ้นเว็บ แล้วแก้ฟรี 30 วัน",
+        ],
+      },
+    },
+  },
+  platform: {
+    title: "ทุกอย่างตั้งแต่ทักมา จนเว็บขึ้น",
+    cells: {
+      design: {
+        title: { mark: "ออกแบบ", rest: "ให้ธุรกิจคุณ" },
+        body: "เริ่มจากตัวอย่างที่ชอบ แล้วปรับให้เป็นของคุณ ทั้งข้อความ รูป และภาษา จะไทย อังกฤษ หรือทั้งคู่ก็ได้",
+      },
+      live: {
+        title: { mark: "ขึ้นเว็บ", rest: "บนโดเมนของคุณ" },
+        body: "เปิดในมือถือได้ไว วัดผลจริง ไม่ได้แค่พูด เว็บนี้ได้คะแนนความเร็วจาก Lighthouse {performance} ขึ้นไป และการเข้าถึง {accessibility} เต็ม",
+        scores: {
+          performance: "ความเร็ว",
+          accessibility: "การเข้าถึง",
+          bestPractices: "แนวปฏิบัติที่ดี",
+          seo: "SEO",
+        },
+        caption: "วัดบนมือถือ ค่าต่ำสุดจาก {routes} หน้า",
+      },
+      yours: {
+        title: { mark: "เป็นของคุณ", rest: " รวมโค้ดทั้งหมด" },
+        body: "โค้ด โดเมน และโฮสติ้งอยู่ในชื่อคุณ จะเลิกจ้างเมื่อไหร่ ก็เอาไปได้ทั้งหมด",
+        owner: "เจ้าของ",
+        you: "คุณ",
+      },
+      fixes: {
+        title: { mark: "แก้ฟรี", rest: " 30 วันหลังเว็บขึ้น" },
+        body: "อะไรที่ไม่ตรงกับที่ตกลงกันไว้ แก้ให้ฟรีหนึ่งเดือนหลังเว็บขึ้น",
+        fixed: "แก้แล้ว",
+        tickets: [
+          "เมนูซ้อนกันบนมือถือจอเล็ก",
+          "ราคาลดไม่ขึ้นในหน้าสินค้า",
+          "หัวข้อภาษาไทยตัดกลางคำ",
+        ],
+      },
+    },
   },
   work: {
     label: "โปรเจกต์",
     title: "สร้างเสร็จ ส่งขึ้นใช้ และยังรันอยู่",
-    sub: "ทุกตัวใช้งานจริงทุกวัน ไม่ใช่ตัวอย่างโชว์ กดเข้าไปดูได้ว่าสร้างยังไงและทำอะไรได้บ้าง",
+    sub: "นอกจากเว็บ ผมสร้างระบบที่ใช้งานจริงทุกวันด้วย ไม่ใช่ตัวอย่างโชว์ กดเข้าไปดูได้ว่าสร้างยังไงและทำอะไรได้บ้าง",
     caseStudy: "ดูเบื้องหลัง",
-  },
-  lab: {
-    title: "{labs} แบบ สร้างขึ้นมาจริงทุกอัน",
-    sub: "ทุกอันเป็นเว็บที่ทำงานได้จริง ไม่ใช่ธีมที่เปลี่ยนแค่สี ตัวจองทัวร์คิดเงินได้จริง หน้าร้านอาหารรู้ว่าตอนนี้เปิดหรือปิด เลือกอันที่เข้ากับธุรกิจคุณ แล้วผมเอาเนื้อหาของคุณใส่ลงไปในแบบนั้น",
-    seeAll: "ดูครบ {count} แบบใน The Lab",
-    railEnd: "แบบให้เลือกดู",
-    proof: [
-      {
-        value: "41 ms",
-        label:
-          "ค่าหน่วงจริงของจอ e-ink ที่ Sable ทำซ้ำ รวมอาการกะพริบตอนรีเฟรชทั้งจอ",
-      },
-      {
-        value: "30%",
-        label:
-          "ค่ามัดจำที่ Longtail คิดให้สดๆ ตอนเพิ่มผู้ใหญ่ เด็ก และรถรับที่โรงแรม",
-      },
-      {
-        value: "3",
-        label: "อันที่เรนเดอร์ 3D สดในเบราว์เซอร์ ไม่ใช่วิดีโอที่อัดมา",
-      },
-    ],
   },
   about: {
     label: "เครื่องมือที่ใช้",
     title: "คนเดียว ครบทั้งกอง",
-    p1: "ผมชื่อฟิล์ม สร้างบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดทำโปรเจกต์แบบจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
-    p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นบอทเทรดหรือระบบทำวิดีโอสั้นก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
+    profile: "โปรไฟล์ของฟิล์ม",
+    // Roman spelling on both sides: it is how the name appears on GitHub and
+    // in email, and a guessed Thai spelling of it would be worse than none.
+    name: "Nuttapon Yimnoi",
+    nickname: "ฟิล์ม",
+    location: "กรุงเทพฯ",
+    p1: "ผมชื่อฟิล์ม รับทำเว็บไซต์ให้ธุรกิจ และสร้างระบบที่ใช้เองทุกวัน ทั้งบอทเทรด AI assistant dashboard และระบบผลิตคอนเทนต์ ถนัดจับเองทุกขั้น ตั้งแต่สเก็ตช์แรกยันวันที่ระบบรันอยู่บน production",
+    p2: "หลักทำงานเรียบง่าย คือส่งของให้ได้ก่อน เริ่มจากเล็ก ใช้ได้จริง แล้วค่อยขัดให้ดีขึ้นเรื่อยๆ จะเป็นเว็บร้านค้าหรือบอทเทรดก็เป้าเดียวกัน ทำให้เวิร์กก่อน แล้วค่อยทำให้เนี้ยบ",
     stats: [
       { value: "{projects}", label: "ผลงานที่ส่งแล้ว" },
       { value: "ทำเอง", label: "ออกแบบ สร้าง และดูแลต่อ" },
@@ -693,6 +838,13 @@ const th: typeof en = {
     sending: "กำลังส่ง",
     success: "ได้รับแล้ว อ่านเองทุกฉบับ เดี๋ยวตอบกลับจาก yimwired@gmail.com",
     error: "ส่งไม่ผ่าน ส่งเมลมาตรงๆ ได้เลย ถึงมือแน่นอน",
+    errors: {
+      name: "ใส่ชื่อก่อน จะได้รู้ว่าเรียกว่าอะไร",
+      email: "ใส่อีเมลไว้ ผมจะได้ตอบกลับ",
+      emailShape: "อีเมลนี้ดูยังไม่ครบ ลองเช็คอีกที",
+      message: "เล่าสั้นๆ สักบรรทัดก็พอ",
+    },
+    dismiss: "ปิด",
     copyEmail: "คัดลอกอีเมล",
     copied: "คัดลอกแล้ว",
   },
@@ -1014,64 +1166,6 @@ const th: typeof en = {
         {
           h: "สถานะตอนนี้",
           p: "ตอนนี้ AURUM รันครบวงจรบน MetaTrader 5 มี dashboard ไว้มอนิเตอร์สดๆ บทเรียนใหญ่สุดจากโปรเจกต์นี้คือ ส่วนที่ยากของบอทเทรดไม่ใช่ logic จุดเข้า แต่เป็นระบบคุมความเสี่ยง การรับมือตอนระบบสะดุด และการตอบให้ได้ทุกครั้งว่าบอททำอะไรลงไป เพราะอะไร",
-        },
-      ],
-    },
-    "you-are-the-virus": {
-      title: "You Are the Virus",
-      subtitle: "เกมที่ให้เล่นเป็นฝ่ายผู้ร้าย",
-      imageAlt: "ภาพในเกม You Are the Virus",
-      meta: [
-        { k: "บทบาท", v: "ออกแบบและสร้างเองทั้งหมด" },
-        { k: "Engine", v: "Godot 4 · GDScript" },
-        { k: "แนวเกม", v: "Side-scroll เอาตัวรอด" },
-        { k: "สถานะ", v: "อยู่ช่วง playtest" },
-      ],
-      sections: [
-        {
-          h: "ไอเดีย",
-          p: "เกมไวรัสส่วนใหญ่ให้เราถือวัคซีนไล่ล่า เกมนี้สลับข้าง ยื่นไวรัสให้เล่นเอง ล่องไปตามกระแสเลือดของโฮสต์ บุกเซลล์เก็บ DNA หลบเม็ดเลือดขาว แล้วกลายพันธุ์ให้แกร่งขึ้นเรื่อยๆ จนรู้ระหว่างทางว่าโฮสต์ที่บุกอยู่คือเด็กคนหนึ่ง ทุกรอบจบลงที่ทางเลือกเดิม กลายพันธุ์แล้วชนะ หรือสลายตัวเองเพื่อให้เด็กรอด",
-        },
-        {
-          h: "แนวทาง",
-          p: "หลอดเลือดเลื่อนผ่านจอไปเองตลอด แรงกดดันเลยไม่มีจังหวะให้พัก ทั้งเกมขับด้วยสามคำสั่ง บุก หลบ วิวัฒนาการ แต่ละรอบสุ่มจุดเริ่มจากปลายร่างกาย มือ เท้า จมูก หรือปาก แล้วไต่ขึ้นห้าชั้นไปหาสมอง อวัยวะแต่ละจุดมีกับดักของตัวเอง เมือกที่ทำให้ลื่นจนคุมตัวไม่อยู่ เอนไซม์ในน้ำลายที่กัดเลือดทีละนิด เส้นเลือดฝอยที่แคบจนไม่มีที่หลบ",
-        },
-        {
-          h: "รายละเอียดที่สำคัญจริง",
-          p: "ความสามารถทุกอย่างหยิบมาจากไวรัสวิทยาจริง ทั้ง glycoprotein shift, lytic burst และการซ่อนตัวแบบ endocytosis แต่ละอันมีราคาที่ต้องจ่ายกับข้อเสียของมันเอง จะได้ไม่มีสายไหนโกงเกมได้ HUD เป็นกราฟ ECG ที่เต้นตามสัญญาณชีพของโฮสต์ เสียงทั้งหมด 12 SFX กับเพลง 6 แทร็ก สร้างเองด้วย ffmpeg ส่วนเศษความทรงจำที่โผล่คั่นระหว่างด่าน ค่อยๆ เฉลยว่ากำลังฆ่าใครอยู่",
-        },
-        {
-          h: "สถานะตอนนี้",
-          p: "ตอนนี้เล่นได้ครบลูปแล้ว ตั้งแต่ฉากเปิด ผ่านด่าน เก็บเศษความทรงจำ ไปจนถึงตอนจบทั้งสองแบบ ที่เหลือคือรื้อระบบ side-scroll ทีละส่วน เสร็จส่วนไหนก็โยนเข้า playtest ทันที เป้าคือหนึ่งรอบจบใน 10-15 นาที และคุ้มพอให้กลับมาเล่นซ้ำเพื่อดูตอนจบอีกแบบ",
-        },
-      ],
-    },
-    "llm-fusebox": {
-      title: "fusebox",
-      subtitle: "ตัวกันงบสำหรับการเรียก LLM API",
-      imageAlt: "fusebox บล็อกการเรียกที่จะทำให้เกินงบ",
-      meta: [
-        { k: "บทบาท", v: "ออกแบบและสร้างเองทั้งหมด" },
-        { k: "Stack", v: "Python · ไม่มี dependency ตอนรัน" },
-        { k: "ซอร์ส", v: "github.com/yimwired/llm-fusebox" },
-        { k: "สถานะ", v: "เผยแพร่แล้ว (MIT)" },
-      ],
-      sections: [
-        {
-          h: "ปัญหา",
-          p: "agent loop ที่หลุดออกไปไม่ได้ดูเหมือนบั๊กตอนมันกำลังรัน มันดูเหมือนงานกำลังเดินหน้า เรียก tool ได้ผลลัพธ์ เรียกต่อ ได้ผลลัพธ์ วนแบบนี้ทั้งคืน โดยที่ทุกรอบจ่ายค่า context เต็มก้อน กว่าจะรู้ตัวก็ตอนบิลมาแล้ว ของที่มีอยู่ก็กันไม่ทัน เพราะ cap ฝั่งผู้ให้บริการคุมทั้งองค์กรและมาช้าเป็นชั่วโมง ส่วน max_tokens คุมได้แค่คำตอบเดียว ไม่ได้คุมหมื่นครั้ง",
-        },
-        {
-          h: "แนวทาง",
-          p: "fusebox คือชิ้นเล็กๆ ที่หายไป คืออะไรสักอย่างที่รู้ว่าการเรียกครั้งหน้าจะเสียเท่าไหร่ แล้วปฏิเสธเป็น วิธีใช้คือประกาศ fuse ไว้ก่อน เช่นครั้งละไม่เกินครึ่งดอลลาร์ วันละไม่เกินห้า แล้วเช็คก่อนยิงทุกครั้ง จากนั้นค่อยบันทึกว่าจ่ายจริงเท่าไหร่ ตัว check จะ raise แล้วบล็อกให้ ส่วน record ไม่ raise เลยสักครั้ง เพราะการบล็อกต้องเกิดก่อนเงินจะออก พอคำตอบกลับมาแล้วโยน error ทิ้งก็ได้แค่ทิ้งของที่จ่ายเงินไปแล้ว",
-        },
-        {
-          h: "รายละเอียดที่สำคัญจริง",
-          p: "token ที่มาจาก cache คิดคนละราคา อ่านจาก cache เหลือหนึ่งในสิบของ input ปกติ ส่วนเขียนลง cache แพงขึ้นอีกหนึ่งในสี่ ตรงนี้แหละที่การประเมินแบบเอา input บวก output พังหนักที่สุด และมันพังกับ agent loop ยาวๆ ซึ่งเป็นแบบที่เสี่ยงหลุดที่สุดพอดี ตัวเลขเงินใช้ Decimal ทั้งเส้นไม่แตะ float เพราะค่าใช้จ่ายระดับเศษสตางค์พอคูณเป็นพันครั้งแล้วมันเพี้ยน และไม่มีทางไหนที่ระบบจะเงียบๆ เลิกกันเงินให้ โมเดลที่ไม่รู้จักจะ raise ไม่ใช่คิดราคาเป็นศูนย์ ledger ที่อ่านไม่ได้ก็ raise ไม่ใช่เริ่มนับใหม่จากศูนย์ เพราะ cap ที่แอบหลุดไปเองแย่กว่าไม่มี cap เลย",
-        },
-        {
-          h: "สถานะตอนนี้",
-          p: "ปล่อยออกมาแล้วภายใต้ MIT มีเทส 96 ตัว ผ่านครบตั้งแต่ Python 3.9 ถึง 3.13 ทั้งบน Linux และ Windows และไม่ต้องลงอะไรเพิ่มเลยตอนรัน จุดเริ่มคือคืนหนึ่งที่นั่งอ่าน cost guard ของคนอื่นแล้วถามตัวเองว่าถ้าทำให้ใช้ได้ทั่วไปมันจะหน้าตาแบบไหน บทเรียนที่ติดมาคือ ส่วนที่น่าสนใจของการเอา AI ไปรันจริงไม่ใช่ prompt แต่เป็นตอนที่มันพัง",
         },
       ],
     },

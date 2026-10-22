@@ -10,7 +10,7 @@ export default function NotFound() {
   const { t } = useLocale();
 
   return (
-    <main className="relative flex min-h-[100svh] flex-col justify-center px-5 sm:px-8">
+    <main className="font-site relative flex min-h-[100svh] flex-col justify-center px-5 sm:px-8">
       <div className="absolute top-5 right-5 sm:top-6 sm:right-8">
         <LanguageSwitch />
       </div>

@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { IBM_Plex_Sans_Thai, Kanit } from "next/font/google";
 import { UmbraDemo } from "@/components/labs/umbra/umbra-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -27,6 +28,8 @@ export const metadata = pageMetadata({
     "Surrealism study: a composite studio whose scene is lit by real trigonometry. Move the sun and every shadow is redrawn from the angle. One object is cut from another photograph and kept its own light, and the page measures how far out it is. A fictional studio.",
   path: "/labs/umbra",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function UmbraPage() {
   return (

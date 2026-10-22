@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Grand_Hotel } from "next/font/google";
 import { ContourDemo } from "@/components/labs/contour-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -16,6 +17,8 @@ export const metadata = pageMetadata({
     "Beverage packaging study: one drink in three pack sizes, lathed in WebGL from published dimensions, with the labels painted in the browser. An unofficial concept.",
   path: "/labs/contour",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function ContourPage() {
   return (

@@ -57,6 +57,25 @@ export const pricingTiers: PricingTier[] = [
 
 export type PricingTierId = PricingTier["id"];
 
+/** A tier sold at a list price, which is every tier but Custom. */
+export type PricedTier = PricingTier & { price: string };
+
+export function isPriced(tier: PricingTier): tier is PricedTier {
+  return tier.price !== null;
+}
+
+/** The list price in baht as a number, for sums and comparisons. */
+export function priceValue(tier: PricedTier): number {
+  return Number(tier.price.replaceAll(",", ""));
+}
+
+/** A priced tier by id. Throws, because asking for one without a price is a build-time mistake. */
+export function pricedTier(id: PricingTierId): PricedTier {
+  const tier = pricingTiers.find((item) => item.id === id);
+  if (!tier || !isPriced(tier)) throw new Error(`No priced tier called "${id}"`);
+  return tier;
+}
+
 // ─────────────────────────────────────────────────────────────
 //  Monthly upkeep, sold after handover and always optional: the
 //  repository and the hosting are the client's either way, so a

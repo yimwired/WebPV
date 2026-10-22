@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Cormorant_Garamond } from "next/font/google";
 import { TrineDemo } from "@/components/labs/trine-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -14,6 +15,8 @@ export const metadata = pageMetadata({
     "Jewellery product study: a photographed hand with the ring rebuilt in WebGL, turnable by hand, and a metal picker that recolours it live.",
   path: "/labs/trine",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function TrinePage() {
   return (

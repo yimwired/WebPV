@@ -296,12 +296,13 @@ const probe = (page) =>
 
 
 /**
- * The site ships dark and remembers an explicit choice in localStorage, so the
- * light palette is only ever on screen for someone who asked for it. THEME=light
+ * The site ships light (dark until 2026-10-17) and remembers an explicit choice
+ * in localStorage, so the dark palette is only ever on screen for someone who
+ * asked for it. THEME=dark
  * seeds that choice before the first navigation, which is the only way to
  * measure the other half of the tokens.
  */
-const THEME = process.env.THEME === "light" ? "light" : "dark";
+const THEME = process.env.THEME === "dark" ? "dark" : "light";
 const seedTheme = (context) =>
   context.addInitScript((theme) => {
     try {
@@ -311,6 +312,13 @@ const seedTheme = (context) =>
     }
   }, THEME);
 
+/**
+ * Headless Chromium reports `prefers-reduced-transparency: reduce` by default,
+ * which turns the site's glass solid. Audit the glass a visitor actually sees;
+ * TRANSPARENCY=reduce audits the solid fallback. Same flag as shoot-contrast.
+ */
+const TRANSPARENCY = process.env.TRANSPARENCY === "reduce" ? "reduce" : "no-preference";
+
 const browser = await chromium.launch();
 const report = {};
 
@@ -319,6 +327,10 @@ for (const route of ROUTES) {
     const ctx = await browser.newContext({ viewport, locale: "en-US" });
     await seedTheme(ctx);
     const page = await ctx.newPage();
+    const cdp = await ctx.newCDPSession(page);
+    await cdp.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-transparency", value: TRANSPARENCY }],
+    });
     const errors = [];
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
     page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text().slice(0, 160)}`));

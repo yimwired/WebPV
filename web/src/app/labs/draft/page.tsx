@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Itim, Sarabun } from "next/font/google";
 import { DraftDemo } from "@/components/labs/draft/draft-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -27,6 +28,8 @@ export const metadata = pageMetadata({
     "Conceptual sketch study: an interior studio that publishes the working drawing instead of the render. Set your room's real dimensions and the plan redraws to scale, measures the walkway left between the furniture, and writes in the margin which piece does not fit and by how many centimetres. A fictional studio.",
   path: "/labs/draft",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function DraftPage() {
   return (

@@ -1,47 +1,113 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/lib/i18n";
+import { GlassLens, useSupportsLens } from "./glass";
 import { LanguageSwitch } from "./language-switch";
 import { ThemeToggle } from "./theme-toggle";
+
+/** Height in px, from the top of the viewport, of the pill's middle. */
+const NAV_LINE = 44;
+
+type Ground = "light" | "dark";
+
+/**
+ * The ground of the topmost zone crossing the navbar's line, or light where
+ * none does. The latest in document order is the one on top: it is either
+ * nested inside the others or painted after them.
+ */
+function topmostGround(crossing: Set<HTMLElement>): Ground {
+  let top: HTMLElement | undefined;
+  for (const zone of crossing) {
+    if (!top || top.compareDocumentPosition(zone) & Node.DOCUMENT_POSITION_FOLLOWING) top = zone;
+  }
+  return top?.dataset.navTone === "dark" ? "dark" : "light";
+}
+
+/**
+ * What the navbar is passing over. Sections that stay dark in either theme
+ * carry `data-nav-tone="dark"`; a pearl surface over one of them carries
+ * `data-nav-tone="light"`: the ledger sheet inside one, and the card that rises
+ * 160px into the section above it, which left the bar dark over white for as
+ * long as the overlap lasted. The observer's root is cut down to a one pixel
+ * band at the pill's height, so it reports exactly the zones crossing that
+ * line, with no scroll listener involved.
+ */
+function useGroundUnderNav(): Ground {
+  const [ground, setGround] = useState<Ground>("light");
+
+  useEffect(() => {
+    const zones = document.querySelectorAll<HTMLElement>("[data-nav-tone]");
+    if (zones.length === 0) return;
+
+    const crossing = new Set<HTMLElement>();
+    let observer: IntersectionObserver | undefined;
+    let frame = 0;
+
+    // The band is given in pixels from the bottom too, so it has to be
+    // rebuilt when the viewport changes height.
+    const watch = () => {
+      observer?.disconnect();
+      crossing.clear();
+      const below = Math.max(0, window.innerHeight - NAV_LINE - 1);
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const zone = entry.target as HTMLElement;
+            if (entry.isIntersecting) crossing.add(zone);
+            else crossing.delete(zone);
+          }
+          setGround(topmostGround(crossing));
+        },
+        { rootMargin: `-${NAV_LINE}px 0px -${below}px 0px` },
+      );
+      zones.forEach((zone) => observer?.observe(zone));
+    };
+
+    const onResize = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(watch);
+    };
+
+    watch();
+    window.addEventListener("resize", onResize);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  return ground;
+}
 
 export function Navbar() {
   const { t } = useLocale();
   const pathname = usePathname();
   const onHome = pathname === "/";
+  const ground = useGroundUnderNav();
+  const lens = useSupportsLens();
+  const bar = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // section anchors only exist on the home page, so they need it as a prefix
   // everywhere else
   const section = (hash: string) => (onHome ? hash : `/${hash}`);
 
+  // "Contact" is not in the list: the button beside it goes to the same
+  // place, and one destination should have one label.
   const links = [
     { href: section("#work"), label: t.nav.work },
     { href: "/services", label: t.nav.services },
     { href: "/pricing", label: t.nav.pricing },
     { href: section("#about"), label: t.nav.about },
     { href: "/labs", label: t.nav.labs },
-    { href: section("#contact"), label: t.nav.contact },
   ];
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.3,
-  });
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // while the sheet is open: Escape closes it and the page behind stays put
   useEffect(() => {
@@ -60,69 +126,82 @@ export function Navbar() {
     };
   }, [menuOpen]);
 
-  const linkClass =
-    "rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground";
-
   const renderLink = (
-    l: { href: string; label: string },
-    className: string
+    link: { href: string; label: string },
+    className: string,
   ) => {
-    const props = {
-      className,
-      onClick: () => setMenuOpen(false),
-    };
-    return l.href.startsWith("#") ? (
-      <a key={l.href} href={l.href} {...props}>
-        {l.label}
+    const props = { className, onClick: () => setMenuOpen(false) };
+    return link.href.startsWith("#") ? (
+      <a key={link.href} href={link.href} {...props}>
+        {link.label}
       </a>
     ) : (
-      <Link key={l.href} href={l.href} {...props}>
-        {l.label}
+      <Link key={link.href} href={link.href} {...props}>
+        {link.label}
       </Link>
     );
   };
 
   return (
+    // The header spans the window but only the pill and what opens from it are
+    // solid: the band above the pill and the sides beside it are empty, and
+    // would otherwise swallow every click and hover on the page passing under
+    // them. Each solid piece takes pointer events back.
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-200",
-        // fully opaque once you leave the hero: a translucent bar over a
-        // screenshot reads as a rendering glitch, not as depth
-        scrolled && "bg-background border-line border-b",
+        "pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4",
+        // Scopes the dark tokens to the bar while it crosses a dark section.
+        // That is the glass's adaptive layer: the same tokens retint it from
+        // ivory to deep blue, so its text never loses the ground under it.
+        ground === "dark" && "dark",
       )}
     >
-      {/* Six links and a CTA stand between the tab key and the page, on every
-          page. Visible only once focused; `not-sr-only` resets padding to 0, so
-          the visible sizing has to come back on the focus variant. */}
+      {/* Five links and a button stand between the tab key and the page, on
+          every page. Visible only once focused; `not-sr-only` resets padding
+          to 0, so the visible sizing has to come back on the focus variant. */}
       <a
         href="#main"
-        className="bg-surface border-line-control text-foreground sr-only rounded-md border text-sm focus:not-sr-only focus:absolute focus:top-3 focus:left-5 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:px-4"
+        className="bg-background border-line-control text-foreground pointer-events-auto sr-only rounded-full border text-sm focus:not-sr-only focus:absolute focus:top-4 focus:left-5 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:px-5"
       >
         {t.nav.skipToContent}
       </a>
 
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        {/* The wordmark is four characters, so its text box is 26x20 and misses
-            the 24px target floor. Padding gives it a real target and the
-            matching negative margin keeps the optical alignment with the page
-            gutter below it. */}
+      {/* The tint and the text swap in the same frame, with no fade. Fading
+          either one passes through a moment where ink and ground are nearly
+          the same colour: a 500ms fade on the ground alone left white text on
+          a still-white pill every time the bar crossed into a dark section.
+          Everything on the glass is in the foreground colour, never muted
+          grey: see the note on `.glass` in globals.css for the arithmetic. */}
+      <div
+        ref={bar}
+        data-lens={lens ? "" : undefined}
+        className="glass text-foreground pointer-events-auto mx-auto flex h-14 max-w-[1040px] items-center justify-between gap-3 rounded-full ps-5 pe-1.5 sm:h-16 sm:pe-2"
+      >
+        {/* The wordmark is three characters, so its text box misses the 24px
+            target floor. Padding gives it a real target and the matching
+            negative margin keeps it optically on the pill's inner edge. */}
         <a
           href={onHome ? "#top" : "/"}
-          className="text-foreground/90 hover:text-foreground -mx-2 -my-3 rounded-md px-2 py-3 text-sm font-medium tracking-tight transition-colors"
+          className="-mx-2 -my-3 rounded-full px-2 py-3 text-[17px] font-semibold tracking-tight"
         >
-          Film
+          Yim
         </a>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {links.map((l) => renderLink(l, linkClass))}
+        <nav className="hidden items-center gap-0.5 lg:flex">
+          {links.map((link) =>
+            renderLink(
+              link,
+              "text-foreground hover:bg-foreground/[0.07] rounded-full px-3.5 py-2 text-[15px] transition-colors",
+            ),
+          )}
         </nav>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <LanguageSwitch />
           <ThemeToggle />
           <a
             href={section("#contact")}
-            className="bg-foreground text-background hidden rounded-md px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90 md:inline-block"
+            className="bg-foreground text-background hidden h-11 items-center rounded-full px-5 text-[15px] font-medium transition-opacity hover:opacity-90 sm:h-12 lg:inline-flex"
           >
             {t.nav.cta}
           </a>
@@ -132,22 +211,18 @@ export function Navbar() {
             aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
-            className="border-line-strong text-foreground/80 hover:text-foreground grid h-9 w-9 place-items-center rounded-md border transition-colors md:hidden"
+            className="bg-foreground text-background grid h-11 w-11 place-items-center rounded-full transition-opacity hover:opacity-90 lg:hidden"
           >
             {menuOpen ? (
-              <X className="h-4.5 w-4.5" />
+              <X aria-hidden className="h-5 w-5" />
             ) : (
-              <Menu className="h-4.5 w-4.5" />
+              <Menu aria-hidden className="h-5 w-5" />
             )}
           </button>
         </div>
       </div>
 
-      {/* scroll progress */}
-      <motion.div
-        style={{ scaleX: progress }}
-        className="bg-brand h-px origin-left"
-      />
+      <GlassLens measure={bar} />
 
       <AnimatePresence>
         {menuOpen && (
@@ -158,27 +233,30 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              className="bg-background/95 fixed inset-0 -z-10 md:hidden"
+              className="bg-background/80 pointer-events-auto fixed inset-0 -z-10 lg:hidden"
             />
+            {/* Glass too, but dense and without the lens: the lens map is cut
+                to the bar's proportions, and this sheet sits over whole
+                paragraphs of page text rather than a band of pictures. */}
             <motion.nav
               key="sheet"
               id="mobile-nav"
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="bg-surface border-line mx-4 mt-2 flex flex-col gap-1 rounded-lg border p-3 md:hidden"
+              initial={{ opacity: 0, y: -12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="glass glass-dense text-foreground pointer-events-auto mx-auto mt-2 flex max-w-[1040px] origin-top flex-col gap-1 rounded-[28px] p-3 lg:hidden"
             >
-              {links.map((l) =>
+              {links.map((link) =>
                 renderLink(
-                  l,
-                  "rounded-md px-4 py-3 text-base text-foreground/80 transition-colors hover:text-foreground",
+                  link,
+                  "text-foreground hover:bg-foreground/[0.07] rounded-2xl px-4 py-3 text-lg transition-colors",
                 ),
               )}
               <a
                 href={section("#contact")}
                 onClick={() => setMenuOpen(false)}
-                className="bg-foreground text-background mt-1 rounded-md px-4 py-3 text-center text-base font-medium"
+                className="bg-foreground text-background mt-2 flex h-12 items-center justify-center rounded-full text-base font-medium"
               >
                 {t.nav.cta}
               </a>

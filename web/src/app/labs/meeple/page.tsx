@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { K2D, Silkscreen } from "next/font/google";
 import { MeepleDemo } from "@/components/labs/meeple/meeple-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -29,6 +30,8 @@ export const metadata = pageMetadata({
     "Pixel art style study for a board game cafe: answer the three questions the staff ask and the shelf splits into what you can actually play tonight and what you cannot, with the reason on every box.",
   path: "/labs/meeple",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function MeeplePage() {
   return (

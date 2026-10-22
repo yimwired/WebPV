@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { IBM_Plex_Sans_Thai } from "next/font/google";
 import { PrismDemo } from "@/components/labs/prism/prism-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -19,6 +20,8 @@ export const metadata = pageMetadata({
     "Glass study: refraction at the rim, a chromatic fringe, a specular edge and a sheet that flips mode to keep its text readable. Switch each layer off and see what it was doing.",
   path: "/labs/prism",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function PrismPage() {
   return (

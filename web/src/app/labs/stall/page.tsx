@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { StallDemo } from "@/components/labs/stall-demo";
 import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
@@ -8,6 +9,8 @@ export const metadata = pageMetadata({
     "Marketplace style study: accounts, listings, search and filters, with the seller messaged directly and no money held by the site.",
   path: "/labs/stall",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function StallPage() {
   return (

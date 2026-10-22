@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Trirong } from "next/font/google";
 import { LoomDemo } from "@/components/labs/loom/loom-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -20,6 +21,8 @@ export const metadata = pageMetadata({
     "Bohemian style study for a three-room guesthouse: pick your nights and the panel prices them direct and through a booking agent side by side, so the commission the owner pays is finally a number the guest can see.",
   path: "/labs/loom",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function LoomPage() {
   return (

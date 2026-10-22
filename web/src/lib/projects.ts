@@ -44,25 +44,10 @@ export const STATUS_LABEL: Record<ProjectStatus, string> = {
   paused: "Paused",
 };
 
+// You Are the Virus (a browser game) and fusebox (a Python library) were
+// taken off on Film's call, 2026-10-22: the site sells websites and they are
+// neither. Their entries and case studies are in git history.
 export const projects: Project[] = [
-  {
-    id: "you-are-the-virus",
-    name: "You Are the Virus",
-    tagline: "Infect, mutate, survive",
-    description:
-      "A browser game where you play as a virus. Infect a host's cells, spend evolution points to mutate new abilities, and spread while the host's vitals fight back.",
-    category: "Game",
-    tags: ["Game", "Strategy", "Bio-sim", "Web"],
-    status: "active",
-    href: "/work/you-are-the-virus",
-    accent: "#34d399", // emerald
-    image: "/projects/you-are-the-virus.webp",
-    th: {
-      tagline: "แพร่เชื้อ กลายพันธุ์ เอาตัวรอด",
-      description:
-        "เกมบนเบราว์เซอร์ที่ได้สวมบทเป็นไวรัส บุกยึดเซลล์ของโฮสต์ เก็บแต้มวิวัฒนาการไว้ปลดล็อกการกลายพันธุ์ใหม่ แล้วรีบแพร่เชื้อให้ทั่ว ก่อนภูมิคุ้มกันจะไล่ทัน",
-    },
-  },
   {
     id: "aurum",
     name: "AURUM",
@@ -80,23 +65,6 @@ export const projects: Project[] = [
       tagline: "เทอร์มินัลเทรดทองอัตโนมัติ XAU/USD",
       description:
         "บอทเทรดทองบน MT5 ที่รันจริงอยู่ตอนนี้ ใช้ 12 strategy engines สแกนตามจังหวะแต่ละ session คุมความเสี่ยงแบบ real-time พร้อม trade tape และ kill switch ทำเองครบทั้งระบบ",
-    },
-  },
-  {
-    id: "llm-fusebox",
-    name: "fusebox",
-    tagline: "A spend limit for LLM API calls",
-    description:
-      "An open-source Python library that prices an LLM call before you make it, blocks it if it would blow the budget, and keeps a ledger of what was really spent. No runtime dependencies, 96 tests.",
-    category: "Open source",
-    tags: ["Python", "LLM", "Cost control", "Library"],
-    status: "live",
-    href: "/work/llm-fusebox",
-    accent: "#fb7185", // rose — a blown fuse
-    th: {
-      tagline: "ตัวกันงบสำหรับการเรียก LLM API",
-      description:
-        "ไลบรารี Python โอเพนซอร์สที่คิดราคาให้ก่อนยิง LLM ถ้าเกินงบก็บล็อกไว้เลย แล้วจดไว้ว่าจ่ายจริงไปเท่าไหร่ ไม่มี dependency ตอนรัน มีเทส 96 ตัว",
     },
   },
   {

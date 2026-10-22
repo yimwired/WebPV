@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { MinimalDemo } from "@/components/labs/minimal-demo";
 import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
@@ -8,6 +9,8 @@ export const metadata = pageMetadata({
     "Swiss minimal style study: white space, strict grid, one red accent.",
   path: "/labs/minimal",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function MinimalPage() {
   return (

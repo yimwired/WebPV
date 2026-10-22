@@ -3,6 +3,10 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* The visitor's theme, as opposed to `dark:`, which a dark section also
+   triggers. The theme toggle's icon has to say which theme is on, not which
+   section the navbar happens to be passing over. */
+@custom-variant theme-dark (&:is(html.dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -13,9 +17,14 @@
   --color-line-strong: var(--line-strong);
   --color-line-control: var(--line-control);
   --color-surface: var(--surface);
+  --color-zone-dark: var(--zone-dark);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  /* The site's own pages set these on a wrapper (see `.font-site` below). The
+     labs keep --font-sans: several of them inherit it and are not ours to restyle. */
+  --font-site: var(--font-site);
+  --font-hand: var(--font-hand);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -54,28 +63,53 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+/* ── Palette ────────────────────────────────────────────────────────────────
+   Midnight blue and pearl white, with gold as the one accent. Film asked for
+   deep blue and ivory (2026-10-18), then found that build one-toned and asked
+   for something richer that contrasts the way the earlier white and navy did
+   (2026-10-22): the page, its wells and the accent had all been the same warm
+   yellow. Now the grounds are close to neutral, the blue goes deeper, and gold
+   is the only warm colour on the page, so it reads as metal rather than as
+   more of the paper. Whole sections can be set in midnight (`.dark` on a
+   section scopes these tokens to it), which is also the ground of the dark
+   theme. Chroma stays at 0.13 or under everywhere: what reads as expensive
+   here is restraint, not saturation. Every ratio below was computed from the
+   painted colour, alpha composited in sRGB over the ground it is quoted
+   against, the way the browser composites it.
+
+   `.paper` is the light palette again, for a sheet that stays white inside a
+   dark section (the ledger of worries, the drawings in the platform panels):
+   their text keeps the ratios below instead of inheriting midnight's. */
+:root,
+.paper {
+  /* Native controls and scrollbars follow the page; `.dark` flips it back. */
+  color-scheme: light;
+
+  /* #FAF9F7 pearl. White with the faintest warmth, so pure white cards still
+     lift off it and the gold stays the only warm thing on the page. */
+  --background: oklch(0.982 0.003 95);
+  /* #0D162C, a midnight blue near enough to black to carry body text: 17.1:1
+     on the page, 18.0:1 on --card, 15.9:1 on --surface. */
+  --foreground: oklch(0.205 0.045 265);
+  /* #FFFFFF, one step lighter than the page, for cards that float on it. */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.205 0.045 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  /* One step darker than the shadcn default: at 0.556 this lands on 4.4:1
-     over --surface, the ground under the featured pricing card. 4.6:1
-     there now, 5.0:1 on the page. */
-  --muted-foreground: oklch(0.545 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.205 0.045 265);
+  --primary: oklch(0.205 0.045 265);
+  --primary-foreground: oklch(0.982 0.003 95);
+  --secondary: oklch(0.958 0.007 258);
+  --secondary-foreground: oklch(0.205 0.045 265);
+  --muted: oklch(0.958 0.007 258);
+  /* #535D6E. 6.32:1 on the page, 6.65:1 on --card, 5.87:1 on --surface. */
+  --muted-foreground: oklch(0.475 0.03 262);
+  --accent: oklch(0.958 0.007 258);
+  --accent-foreground: oklch(0.205 0.045 265);
+  /* #A8321F, for form errors. 6.35:1 on the page, 5.91:1 on --surface. */
+  --destructive: oklch(0.493 0.157 31.8);
+  --border: oklch(0.205 0.045 265 / 11%);
+  --input: oklch(0.205 0.045 265 / 20%);
+  --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -83,34 +117,35 @@
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
 
-  /* Single accent, used for state and emphasis only. Amber rather than a
-     blue-violet gradient: the site should read like an instrument panel,
-     not a launch page.
-
-     Same hue as the dark theme, three steps darker, because the two are
-     measured against opposite grounds. The dark value carried over here
-     unchanged for a while and sat at 2.05:1 on white, which made every piece
-     of --brand text unreadable and the focus ring invisible. At this
-     lightness: 5.2:1 on the page, 4.9:1 on --surface, and 5.2:1 as a focus
-     ring, against the 4.5 and 3.0 those two jobs ask for. */
-  --brand: oklch(0.54 0.12 66);
-  --line: oklch(0.145 0 0 / 12%);
-  --line-strong: oklch(0.145 0 0 / 22%);
+  /* #8C6522 old gold. Gold itself is under 2:1 on white, so on the light
+     ground the accent is the darkest gold that still reads as metal: 4.99:1
+     on the page, 5.25:1 on --card, 4.64:1 on --surface, against the 4.5 text
+     asks for and the 3.0 a focus ring needs. Next to neutral white it reads
+     as gold; the brass before it, on ivory, read as brown. */
+  --brand: oklch(0.535 0.096 77);
+  --line: oklch(0.205 0.045 265 / 11%);
+  --line-strong: oklch(0.205 0.045 265 / 20%);
   /* Only for a boundary that IDENTIFIES a control (input, select, textarea).
-     WCAG 1.4.11 wants 3:1 there, and --line-strong is 1.7:1 -- fine as a
-     decorative rule, invisible as the edge of a text field. 3.22:1 over
-     --surface. Do not use it for decorative hairlines. */
-  --line-control: oklch(0.145 0 0 / 46%);
-  --surface: oklch(0.975 0 0);
+     WCAG 1.4.11 wants 3:1 there, and --line-strong is 1.5:1: fine as a
+     decorative rule, invisible as the edge of a text field. 3.4:1 on the
+     page, 3.3:1 on --surface. Do not use it for decorative hairlines. */
+  --line-control: oklch(0.205 0.045 265 / 50%);
+  /* #EEF1F6, a cool mist: wells, chips and form fields. Cool on purpose, so
+     the light sections carry some of the blue instead of a second warm tone. */
+  --surface: oklch(0.958 0.007 258);
+  /* Midnight, the ground of the dark sections, as a plain colour that does not
+     change with the theme: for the ground showing around a card that does.
+     Same value as --background in .dark. */
+  --zone-dark: oklch(0.215 0.058 266);
 
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.205 0.045 265);
+  --sidebar-primary: oklch(0.205 0.045 265);
+  --sidebar-primary-foreground: oklch(0.982 0.003 95);
+  --sidebar-accent: oklch(0.958 0.007 258);
+  --sidebar-accent-foreground: oklch(0.205 0.045 265);
+  --sidebar-border: oklch(0.205 0.045 265 / 11%);
+  --sidebar-ring: var(--brand);
 }
 
 .dark {
@@ -119,51 +154,105 @@
      it they stay light and read as a rendering bug on a dark page. */
   color-scheme: dark;
 
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  /* #0D1734 midnight. Chroma 0.058: plainly blue rather than a blue-tinted
+     grey, and darker than the #0B1F44 it replaces, which is where the depth
+     comes from. */
+  --background: oklch(0.215 0.058 266);
+  /* The pearl of the light page, a shade warmer: 16.3:1 here, 14.1:1 on
+     --surface. */
+  --foreground: oklch(0.972 0.006 92);
+  /* #172446, one step up from the page. */
+  --card: oklch(0.27 0.066 266);
+  --card-foreground: oklch(0.972 0.006 92);
+  --popover: oklch(0.27 0.066 266);
+  --popover-foreground: oklch(0.972 0.006 92);
+  --primary: oklch(0.972 0.006 92);
+  --primary-foreground: oklch(0.215 0.058 266);
+  --secondary: oklch(0.27 0.066 266);
+  --secondary-foreground: oklch(0.972 0.006 92);
+  --muted: oklch(0.27 0.066 266);
+  /* #AAB6CD. 8.65:1 on the page, 7.47:1 on --surface. */
+  --muted-foreground: oklch(0.775 0.035 262);
+  --accent: oklch(0.27 0.066 266);
+  --accent-foreground: oklch(0.972 0.006 92);
+  /* #FF9E8A. 8.84:1 on the page, 7.63:1 on --surface. */
+  --destructive: oklch(0.793 0.12 32.4);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: var(--brand);
 
-  /* The light theme uses the same hue at oklch(0.54 0.12 66); see the note in
-     :root for why the two lightnesses differ. 9.6:1 here. */
-  --brand: oklch(0.78 0.13 66);
-  --line: oklch(1 0 0 / 9%);
+  /* #E3BD70 champagne. On midnight the accent can be gold proper: 9.90:1 on
+     the page, 8.55:1 on --surface. See :root for why the light value is
+     darker. */
+  --brand: oklch(0.815 0.105 84);
+  --line: oklch(1 0 0 / 10%);
   --line-strong: oklch(1 0 0 / 18%);
-  /* See the note in :root. 3.21:1 over --surface, 3.41:1 over --background. */
-  --line-control: oklch(1 0 0 / 35%);
-  /* Opaque, one step above the page. Panels are lifted by tone, not by
-     blurring whatever happens to be behind them. */
-  --surface: oklch(0.185 0 0);
+  /* See the note in :root. Pearl at 40%: 3.6:1 on the page, 3.5:1 on
+     --surface. */
+  --line-control: oklch(0.972 0.006 92 / 40%);
+  /* Opaque, one step above the page. Panels are lifted by tone; the two
+     glass pieces (navbar, form messages) are the only translucent surfaces. */
+  --surface: oklch(0.27 0.066 266);
 
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.27 0.066 266);
+  --sidebar-foreground: oklch(0.972 0.006 92);
   /* shadcn ships a blue-violet here (oklch(0.488 0.243 264.376)). Removed: the
-     site has one accent and it is amber. Nothing consumes it -- no sidebar
-     component exists -- so this falls back to the neutral :root value. */
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+     site has one accent and it is gold. Nothing consumes it -- no sidebar
+     component exists -- so this falls back to the :root value. */
+  --sidebar-primary-foreground: oklch(0.972 0.006 92);
+  --sidebar-accent: oklch(0.27 0.066 266);
+  --sidebar-accent-foreground: oklch(0.972 0.006 92);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: var(--brand);
+}
+
+/* In the dark theme the whole page is already midnight, so a section that is
+   dark on purpose would disappear into it and the page would read as one
+   tone, which is what Film saw in the ivory build. Those sections go a step
+   deeper instead (#060D22): their pearl sheets and the cards rising over them
+   keep the rhythm the light theme gets from pearl against midnight. Text only
+   gains here: pearl 17.8:1, muted 9.5:1, champagne 10.8:1. */
+html.dark {
+  --zone-dark: oklch(0.165 0.045 266);
+}
+
+html.dark .dark {
+  --background: oklch(0.165 0.045 266);
+}
+
+/* A lab paints its own ground and says which way it goes in its page.tsx, as
+   `viewport.colorScheme`, which Next writes as <meta name="color-scheme">. The
+   page around the demo follows that rather than the site theme: the root's
+   background fills the scrollbar's track and the gap an overscroll opens, its
+   color-scheme styles native controls, and the body's ink is what a lab
+   inherits wherever it sets none. Without this a dark lab under the light
+   default had a pearl stripe for a scrollbar and white date pickers, and a
+   light lab in the dark theme the reverse.
+
+   Plain neutrals rather than the site's tokens: the labs never use the
+   palette, and most dark ones are painted near black, not midnight. These
+   stay separate rules on purpose: listed beside `:root` or `.dark`, the
+   build folds them into one :is() that takes the :has() selector's weight,
+   and that weight beat `html.dark .dark` across the whole site. */
+:root:has(meta[name="color-scheme"][content="dark"]) {
+  color-scheme: dark;
+  --background: oklch(0.16 0.006 270);
+  --foreground: oklch(0.97 0 0);
+  --line-strong: oklch(1 0 0 / 18%);
+  --line-control: oklch(1 0 0 / 40%);
+}
+
+:root:has(meta[name="color-scheme"][content="light"]) {
+  color-scheme: light;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.2 0 0);
+  --line-strong: oklch(0 0 0 / 18%);
+  --line-control: oklch(0 0 0 / 40%);
 }
 
 @layer base {
@@ -197,7 +286,9 @@
   }
 }
 
-/* Thin, premium scrollbar */
+/* Thin scrollbar. The thumb takes the hairline tokens so it shows on either
+   ground: it was white at 12% when the site was dark-only, which made it
+   invisible on the light page. */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -206,13 +297,13 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(1 0 0 / 12%);
+  background: var(--line-strong);
   border-radius: 9999px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(1 0 0 / 22%);
+  background: var(--line-control);
   background-clip: padding-box;
 }
 
@@ -286,3 +377,287 @@
    coordinates: custom properties set on <html> never reach this pseudo tree, so
    a keyframe reading var(--theme-x) would quietly open the wipe from the wrong
    place. The toggle also skips the transition entirely under reduce motion. */
+
+/* ── Home page ─────────────────────────────────────────────────────────────
+   The pieces of the home page that are easier to say in CSS than in Motion:
+   they either have to run before hydration, or they are triggered by a
+   `data-shown` attribute that <Sweep> sets once in view. The reduced-motion
+   block above already collapses every one of them to its end state. */
+
+/* Handwriting writes itself in: a clip opening left to right, which reads as
+   a pen moving. CSS rather than Motion so the hero's margin note runs from
+   the first paint, like the headline it annotates. The insets reach past the
+   box because handwriting overhangs its own line. */
+@keyframes hand-write {
+  from {
+    clip-path: inset(-30% 100% -40% -8%);
+  }
+  to {
+    clip-path: inset(-30% -8% -40% -8%);
+  }
+}
+
+.hand-write {
+  display: inline-block;
+  animation: hand-write 0.9s cubic-bezier(0.45, 0, 0.15, 1) 0.6s both;
+}
+
+/* The demos beside the headline drift upward without end, faded until a
+   pointer finds one (Film's idea, 2026-10-22, in place of cards scattered at
+   angles round the headline). A lane holds its cards twice and slides by
+   exactly one set, so the loop has no seam; each card carries its own bottom
+   spacing instead of the lane having a `gap`, which would leave the two sets
+   half a gap out of step. Hovering a lane stops it, so a moving card can still
+   be clicked. Under reduced motion the shared rule above ends the animation
+   at once and the lanes rest where they started. */
+@keyframes drift-up {
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+.drift-track {
+  animation: drift-up 80s linear infinite;
+}
+
+.drift-lane:hover .drift-track {
+  animation-play-state: paused;
+}
+
+.drift-card {
+  opacity: var(--drift-rest, 0.42);
+  transition: opacity 0.3s ease-out;
+}
+
+.drift-card:hover {
+  opacity: 1;
+}
+
+/* Lanes rise out of the page and sink back into it, rather than being cut by
+   the edges of the hero. */
+.drift-fade {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+}
+
+@keyframes drift-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.drift-in {
+  animation: drift-in 1.2s ease-out 0.2s both;
+}
+
+/* Key words are gilded once they are on screen: the ink slides off and a
+   gold leaf with a lighter band across its middle slides on. One metal, not
+   a rainbow. Each stop clears 4.5:1 on the ground it is used on: the light
+   theme's deep and bright gold are 6.57 and 4.99:1 on the page (6.11 and
+   4.64 on --surface), the dark theme's champagne 7.28 and 12.93:1 on
+   midnight. */
+:root {
+  --sweep-1: oklch(0.47 0.085 74);
+  --sweep-2: var(--brand);
+  --sweep-3: oklch(0.47 0.085 74);
+}
+
+.dark {
+  --sweep-1: oklch(0.73 0.115 80);
+  --sweep-2: oklch(0.895 0.085 90);
+  --sweep-3: oklch(0.73 0.115 80);
+}
+
+/* The gradient is three words wide and starts parked on its plain first
+   third; sliding it to the middle third brings the metal across the word. */
+.sweep {
+  background-image: linear-gradient(
+    90deg,
+    var(--foreground) 0% 30%,
+    var(--sweep-1) 36%,
+    var(--sweep-2) 51%,
+    var(--sweep-3) 66% 100%
+  );
+  background-size: 300% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.sweep[data-shown] {
+  animation: sweep 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+@keyframes sweep {
+  to {
+    background-position: 50% 0;
+  }
+}
+
+/* A gold pen stroke through a line of text, slightly uneven the way a ruler
+   is never quite used. Pains grows the background-size from 0% to cross a
+   worry out; `clone` gives every wrapped line its own stroke. The colour is
+   the light theme's gold, fixed, because it only ever sits on `.paper`. */
+.strike {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 12' preserveAspectRatio='none'%3E%3Cpath d='M2 7C70 4 150 8 222 5C252 4 280 5 298 6' fill='none' stroke='%238C6522' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 100% 0.5em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Drafting paper: a fine blue grid under the illustrations, the way a plan is
+   drawn before anything is built. The panels carry their own paper colour
+   inline; this only adds the rule lines, at 7% ink so they read as texture
+   and never compete with what is drawn on them. */
+.blueprint {
+  background-image:
+    linear-gradient(oklch(0.205 0.045 265 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.205 0.045 265 / 7%) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: -1px -1px;
+}
+
+/* The lift every floating card on the home page shares, cast in the ink's
+   own blue rather than grey. */
+.shadow-float {
+  box-shadow:
+    0 1px 2px oklch(0.205 0.045 265 / 6%),
+    0 14px 32px -10px oklch(0.205 0.045 265 / 24%);
+}
+
+/* ── Glass ─────────────────────────────────────────────────────────────────
+   Film asked for the navbar and the form messages to be glass, the way
+   iPhone's are (2026-10-18). Those two pieces only: everywhere else panels
+   are still lifted by tone. The standard is REACTBITS.md's, four layers:
+
+   1. refraction  the backdrop bends at the rim (`[data-lens]`, see glass.tsx)
+   2. fringe      each colour channel bends a little differently at that rim
+   3. specular    a hairline highlight round the edge, brightest at the top
+   4. adaptive    the tint flips with the ground: pearl over light sections,
+                  midnight over dark ones, because `.dark` swaps these tokens
+
+   The tint is opaque enough to be solved against the worst backdrop rather
+   than the usual one. Alpha composites in sRGB, so pearl at 72% over black
+   still lands at (180, 179, 178): 8.6:1 for the ink, and only 3.2:1 for
+   --muted-foreground, which is why nothing on the glass is set in muted
+   grey. Midnight at 78% over the white panels in the dark sections leaves
+   pearl text at 8.1:1 or better. */
+:root {
+  --glass-tint: oklch(0.982 0.003 95 / 72%);
+  --glass-sheen: oklch(1 0 0 / 22%);
+  --glass-rim: oklch(1 0 0 / 90%);
+  --glass-rim-soft: oklch(1 0 0 / 22%);
+  --glass-shade: oklch(0.205 0.045 265 / 9%);
+  --glass-shadow:
+    0 1px 2px oklch(0.205 0.045 265 / 6%),
+    0 12px 32px -14px oklch(0.205 0.045 265 / 34%);
+  /* what the glass falls back to when it cannot or should not be seen through */
+  --glass-solid: var(--card);
+}
+
+.dark {
+  --glass-tint: oklch(0.215 0.058 266 / 78%);
+  --glass-sheen: oklch(1 0 0 / 5%);
+  --glass-rim: oklch(1 0 0 / 34%);
+  --glass-rim-soft: oklch(1 0 0 / 7%);
+  --glass-shade: oklch(0 0 0 / 22%);
+  --glass-shadow:
+    0 1px 2px oklch(0 0 0 / 28%),
+    0 16px 36px -14px oklch(0 0 0 / 55%);
+  --glass-solid: var(--surface);
+}
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 60%), var(--glass-tint);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow:
+    inset 0 -1px 0 var(--glass-shade),
+    var(--glass-shadow);
+}
+
+/* Chromium only, and only once glass.tsx has confirmed the browser paints an
+   SVG filter as a backdrop: Firefox and Safari parse `url()` here and then
+   draw nothing through it, which is worse than plain blur. Nothing follows
+   the `url()`: a blur written after it was not applied, so the frost is inside
+   the filter and the saturation boost comes first. */
+.glass[data-lens] {
+  backdrop-filter: saturate(1.5) url(#site-lens);
+}
+
+/* The specular rim: a one pixel ring cut out of a vertical gradient, so the
+   top edge catches the light and the sides fade before the bottom picks up a
+   fainter reflection. A ring rather than a border, because a border would
+   take the gradient across the whole face. */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--glass-rim),
+    var(--glass-rim-soft) 38%,
+    var(--glass-rim-soft) 72%,
+    color-mix(in oklab, var(--glass-rim) 60%, transparent)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+/* A denser sheet for glass that carries a list of links, like the phone menu:
+   it sits over whole paragraphs of page text, not over a band of cards. */
+.glass-dense {
+  --glass-tint: oklch(0.982 0.003 95 / 90%);
+}
+
+.dark .glass-dense,
+.glass-dense.dark {
+  --glass-tint: oklch(0.215 0.058 266 / 92%);
+}
+
+/* Messages that something needs fixing carry a warm cast, so they read as a
+   warning before they are read at all. A field's message sits on the form's
+   own card, where --destructive measures 5.9:1 on the light plate and 6.9:1
+   on the dark one. The toast floats over anything, so its text stays in the
+   foreground colour and only its icon takes the warning colour. */
+.glass-warn {
+  --glass-tint: oklch(0.955 0.03 40 / 82%);
+}
+
+.dark .glass-warn {
+  --glass-tint: oklch(0.32 0.075 30 / 82%);
+}
+
+/* No transparency for anyone who asked the system for less of it, or for a
+   browser that cannot blur what is behind: the same piece, solid. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass[data-lens] {
+    background: var(--glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-solid);
+  }
+}
