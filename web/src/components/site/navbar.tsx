@@ -126,9 +126,13 @@ export function Navbar() {
   };
 
   return (
+    // The header spans the window but only the pill and what opens from it are
+    // solid: the band above the pill and the sides beside it are empty, and
+    // would otherwise swallow every click and hover on the page passing under
+    // them. Each solid piece takes pointer events back.
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4",
+        "pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4",
         // Scopes the dark tokens to the bar while it crosses a dark section.
         // That is the glass's adaptive layer: the same tokens retint it from
         // ivory to deep blue, so its text never loses the ground under it.
@@ -140,7 +144,7 @@ export function Navbar() {
           to 0, so the visible sizing has to come back on the focus variant. */}
       <a
         href="#main"
-        className="bg-background border-line-control text-foreground sr-only rounded-full border text-sm focus:not-sr-only focus:absolute focus:top-4 focus:left-5 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:px-5"
+        className="bg-background border-line-control text-foreground pointer-events-auto sr-only rounded-full border text-sm focus:not-sr-only focus:absolute focus:top-4 focus:left-5 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:px-5"
       >
         {t.nav.skipToContent}
       </a>
@@ -154,7 +158,7 @@ export function Navbar() {
       <div
         ref={bar}
         data-lens={lens ? "" : undefined}
-        className="glass text-foreground mx-auto flex h-14 max-w-[1040px] items-center justify-between gap-3 rounded-full ps-5 pe-1.5 sm:h-16 sm:pe-2"
+        className="glass text-foreground pointer-events-auto mx-auto flex h-14 max-w-[1040px] items-center justify-between gap-3 rounded-full ps-5 pe-1.5 sm:h-16 sm:pe-2"
       >
         {/* The wordmark is three characters, so its text box misses the 24px
             target floor. Padding gives it a real target and the matching
@@ -212,7 +216,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
-              className="bg-background/80 fixed inset-0 -z-10 lg:hidden"
+              className="bg-background/80 pointer-events-auto fixed inset-0 -z-10 lg:hidden"
             />
             {/* Glass too, but dense and without the lens: the lens map is cut
                 to the bar's proportions, and this sheet sits over whole
@@ -224,7 +228,7 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.98 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="glass glass-dense text-foreground mx-auto mt-2 flex max-w-[1040px] origin-top flex-col gap-1 rounded-[28px] p-3 lg:hidden"
+              className="glass glass-dense text-foreground pointer-events-auto mx-auto mt-2 flex max-w-[1040px] origin-top flex-col gap-1 rounded-[28px] p-3 lg:hidden"
             >
               {links.map((link) =>
                 renderLink(
