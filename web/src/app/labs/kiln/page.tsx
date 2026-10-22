@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { IBM_Plex_Sans_Thai, Maitree } from "next/font/google";
 import { KilnDemo } from "@/components/labs/kiln/kiln-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -28,6 +29,8 @@ export const metadata = pageMetadata({
     "Wabi-sabi style study for a one-off ceramics studio: the flaws on each piece are marked on the photograph and explained, because a handmade shop sells the thing a factory would reject.",
   path: "/labs/kiln",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function KilnPage() {
   return (

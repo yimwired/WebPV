@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Charm, Maitree } from "next/font/google";
 import { PasteDemo } from "@/components/labs/paste/paste-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -30,6 +31,8 @@ export const metadata = pageMetadata({
     "Scrapbook style study: a wedding invitation made of taped-down instant photos and ruled paper, doing the one thing a paper invitation cannot. Type your name and it tells you your table.",
   path: "/labs/paste",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function PastePage() {
   return (

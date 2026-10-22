@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { VisionDemo } from "@/components/labs/vision-demo";
 import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
@@ -8,6 +9,8 @@ export const metadata = pageMetadata({
     "Cinematic spatial style study: pure black, scroll-driven statements, floating glass windows.",
   path: "/labs/vision",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function VisionPage() {
   return (

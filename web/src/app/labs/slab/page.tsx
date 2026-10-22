@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Kanit } from "next/font/google";
 import { SlabDemo } from "@/components/labs/slab/slab-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -19,6 +20,8 @@ export const metadata = pageMetadata({
     "Neo-brutalist style study: hard borders, flat offset shadows, controls that land on their own shadow, and a palette the visitor can repaint from the top bar.",
   path: "/labs/slab",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function SlabPage() {
   return (

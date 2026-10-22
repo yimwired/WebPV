@@ -80,8 +80,16 @@
    `.paper` is the light palette again, for a sheet that stays white inside a
    dark section (the ledger of worries, the drawings in the platform panels):
    their text keeps the ratios below instead of inheriting midnight's. */
+/* A lab paints its own ground and says so in its page.tsx, as
+   `viewport.colorScheme`, which Next writes as <meta name="color-scheme">. The
+   page around the demo follows that meta rather than the site theme: the
+   root's background is what fills the scrollbar's track and the gap an
+   overscroll opens, and its color-scheme styles the native controls. Without
+   it a dark lab under the light default had a pearl stripe for a scrollbar
+   and white date pickers, and a light one in the dark theme the reverse. */
 :root,
-.paper {
+.paper,
+:root:has(meta[name="color-scheme"][content="light"]) {
   /* Native controls and scrollbars follow the page; `.dark` flips it back. */
   color-scheme: light;
 
@@ -148,7 +156,8 @@
   --sidebar-ring: var(--brand);
 }
 
-.dark {
+.dark,
+:root:has(meta[name="color-scheme"][content="dark"]) {
   /* Tells the browser to render its own chrome dark too: scrollbars, the
      autofill background on the contact form, and native form controls. Without
      it they stay light and read as a rendering bug on a dark page. */

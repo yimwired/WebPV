@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Playfair_Display } from "next/font/google";
 import { LuxeDemo } from "@/components/labs/luxe-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -14,6 +15,8 @@ export const metadata = pageMetadata({
     "Luxury editorial style study: ivory paper, serif headlines, hairline gold rules.",
   path: "/labs/luxe",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function LuxePage() {
   return (

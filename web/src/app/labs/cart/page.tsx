@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Kanit } from "next/font/google";
 import { CartDemo } from "@/components/labs/cart-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -19,6 +20,8 @@ export const metadata = pageMetadata({
     "Single product style study: off-black retail, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it.",
   path: "/labs/cart",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function CartPage() {
   return (

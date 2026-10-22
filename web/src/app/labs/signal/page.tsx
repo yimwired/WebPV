@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { SignalDemo } from "@/components/labs/signal-demo";
 import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
@@ -8,6 +9,8 @@ export const metadata = pageMetadata({
     "Instrumentation style study: a working oscilloscope whose readout is measured off the trace, not printed beside it.",
   path: "/labs/signal",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function SignalPage() {
   return (

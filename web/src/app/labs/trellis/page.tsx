@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Anuphan, Instrument_Serif, Mali } from "next/font/google";
 import { TrellisDemo } from "@/components/labs/trellis/trellis-demo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
@@ -39,6 +40,8 @@ export const metadata = pageMetadata({
     "Type a word and a garden grows out of its letters. Vines coil around the strokes, in front of one and behind the next, roses settle on their tops, and backspace withers them. Thai works too, tone marks kept clear. Ten palettes, a Poster mode, PNG and SVG export, and a link that regrows the same garden.",
   path: "/labs/trellis",
 });
+
+export const viewport: Viewport = { colorScheme: "dark" };
 
 export default function TrellisPage() {
   return (

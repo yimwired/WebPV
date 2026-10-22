@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Anton, Kanit } from "next/font/google";
 import { EmberDemo } from "@/components/labs/ember/ember-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -26,6 +27,8 @@ export const metadata = pageMetadata({
     "Thai charcoal grill buffet style study: a loud chain brand page with floating product cards, a scroll-parallax hero and a dialog that grows out of the card you pressed.",
   path: "/labs/ember",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function EmberPage() {
   return (

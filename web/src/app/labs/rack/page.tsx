@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Chakra_Petch } from "next/font/google";
 import { RackDemo } from "@/components/labs/rack/rack-demo";
 import { pageMetadata } from "@/lib/seo";
@@ -21,6 +22,8 @@ export const metadata = pageMetadata({
     "Y2K style study for a second-hand clothing shop: every piece is the only one of itself and its label means nothing, so the rail asks for your own chest measurement and answers with what fits, what does not, and by how many inches.",
   path: "/labs/rack",
 });
+
+export const viewport: Viewport = { colorScheme: "light" };
 
 export default function RackPage() {
   return (
