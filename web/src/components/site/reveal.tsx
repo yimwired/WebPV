@@ -40,7 +40,9 @@ export function Reveal({
       className={className}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
+      // Top and bottom only: side margins would hide anything narrow near
+      // the edge of a phone's screen for good.
+      viewport={{ once: true, margin: "-80px 0px" }}
       transition={{ duration: 0.5, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
       variants={variants}
     >

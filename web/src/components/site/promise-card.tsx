@@ -3,16 +3,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useInView,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Check, ChevronRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
-import { prefersReducedMotion } from "@/lib/reduced-motion";
 import { labCardSrc } from "@/lib/lab-images";
 import { pricedTier, priceValue } from "@/lib/pricing";
 import { resolvedCategories } from "@/lib/showcase";
@@ -21,7 +14,11 @@ import { cn } from "@/lib/utils";
 import { Sweep } from "./marks";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const once = { once: true, margin: "-80px" } as const;
+// Top and bottom only. A margin on the sides too cut a phone's screen down to
+// its middle, and the ticks and the bar near the left edge never entered it,
+// so on a phone they stayed invisible.
+const inViewMargin = "-80px 0px";
+const once = { once: true, margin: inViewMargin } as const;
 
 // The quote in the second step is the real Standard package, split the way
 // /pricing says Standard is paid: half to start, half on launch day.
@@ -39,7 +36,7 @@ function TryArt() {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const frame = useRef<HTMLDivElement>(null);
-  const inView = useInView(frame, { margin: "-80px" });
+  const inView = useInView(frame, { margin: inViewMargin });
   const tabs = resolvedCategories.slice(0, 3).map((category) => category.labs[0]);
   const [active, setActive] = useState(0);
 
@@ -273,32 +270,19 @@ function StepLink({ href, children }: { href: string; children: ReactNode }) {
 /**
  * The card that rises over the ledger of worries and lays out the heading's
  * three steps side by side. It starts a little narrower than the screen, so
- * the ground shows round it, and widens to the full width as it comes up.
+ * the ground shows round it, and widens to the full width as it comes up:
+ * `.promise-rise` in globals.css, driven by the scroll itself.
  */
 export function PromiseCard() {
   const { t } = useLocale();
-  const card = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: card,
-    offset: ["start end", "start 0.15"],
-  });
-  // Under reduced motion the card rests at full width with its corners.
-  const scale = useTransform(scrollYProgress, (progress) =>
-    prefersReducedMotion() ? 1 : 0.94 + 0.06 * progress,
-  );
-  const radius = useTransform(scrollYProgress, (progress) =>
-    prefersReducedMotion() || progress < 0.7 ? 32 : 32 * ((1 - progress) / 0.3),
-  );
   const rows = t.promise.rows;
   const [tryLabel, priceLabel, buildLabel] = t.promise.steps;
 
   return (
     <section aria-labelledby="promise-title" className="bg-zone-dark">
-      <motion.div
-        ref={card}
+      <div
         data-nav-tone="light"
-        style={{ scale, borderRadius: radius }}
-        className="bg-card text-card-foreground relative z-10 -mt-28 origin-top rounded-[32px] px-5 pt-20 pb-16 sm:-mt-40 sm:px-10 sm:pt-28 sm:pb-24"
+        className="promise-rise bg-card text-card-foreground relative z-10 -mt-28 origin-top rounded-[32px] px-5 pt-20 pb-16 sm:-mt-40 sm:px-10 sm:pt-28 sm:pb-24"
       >
         {/* The whole process in three steps, the first one gilded: it is the
             step nobody else offers. The columns below take them in order. */}
@@ -336,7 +320,7 @@ export function PromiseCard() {
             link={<StepLink href="#contact">{t.nav.cta}</StepLink>}
           />
         </ol>
-      </motion.div>
+      </div>
     </section>
   );
 }

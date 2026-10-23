@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useScroll, useTransform, type Variants } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { ArrowDown, ChevronsDown, ReceiptText } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { useLocale } from "@/lib/i18n";
@@ -50,10 +50,6 @@ export function Hero() {
   const { locale, t } = useLocale();
   const isThai = locale === "th";
   const wrap = (text: string) => (isThai ? thaiWrap(text) : text);
-  // The hint has done its job once the page moves: it fades out over the
-  // first 160px of scroll instead of riding up past the cards.
-  const { scrollY } = useScroll();
-  const hintOpacity = useTransform(scrollY, [0, 160], [1, 0]);
 
   return (
     <section id="top" className="relative isolate overflow-hidden">
@@ -158,14 +154,16 @@ export function Hero() {
 
       <HeroDrift />
 
-      <motion.p
+      {/* The hint has done its job once the page moves: `.scroll-hint` fades
+          it out over the first 160px of scroll instead of letting it ride up
+          past the cards. */}
+      <p
         aria-hidden
-        style={{ opacity: hintOpacity }}
-        className="text-muted-foreground absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-sm lg:flex"
+        className="scroll-hint text-muted-foreground absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-sm lg:flex"
       >
         {t.hero.scrollHint}
         <ChevronsDown className="h-4 w-4" />
-      </motion.p>
+      </p>
     </section>
   );
 }

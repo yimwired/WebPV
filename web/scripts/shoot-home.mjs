@@ -1,11 +1,12 @@
 // Checks small behaviours on the home page that no other script covers:
 // the hero's "Scroll down" hint fades out over the first 160px of scroll and
-// comes back at the top (components/site/hero.tsx); switching language while
-// the ledger of worries is on screen writes the ledger out again, rows and
-// crossings, instead of swapping in text that never animated
-// (components/site/pains.tsx); and the navbar (components/site/navbar.tsx)
-// takes the tone of the topmost ground under its line, pearl sheets inside a
-// dark section included, while its empty edges let the page take the pointer.
+// comes back at the top (`.scroll-hint` in globals.css); switching language
+// while the ledger of worries is on screen writes the ledger out again, rows
+// and crossings, instead of swapping in text that never animated
+// (components/site/pains.tsx); the navbar (components/site/navbar.tsx) takes
+// the tone of the topmost ground under its line, pearl sheets inside a dark
+// section included, while its empty edges let the page take the pointer; and
+// on a phone, everything that animates in has arrived once scrolled past.
 //
 // The ledger is keyed by locale, so a switch mounts a fresh list that is
 // already in view. The way that fails is a list that mounts hidden and stays
@@ -16,7 +17,7 @@
 //
 //   node web/scripts/shoot-home.mjs        from the repo root, export served
 //   SHOOT_URL=http://127.0.0.1:8788        where the export is served
-import { chromium } from "playwright";
+import { chromium, devices } from "playwright";
 import { mkdirSync } from "node:fs";
 
 const BASE = process.env.SHOOT_URL || "http://127.0.0.1:8788";
@@ -25,7 +26,7 @@ mkdirSync(OUT, { recursive: true });
 
 const HINT = "#top > p[aria-hidden]";
 const LEDGER = 'section[aria-labelledby="pains-title"] ol';
-// hero.tsx maps scrollY 0..160 onto the hint's opacity 1..0.
+// `.scroll-hint` in globals.css maps scrollY 0..160 onto the hint's opacity 1..0.
 const HINT_FADE_PX = 160;
 
 const browser = await chromium.launch();
@@ -38,9 +39,9 @@ const check = (ok, label, detail) =>
 const refused = [];
 const REFUSED = /ERR_NETWORK_ACCESS_DENIED/;
 
-async function open(reducedMotion) {
+async function open(reducedMotion, device = { viewport: { width: 1440, height: 900 } }) {
   const context = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
+    ...device,
     reducedMotion,
     // This machine's Chrome reports Thai; every run starts in English.
     locale: "en-US",
@@ -260,6 +261,47 @@ for (const reducedMotion of ["no-preference", "reduce"]) {
   );
   check(onLink === "Pricing", "the pill's links still take the pointer", onLink);
   check(errors.length === 0, "no page errors", errors.slice(0, 2).join(" | "));
+  await context.close();
+}
+
+// --- Entrances on a phone ----------------------------------------------------
+
+// What animates in when scrolled to starts invisible. On a phone two sets of
+// ticks never arrived: their trigger's margin cut the sides off the screen as
+// well as the top and bottom, and the ticks by the left edge never entered
+// what was left. After a walk to the bottom, nothing laid out within the
+// screen's width may still be held at opacity 0 by an entrance.
+{
+  const { context, page, errors } = await open("no-preference", devices["Pixel 7"]);
+  await page.waitForTimeout(1000);
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  for (let y = 0; y < height; y += 300) {
+    await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+    await page.waitForTimeout(200);
+  }
+  // The last entrances begin at the bottom and take about two seconds.
+  await page.waitForTimeout(2500);
+  const stuck = await page.evaluate(() =>
+    [...document.querySelectorAll("[style*='opacity']")]
+      .filter((element) => element.style.opacity === "0" && !element.closest(".drift-track"))
+      .filter((element) => {
+        // Not laid out (the hint below lg), or off to the side in a row that
+        // scrolls sideways: neither is the visitor's to see yet.
+        const box = element.getBoundingClientRect();
+        return element.getClientRects().length > 0 && box.right > 0 && box.left < window.innerWidth;
+      })
+      .map((element) => `${element.tagName.toLowerCase()}.${String(element.className).split(" ").slice(0, 3).join(".")}`),
+  );
+  check(stuck.length === 0, "phone: every entrance has arrived after a scroll to the bottom", stuck.slice(0, 4).join(", ") || "none left hidden");
+  // The quote's deposit bar grows in width rather than fading in, so the
+  // opacity sweep above cannot see it; it sat empty on a phone for the same
+  // reason as the ticks.
+  const deposit = await page.evaluate(() => {
+    const bar = document.querySelector('section[aria-labelledby="promise-title"] [class~="h-1.5"] > div');
+    return bar ? bar.getBoundingClientRect().width / bar.parentElement.getBoundingClientRect().width : null;
+  });
+  check(deposit !== null && Math.abs(deposit - 0.5) < 0.02, "phone: the deposit bar fills to half", deposit?.toFixed(2));
+  check(errors.length === 0, "phone: no page errors", errors.slice(0, 2).join(" | "));
   await context.close();
 }
 
