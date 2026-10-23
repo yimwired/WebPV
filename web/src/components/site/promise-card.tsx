@@ -7,7 +7,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Check, ChevronRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { labCardSrc } from "@/lib/lab-images";
-import { pricedTier, priceValue } from "@/lib/pricing";
+import { currentPriceValue, pricedTier } from "@/lib/pricing";
 import { resolvedCategories } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -20,9 +20,10 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const inViewMargin = "-80px 0px";
 const once = { once: true, margin: inViewMargin } as const;
 
-// The quote in the second step is the real Standard package, split the way
-// /pricing says Standard is paid: half to start, half on launch day.
-const standardTotal = priceValue(pricedTier("standard"));
+// The quote in the second step is the real Standard package at the price
+// /pricing charges today, split the way it says Standard is paid: half to
+// start, half on launch day.
+const standardTotal = currentPriceValue(pricedTier("standard"));
 const formatBaht = (amount: number) => `฿${amount.toLocaleString("en-US")}`;
 
 const TAB_INTERVAL_MS = 2600;

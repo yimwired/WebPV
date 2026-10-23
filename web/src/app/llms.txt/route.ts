@@ -8,6 +8,7 @@
 
 import { caseStudySlugs, dictionary } from "@/lib/dictionary";
 import { labs } from "@/lib/labs";
+import { isPriced, pricingTiers } from "@/lib/pricing";
 import { projects } from "@/lib/projects";
 import { CONTACT_EMAIL, PROFILES, SITE_URL } from "@/lib/site";
 
@@ -42,7 +43,7 @@ Languages: English and Thai, every page in both.
 
 ${line("Home", "/", `Overview, the ${projects.length} projects, background and contact.`)}
 ${line("Services", "/services", "What Film takes on: websites and landing pages, automation and bots, dashboards and internal tools, and AI wired into real workflows.")}
-${line("Pricing", "/pricing", "Fixed prices for three website packages plus a quoted tier. Automation, dashboards and AI are quoted per project.")}
+${line("Pricing", "/pricing", `Fixed prices for ${pricingTiers.filter(isPriced).length} website packages plus a quoted tier. Automation, dashboards and AI are quoted per project.`)}
 
 ## Case studies
 

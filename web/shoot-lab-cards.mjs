@@ -8,12 +8,12 @@
 // next build or the export fails with EBUSY on web/out.
 //
 // Re-run after changing any demo's look, and after changing `lib/projects.ts`:
-// five of these demos render the project list, so adding a project silently
-// dates their cards.
+// five of these demos render the project list (dimension, luxe, minimal,
+// space, vision), so adding or removing a project silently dates their cards.
 import { chromium } from "playwright";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, readFile, writeFile, unlink } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile, unlink } from "node:fs/promises";
 import { promisify } from "node:util";
 
 const run = promisify(execFile);
@@ -130,10 +130,15 @@ const unique = [...new Set(slugs)];
 console.log(`${unique.length} labs: ${unique.join(", ")}`);
 
 // ONLY=playroom,cart reshoots just those, for when one demo changed and the
-// rest are already correct. The hashes below are still read off every file on
-// disk, so the manifest stays complete either way.
+// rest are already correct. It also takes an archived demo, which is off the
+// gallery but whose card a package on /pricing may still show (luxe is
+// Business's). The hashes below are read off every file on disk, so the
+// manifest stays complete either way.
 const only = process.env.ONLY?.split(",").map((s) => s.trim());
-const targets = only ? unique.filter((slug) => only.includes(slug)) : unique;
+const targets = only ?? unique;
+for (const slug of only ?? []) {
+  if (!unique.includes(slug)) console.log(`  ${slug} is not in the gallery; shooting its route anyway`);
+}
 
 for (const slug of targets) {
   // `load`, not `networkidle`. Every page carries the switcher, which
@@ -191,9 +196,12 @@ await browser.close();
 // reshoot is invisible to anyone who has already loaded the gallery. Writing a
 // content hash beside them lets the gallery ask for the new bytes by URL,
 // which is the only thing a browser reliably notices.
+// Every card on disk, archived ones included: those still appear on /pricing
+// and in the home page's package rows.
+const onDisk = (await readdir(OUT)).filter((file) => file.endsWith(".webp")).map((file) => file.slice(0, -5));
 const hashes = Object.fromEntries(
   await Promise.all(
-    unique.map(async (slug) => [
+    onDisk.map(async (slug) => [
       slug,
       createHash("sha1")
         .update(await readFile(`${OUT}/${slug}.webp`))

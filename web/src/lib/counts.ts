@@ -6,15 +6,16 @@
 // ─────────────────────────────────────────────────────────────
 
 import { labs } from "./labs";
-import { isPriced, priceValue, pricingTiers } from "./pricing";
+import { currentPriceValue, isPriced, pricingTiers } from "./pricing";
 import { projects } from "./projects";
 
 /**
- * The cheapest package at its list price. The launch discount is left out on
- * purpose: it covers three projects and then ends, and a figure quoted on the
- * home page should still be true the day after it does.
+ * The cheapest package at today's price, the same figure /pricing leads
+ * with. It used to be the list price, so the home page's "4,900 to start"
+ * met a ฿3,400 Quick page on /pricing. When the launch offer is switched
+ * off in pricing.ts, this goes back to the list price in the same build.
  */
-const fromPrice = Math.min(...pricingTiers.filter(isPriced).map(priceValue)).toLocaleString("en-US");
+const fromPrice = Math.min(...pricingTiers.filter(isPriced).map(currentPriceValue)).toLocaleString("en-US");
 
 export function withCounts(copy: string): string {
   return copy

@@ -1,44 +1,22 @@
 "use client";
 
 import { useRef, useState, type KeyboardEvent } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
-import { labBestFor, labKind, type Lab } from "@/lib/labs";
+import { labBestFor, labKind } from "@/lib/labs";
 import { labCardSrc, labStillSrc } from "@/lib/lab-images";
+import { currentPrice, onLaunchPrice } from "@/lib/pricing";
 import { resolvedCategories, type ResolvedCategory } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
 import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
+import { LabPicture } from "./lab-picture";
 import { Reveal } from "./reveal";
+import { SpecRows } from "./spec-rows";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-
-/** A lab's picture on its own preview gradient, so nothing flashes white while it loads. */
-function LabPicture({
-  lab,
-  src,
-  sizes,
-  className,
-}: {
-  lab: Lab;
-  src: string;
-  sizes: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn("relative overflow-hidden", className)}
-      style={{
-        background: `linear-gradient(135deg, ${lab.preview.from}, ${lab.preview.to})`,
-      }}
-    >
-      <Image src={src} alt="" fill sizes={sizes} className="object-cover object-top" />
-    </div>
-  );
-}
 
 /**
  * One kind of business, laid out as a spec sheet: the lead example large, what
@@ -53,7 +31,7 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
   const count = category.labs.length;
 
   const specs = [
-    { label: t.showcase.stats.from, value: `฿${cheapest.price}` },
+    { label: t.showcase.stats.from, value: `฿${currentPrice(cheapest)}` },
     { label: t.showcase.stats.time, value: t.pricing.tiers[cheapest.id].timeline },
     { label: t.showcase.stats.examples, value: String(count) },
   ];
@@ -118,22 +96,7 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
             {labBestFor(lead, locale)}
           </p>
 
-          {/* Leaders only, no rule under each row: with both, every row carried two
-              kinds of line, the faint dots read as scratches, and the last rule sat
-              over the next block's as if a row were missing. The dots stand on the
-              baseline, where a parts list puts them, rather than through the words. */}
-          <dl className="border-line mt-6 border-t pt-2">
-            {specs.map((spec) => (
-              <div key={spec.label} className="flex items-baseline gap-3 py-2.5">
-                <dt className="text-muted-foreground shrink-0 text-[14px]">{spec.label}</dt>
-                <span
-                  aria-hidden
-                  className="border-line-strong min-w-4 flex-1 border-b-2 border-dotted"
-                />
-                <dd className="shrink-0 text-[15px] font-medium tabular-nums">{spec.value}</dd>
-              </div>
-            ))}
-          </dl>
+          <SpecRows specs={specs} className="border-line mt-6 border-t pt-2" />
         </div>
       </div>
 
@@ -192,8 +155,15 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
                   <p className="text-[17px] leading-tight font-medium">
                     {t.pricing.tiers[tier.id].name}
                   </p>
+                  {/* Today's price, as /pricing quotes it, with the list price
+                      struck beside it while the launch offer runs. */}
                   <p className="mt-1 text-[14px]">
-                    ฿{tier.price}
+                    <span className="tabular-nums">฿{currentPrice(tier)}</span>
+                    {onLaunchPrice(tier) && (
+                      <s className="text-muted-foreground ms-1.5 text-[13px] tabular-nums">
+                        <span className="sr-only">{t.pricing.regularPrice} </span>฿{tier.price}
+                      </s>
+                    )}
                     <span className="text-muted-foreground">
                       {" "}
                       · {t.pricing.tiers[tier.id].timeline}
