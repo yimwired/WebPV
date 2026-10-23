@@ -21,6 +21,10 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+// Node 22.18+ strips the types itself, so the prices come from the module the
+// site renders them from. Regenerate the kit whenever `introOffer` flips.
+import { currentPrice, currentPriceValue, isPriced, onLaunchPrice, pricedTier, pricingTiers } from "../src/lib/pricing.ts";
+
 const BASE = process.env.SHOOT_URL ?? "http://127.0.0.1:8788";
 const OUT = "fastwork-covers/profile";
 const ONLY = process.env.ONLY?.split(",").map((part) => part.trim());
@@ -33,15 +37,9 @@ const LAB_COUNT = (
   labsSource.slice(0, labsSource.indexOf("export const archivedLabs")).match(/^\s+slug: "/gm) ?? []
 ).length;
 
-// Only the packages: the care plans below them in the same file are monthly.
-const pricingSource = readFileSync("web/src/lib/pricing.ts", "utf8");
-const tiersSource = pricingSource.slice(
-  pricingSource.indexOf("export const pricingTiers"),
-  pricingSource.indexOf("];", pricingSource.indexOf("export const pricingTiers")),
-);
-const FROM_PRICE = Math.min(
-  ...[...tiersSource.matchAll(/\bprice: "([\d,]+)"/g)].map((m) => Number(m[1].replaceAll(",", ""))),
-).toLocaleString("en-US");
+// Only the packages: the care plans in the same file are monthly. Today's
+// price, the one the site quotes, never the list price beside it.
+const FROM_PRICE = Math.min(...pricingTiers.filter(isPriced).map(currentPriceValue)).toLocaleString("en-US");
 
 // ── Type: fetched once, then inlined ────────────────────────────────────────
 // Geist is the site's own face. Thai on the site falls back to whatever the
@@ -171,7 +169,7 @@ const SERVICES = [
   {
     file: "service-1-quick.jpg",
     label: "แพ็ก 1 · Quick page",
-    price: "4,900",
+    tier: pricedTier("quick"),
     title: "เว็บหน้าเดียว ส่งใน 3 วัน",
     lines: ["ใช้หน้าตาจากตัวอย่างที่เลือก ใส่ข้อความกับรูปของคุณ", "แก้ได้ 1 รอบ · แก้บั๊กฟรี 30 วัน"],
     slug: "counter",
@@ -179,7 +177,7 @@ const SERVICES = [
   {
     file: "service-2-business.jpg",
     label: "แพ็ก 2 · Business",
-    price: "14,900",
+    tier: pricedTier("business"),
     title: "เว็บธุรกิจ 4 ถึง 6 หน้า",
     lines: ["ออกแบบแยกทีละหน้า ไทยและอังกฤษ", "ราว 10 วัน · แก้ได้ 2 รอบ"],
     slug: "ember",
@@ -187,7 +185,7 @@ const SERVICES = [
   {
     file: "service-3-standard.jpg",
     label: "แพ็ก 3 · Standard",
-    price: "24,900",
+    tier: pricedTier("standard"),
     title: "เว็บที่ขายของได้ ไม่เกิน 8 หน้า",
     lines: ["ปรับสไตล์ให้เข้ากับแบรนด์ แก้ข้อความเองได้", "ราว 2 สัปดาห์ · แก้ได้ 3 รอบ"],
     slug: "longtail",
@@ -195,14 +193,19 @@ const SERVICES = [
   {
     file: "service-4-signature.jpg",
     label: "Signature",
-    price: "49,900",
+    tier: pricedTier("signature"),
     title: "เว็บ 3D และ motion ทำใหม่ให้เฉพาะคุณ",
     lines: ["WebGL, configurator หรือ motion ที่เขียนขึ้นใหม่", "3 ถึง 5 สัปดาห์ · แก้ได้ 3 รอบ"],
     slug: "thock",
   },
 ];
 
+// While the launch offer runs the list price stays beside it struck through,
+// as on /pricing, so the cover and the page it links to read the same.
 function serviceHtml(service) {
+  const listPrice = onLaunchPrice(service.tier)
+    ? `<s class="num" style="font-size:60px;color:var(--muted)">${service.tier.price}</s>`
+    : "";
   return `
 <div style="position:relative;width:1400px;height:1400px;overflow:hidden;background:var(--background)">
   <div style="position:absolute;left:110px;right:110px;top:196px">
@@ -210,8 +213,9 @@ function serviceHtml(service) {
       <span class="dot" style="width:12px;height:12px"></span><span class="th" style="font-family:'Geist Mono','Noto Sans Thai',monospace">${service.label}</span>
     </p>
     <div style="margin-top:34px;display:flex;align-items:baseline;gap:26px">
-      <span class="num" style="font-size:236px;font-weight:600;line-height:0.9">${service.price}</span>
+      <span class="num" style="font-size:236px;font-weight:600;line-height:0.9">${currentPrice(service.tier)}</span>
       <span class="th" style="font-size:60px;color:var(--muted)">บาท</span>
+      ${listPrice}
     </div>
     <h2 class="th" style="margin-top:46px;font-size:64px;font-weight:600;line-height:1.2">${service.title}</h2>
     <div class="th" style="margin-top:22px;font-size:34px;line-height:1.55;color:var(--muted)">
