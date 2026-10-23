@@ -212,7 +212,15 @@ const en = {
   },
   services: {
     title: "What I can build for you",
-    sub: "Same approach as everything above: designed, built and shipped by one person who has to live with the result.",
+    sub: "Designed, built and shipped by one person who has to live with the result.",
+    // The hero's plate of the four kinds of work, each a link to its section.
+    indexLabel: "Kinds of work",
+    // The band for the three offerings that are not websites. Both promises
+    // are the quoted tier's terms on /pricing, not new ones.
+    beyond: {
+      title: "Beyond websites",
+      sub: "A free scoping call first, then a fixed price for the whole job, built in stages you can stop between.",
+    },
     offerings: [
       {
         title: "Websites & landing pages",
@@ -310,9 +318,6 @@ const en = {
       },
       measured: "Measured {date} · re-run with one command, so the number cannot quietly go stale",
     },
-    ctaTitle: "Have something in mind?",
-    ctaSub: "Tell me roughly what you need and I'll send back scope, timeline and a price.",
-    ctaButton: "Ask for a quote",
     ctaPricing: "See the packages",
   },
   // Numbers live in `pricing.ts`; only the wording is here, keyed by tier id.
@@ -423,6 +428,10 @@ const en = {
       "Deployment set up and running",
       "30 days of free fixes after launch",
     ],
+    // The list above set as a receipt: each line marked included, and the
+    // total they add to the package price, which is nothing.
+    includedValue: "Included",
+    includedTotal: "Added to your package price",
     careTitle: "After the 30 days",
     careSub:
       "Every package comes with a month of free fixes. If you would rather never log in after that, one of these keeps the site looked after. Month to month, stop whenever: the site, the domain and the code stay yours either way.",
@@ -485,7 +494,6 @@ const en = {
     ],
     ctaTitle: "Not sure which one fits?",
     ctaSub: "Send the rough idea. I'll tell you which package it lands in, or that it doesn't need one.",
-    ctaButton: "Ask for a quote",
     ctaSecondary: "See the styles",
     proof: "{projects} projects you can read the build of, {labs} styles you can click through.",
     fastworkNote:
@@ -856,10 +864,15 @@ const th: typeof en = {
   },
   services: {
     title: "รับทำอะไรบ้าง",
-    sub: "วิธีทำงานเหมือนงานทุกชิ้นข้างบน ออกแบบเอง สร้างเอง ส่งจนขึ้นใช้จริง โดยคนที่ต้องอยู่กับผลงานนั้นเอง",
+    sub: "ออกแบบ สร้าง จนขึ้นใช้จริง ทำเองคนเดียวทั้งหมด ผลออกมายังไงผมรับเอง",
+    indexLabel: "งานที่รับ",
+    beyond: {
+      title: "ไม่ใช่เว็บก็ทำ",
+      sub: "คุยขอบเขตงานกันฟรีก่อน แล้วค่อยเสนอราคาคงที่ให้ทั้งงาน แบ่งทำเป็นช่วง หยุดระหว่างช่วงได้",
+    },
     offerings: [
       {
-        title: "เว็บไซต์และแลนดิ้งเพจ",
+        title: "เว็บไซต์​และแลนดิ้งเพจ",
         blurb:
           "เว็บที่โหลดไว ใช้ได้ทุกจอ หน้าตาเหมือนทำมาเพื่อคุณ ไม่ใช่เทมเพลตสำเร็จรูป เลือกสไตล์จาก The Lab หรือส่งตัวอย่างที่ชอบมาก็ได้ ทำเสร็จแล้วขึ้นออนไลน์ให้เลย",
         points: [
@@ -952,9 +965,6 @@ const th: typeof en = {
       },
       measured: "วัดเมื่อ {date} · รันซ้ำด้วยคำสั่งเดียว ตัวเลขเลยเก่าแบบเงียบๆ ไม่ได้",
     },
-    ctaTitle: "มีงานในใจแล้วใช่ไหม",
-    ctaSub: "เล่าคร่าวๆ มาได้เลย เดี๋ยวสรุปขอบเขตงาน เวลา และราคากลับไปให้",
-    ctaButton: "ขอใบเสนอราคา",
     ctaPricing: "ดูแพ็กเกจกับราคา",
   },
   pricing: {
@@ -1056,7 +1066,7 @@ const th: typeof en = {
         cta: "ส่งขอบเขตงานมาคุย",
       },
     },
-    includedTitle: "ได้เหมือนกันทุกแพ็กเกจ",
+    includedTitle: "ได้เหมือนกัน​ทุกแพ็กเกจ",
     included: [
       "ผมทำเองตั้งแต่ต้นจนจบ ไม่มีชั้นเอเจนซีคั่น",
       "ออกแบบจากจอมือถือก่อน",
@@ -1064,6 +1074,8 @@ const th: typeof en = {
       "ติดตั้งขึ้นเซิร์ฟเวอร์ให้พร้อมใช้",
       "แก้บั๊กฟรี 30 วันหลังขึ้นจริง",
     ],
+    includedValue: "รวมแล้ว",
+    includedTotal: "จ่ายเพิ่มจากราคาแพ็กเกจ",
     careTitle: "หลังพ้น 30 วัน",
     careSub:
       "ทุกแพ็กเกจแก้บั๊กฟรีให้เดือนนึงอยู่แล้ว ถ้าหลังจากนั้นไม่อยากยุ่งกับเว็บเอง เลือกแพ็กเกจดูแลไว้สักตัวก็ได้ คิดรายเดือน หยุดเมื่อไหร่ก็ได้ จะเอาหรือไม่เอา เว็บ โดเมน และโค้ดก็เป็นของคุณเหมือนเดิม",
@@ -1092,7 +1104,7 @@ const th: typeof en = {
       },
     },
     careNote: "ค่าต่ออายุโดเมนจ่ายตามจริง ไม่บวกเพิ่ม",
-    faqTitle: "คำถามที่มักถามก่อน",
+    faqTitle: "คำถาม​ที่มักถามก่อน",
     faq: [
       {
         q: "อะไรที่ไม่รวมในราคา",
@@ -1125,7 +1137,6 @@ const th: typeof en = {
     ],
     ctaTitle: "ไม่แน่ใจว่าอันไหนใช่",
     ctaSub: "เล่าไอเดียคร่าวๆ มา เดี๋ยวบอกให้ว่าเข้าแพ็กเกจไหน หรือจริงๆ แล้วไม่ต้องใช้แพ็กเกจเลย",
-    ctaButton: "ขอใบเสนอราคา",
     ctaSecondary: "ดูสไตล์ทั้งหมด",
     proof: "ผลงาน {projects} ชิ้นที่อ่านเบื้องหลังได้ กับ {labs} สไตล์ที่กดเล่นได้เลย",
     fastworkNote:

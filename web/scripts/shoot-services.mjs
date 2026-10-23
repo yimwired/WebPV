@@ -47,16 +47,35 @@ await page.getByRole("link", { name: /^(Work|ผลงาน)$/ }).first().click
 await page.waitForTimeout(1500);
 console.log(`landed on → ${new URL(page.url()).pathname + new URL(page.url()).hash}`);
 
-// /services has to offer a way through to the prices; the navbar is the only
-// other route there and it is not where a reader who just finished is looking
+// /services has to offer a way through to the prices, under the headline and
+// again after the websites offering, where a reader who wants numbers is
+// looking; the navbar is not
 await page.goto(`${BASE}/services`, { waitUntil: "load" });
 await page.waitForTimeout(1000);
 await revealAll();
-await page
-  .getByRole("link", { name: /^(See the packages|ดูแพ็กเกจกับราคา)$/ })
-  .click();
+const toPricing = page.getByRole("link", { name: /^(See the packages|ดูแพ็กเกจกับราคา)$/ });
+console.log(`links to the packages on /services: ${await toPricing.count()}`);
+await toPricing.first().click();
 await page.waitForTimeout(1200);
 console.log(`services → pricing → ${new URL(page.url()).pathname}`);
+
+// the hero's plate of the four kinds of work jumps to each one below. By
+// position, since the switch above left the site in Thai.
+await page.goto(`${BASE}/services`, { waitUntil: "load" });
+await page.waitForTimeout(1000);
+const plate = page.getByRole("navigation", { name: /^(Kinds of work|งานที่รับ)$/ });
+for (const index of [1, 3]) {
+  const link = plate.getByRole("link").nth(index);
+  const name = (await link.textContent())?.trim();
+  await link.click();
+  await page.waitForTimeout(1200);
+  const hash = new URL(page.url()).hash;
+  const inView = await page.evaluate((id) => {
+    const box = document.getElementById(id)?.getBoundingClientRect();
+    return Boolean(box) && box.top >= 0 && box.top < window.innerHeight / 2;
+  }, hash.slice(1));
+  console.log(`plate "${name}" → ${hash}, section at the top: ${inView}`);
+}
 
 // the labs gallery CTAs reach /services and /pricing
 // (label is "What I build", renamed from "See what I build" in 6251edc)
