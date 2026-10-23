@@ -8,8 +8,10 @@ import { labBySlug } from "@/lib/labs";
 import { labCardSrc, labStillSrc } from "@/lib/lab-images";
 import {
   carePlans,
+  currentPrice,
   introOffer,
   isPriced,
+  onLaunchPrice,
   pricingTiers,
   type CarePlan,
   type PricedTier,
@@ -247,15 +249,14 @@ export function Pricing() {
 function Price({ tier }: { tier: PricedTier }) {
   const { t } = useLocale();
   const p = t.pricing;
-  const onIntro = introOffer.active && Boolean(tier.introPrice);
 
   return (
     <div className="mt-6">
       <p className="flex items-baseline gap-1 text-[40px] leading-none font-medium tracking-[-0.02em] tabular-nums">
         <span className="text-muted-foreground text-[22px] font-normal">฿</span>
-        {onIntro ? tier.introPrice : tier.price}
+        {currentPrice(tier)}
       </p>
-      {onIntro && (
+      {onLaunchPrice(tier) && (
         <p className="mt-2.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[13px]">
           <span className="text-brand font-medium">{p.introBadge}</span>
           <s className="text-muted-foreground tabular-nums">

@@ -69,6 +69,26 @@ export function priceValue(tier: PricedTier): number {
   return Number(tier.price.replaceAll(",", ""));
 }
 
+/**
+ * What a package costs today: the launch price while `introOffer` runs, the
+ * list price once it is switched off. Every page that quotes a figure goes
+ * through this, so the home page never says ฿24,900 while /pricing charges
+ * ฿17,900 for the same package.
+ */
+export function currentPrice(tier: PricedTier): string {
+  return introOffer.active && tier.introPrice ? tier.introPrice : tier.price;
+}
+
+/** Whether today's price is the launch one, so the list price can be shown struck beside it. */
+export function onLaunchPrice(tier: PricedTier): boolean {
+  return currentPrice(tier) !== tier.price;
+}
+
+/** Today's price in baht as a number. */
+export function currentPriceValue(tier: PricedTier): number {
+  return Number(currentPrice(tier).replaceAll(",", ""));
+}
+
 /** A priced tier by id. Throws, because asking for one without a price is a build-time mistake. */
 export function pricedTier(id: PricingTierId): PricedTier {
   const tier = pricingTiers.find((item) => item.id === id);

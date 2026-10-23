@@ -469,7 +469,7 @@ const en = {
       },
       {
         q: "How does payment work?",
-        a: "Starter and Standard: half to start, half on the day it goes live. Signature runs longer, so it splits 40 / 30 / 30, with the middle payment when you see the working build. Bank transfer or PromptPay.",
+        a: "Every package but Signature: half to start, half on the day it goes live. Signature runs longer, so it splits 40 / 30 / 30, with the middle payment when you see the working build. Bank transfer or PromptPay.",
       },
       {
         q: "How is tax handled?",
@@ -1112,7 +1112,7 @@ const th: typeof en = {
       },
       {
         q: "จ่ายเงินยังไง",
-        a: "Starter กับ Standard จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง ส่วน Signature ใช้เวลานานกว่า เลยแบ่งเป็น 40 / 30 / 30 ก้อนกลางจ่ายตอนได้เห็นของที่ใช้งานได้แล้ว โอนธนาคารหรือพร้อมเพย์",
+        a: "ทุกแพ็กเกจยกเว้น Signature จ่ายครึ่งแรกตอนเริ่ม ครึ่งหลังวันที่เว็บขึ้นจริง ส่วน Signature ใช้เวลานานกว่า เลยแบ่งเป็น 40 / 30 / 30 ก้อนกลางจ่ายตอนได้เห็นของที่ใช้งานได้แล้ว โอนธนาคารหรือพร้อมเพย์",
       },
       {
         q: "เรื่องภาษีคิดยังไง",

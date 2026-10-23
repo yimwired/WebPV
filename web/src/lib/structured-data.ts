@@ -7,7 +7,7 @@
 
 import { withCounts } from "@/lib/counts";
 import { dictionary, type CaseStudySlug } from "@/lib/dictionary";
-import { introOffer, pricingTiers } from "@/lib/pricing";
+import { currentPriceValue, isPriced, pricingTiers } from "@/lib/pricing";
 import { projects } from "@/lib/projects";
 import { CONTACT_EMAIL, PROFILES, SITE_URL } from "@/lib/site";
 
@@ -106,17 +106,12 @@ export function caseStudyGraph(slug: CaseStudySlug) {
 export function pricingGraph() {
   const copy = dictionary.en.pricing.tiers;
   const offers = pricingTiers
-    .filter((tier) => tier.price !== null)
+    .filter(isPriced)
     .map((tier) => ({
       "@type": "Offer",
       name: copy[tier.id].name,
       description: copy[tier.id].forWho,
-      price: Number(
-        (introOffer.active && tier.introPrice
-          ? tier.introPrice
-          : (tier.price as string)
-        ).replace(/,/g, ""),
-      ),
+      price: currentPriceValue(tier),
       priceCurrency: "THB",
       url: `${SITE_URL}/pricing`,
       availability: "https://schema.org/InStock",

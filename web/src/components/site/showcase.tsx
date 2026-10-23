@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { labBestFor, labKind } from "@/lib/labs";
 import { labCardSrc, labStillSrc } from "@/lib/lab-images";
+import { currentPrice, onLaunchPrice } from "@/lib/pricing";
 import { resolvedCategories, type ResolvedCategory } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
 import { thaiWrap } from "@/lib/thai-text";
@@ -30,7 +31,7 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
   const count = category.labs.length;
 
   const specs = [
-    { label: t.showcase.stats.from, value: `฿${cheapest.price}` },
+    { label: t.showcase.stats.from, value: `฿${currentPrice(cheapest)}` },
     { label: t.showcase.stats.time, value: t.pricing.tiers[cheapest.id].timeline },
     { label: t.showcase.stats.examples, value: String(count) },
   ];
@@ -154,8 +155,15 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
                   <p className="text-[17px] leading-tight font-medium">
                     {t.pricing.tiers[tier.id].name}
                   </p>
+                  {/* Today's price, as /pricing quotes it, with the list price
+                      struck beside it while the launch offer runs. */}
                   <p className="mt-1 text-[14px]">
-                    ฿{tier.price}
+                    <span className="tabular-nums">฿{currentPrice(tier)}</span>
+                    {onLaunchPrice(tier) && (
+                      <s className="text-muted-foreground ms-1.5 text-[13px] tabular-nums">
+                        <span className="sr-only">{t.pricing.regularPrice} </span>฿{tier.price}
+                      </s>
+                    )}
                     <span className="text-muted-foreground">
                       {" "}
                       · {t.pricing.tiers[tier.id].timeline}

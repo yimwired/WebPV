@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { labBySlug, labs, type Lab } from "./labs";
-import { pricedTier, priceValue, type PricedTier, type PricingTierId } from "./pricing";
+import { currentPriceValue, pricedTier, type PricedTier, type PricingTierId } from "./pricing";
 
 export interface ShowcaseCategory {
   id: "food" | "tours" | "shops" | "events" | "premium" | "studios";
@@ -93,7 +93,7 @@ export const resolvedCategories: ResolvedCategory[] = showcaseCategories.map(
     labs: category.labs.map(labBySlug),
     packages: category.packages
       .map((item) => ({ tier: pricedTier(item.tier), lab: labBySlug(item.lab) }))
-      .sort((a, b) => priceValue(a.tier) - priceValue(b.tier)),
+      .sort((a, b) => currentPriceValue(a.tier) - currentPriceValue(b.tier)),
   }),
 );
 
