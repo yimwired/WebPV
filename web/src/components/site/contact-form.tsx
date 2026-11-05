@@ -64,7 +64,7 @@ function FieldMessage({ id, children }: { id: string; children: ReactNode }) {
       id={id}
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
+      exit={{ opacity: 0, y: -4, transition: { duration: 0.15, ease: [0.22, 1, 0.36, 1] } }}
       transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
       className="glass glass-warn text-destructive flex w-fit max-w-full items-center gap-1.5 rounded-full py-1.5 ps-2 pe-3 text-[13px] leading-snug font-medium"
     >
@@ -288,7 +288,12 @@ export function ContactForm() {
                   key={toast}
                   initial={{ opacity: 0, y: 16, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                  exit={{
+                    opacity: 0,
+                    y: 10,
+                    scale: 0.98,
+                    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+                  }}
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className={cn(
                     "glass glass-dense text-foreground pointer-events-auto flex w-full max-w-[440px] items-center gap-3 rounded-[20px] py-2.5 ps-4 pe-2 text-[14px] leading-snug",
