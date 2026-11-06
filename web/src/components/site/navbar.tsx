@@ -231,7 +231,8 @@ export function Navbar() {
               key="backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.15, ease: [0.22, 1, 0.36, 1] } }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => setMenuOpen(false)}
               className="bg-background/80 pointer-events-auto fixed inset-0 -z-10 lg:hidden"
             />
@@ -243,7 +244,12 @@ export function Navbar() {
               id="mobile-nav"
               initial={{ opacity: 0, y: -12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -12, scale: 0.98 }}
+              exit={{
+                opacity: 0,
+                y: -6,
+                scale: 0.99,
+                transition: { duration: 0.15, ease: [0.22, 1, 0.36, 1] },
+              }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               className="glass glass-dense text-foreground pointer-events-auto mx-auto mt-2 flex max-w-[1040px] origin-top flex-col gap-1 rounded-[28px] p-3 lg:hidden"
             >
