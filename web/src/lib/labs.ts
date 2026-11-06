@@ -226,7 +226,7 @@ export const labs: Lab[] = [
     name: "Trine",
     vibe: "Jewellery, still life",
     description:
-      "A photographed hand with the ring removed and rebuilt in WebGL, sitting exactly where the real one was. Drag to turn it, and the metal picker recolours all three bands live.",
+      "A photographed hand with the ring removed and rebuilt in WebGL, three linked bands held between finger and thumb. Drag it and let go, and it settles a different way each time. The metal picker sits beside it.",
     accent: "#b08d57",
     preview: { from: "#f4f2ef", to: "#dcd8d2" },
     bestFor: "Jewellery, watches, anything sold on one hero object",
@@ -236,10 +236,30 @@ export const labs: Lab[] = [
       kind: "เครื่องประดับ",
       vibe: "เครื่องประดับ ภาพนิ่ง",
       description:
-        "เอาแหวนออกจากรูปมือ แล้วปั้นใหม่เป็น 3D วางกลับที่เดิม ลากหมุนดูได้ เลือกสีทองได้ทั้งสามวง",
+        "เอาแหวนออกจากรูปมือ ปั้นใหม่เป็น 3D ให้นิ้วคีบไว้ สามวงคล้องกัน ลากแล้วปล่อย แหวนไม่เคยนอนท่าเดิม เลือกสีทองข้างๆ ได้เลย",
       buildTime: "สองสัปดาห์ งานหลักคือโมเดลแหวน",
     },
     buildTime: "Two weeks, the 3D object is the work",
+  },
+  {
+    slug: "songtor",
+    name: "Songtor",
+    vibe: "Freight, scroll story",
+    description:
+      "A made-up freight company told as one long scroll. You follow a single container out of the yard in Lat Krabang, past the kilometre posts, onto a ship and across the sea, with its distance and hours running along the bottom. The whole scene moves with the scroll, and the quote form waits at the far end.",
+    accent: "#ff5a1f",
+    preview: { from: "#1d2a3d", to: "#0b111c" },
+    bestFor: "Freight and logistics, any service with a long way from start to finish",
+    kind: "Freight",
+    th: {
+      bestFor: "ขนส่ง โลจิสติกส์ งานบริการที่มีต้นทางกับปลายทางให้เล่า",
+      kind: "ขนส่ง",
+      vibe: "ขนส่ง เล่าตามการเลื่อน",
+      description:
+        "บริษัทขนส่งสมมติ เลื่อนจอแล้วตามตู้ใบเดียวไปตลอดทาง ออกจากลาดกระบัง ผ่านหลักกิโล ลงเรือข้ามทะเล แถบล่างบอกระยะกับชั่วโมงให้ดูตลอด ฟอร์มขอราคารออยู่ปลายทาง",
+      buildTime: "สามถึงห้าสัปดาห์ งานหลักคือฉาก 3D ทั้งเส้นทาง",
+    },
+    buildTime: "Three to five weeks, the 3D scene is the work",
   },
   {
     slug: "cart",

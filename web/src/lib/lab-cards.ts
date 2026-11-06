@@ -27,12 +27,13 @@ export const labCardVersions: Record<string, string> = {
   "sable": "422d2181",
   "signal": "375b08f2",
   "slab": "62598a09",
+  "songtor": "ec26c6f2",
   "space": "756433aa",
   "stall": "6e1e6e44",
   "terminal": "0819d577",
   "thock": "941d73fe",
   "trellis": "c4e75f94",
-  "trine": "30ed0153",
+  "trine": "1848bb79",
   "unfold": "c4cc480f",
   "vision": "32b3cd49"
 };

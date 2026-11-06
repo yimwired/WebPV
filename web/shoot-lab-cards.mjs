@@ -67,6 +67,17 @@ const SHOT_AT = {
  * card shows it mid-deploy instead, which is the thing being sold.
  */
 const PREPARE = {
+  // Songtor scrolls inside its own frame, so SHOT_AT would move the wrong window.
+  // The card shows the yard: the first place that says what this company moves.
+  songtor: async (page) => {
+    const frame = page.frameLocator("iframe");
+    await frame.locator("[data-loader].is-done").waitFor({ state: "attached", timeout: 60000 });
+    await frame.locator('[data-beat="yard"]').evaluate((section) => {
+      const { top, height } = section.getBoundingClientRect();
+      window.scrollTo(0, top + window.scrollY + (height - window.innerHeight) * 0.5);
+    });
+    await page.waitForTimeout(2500);
+  },
   terminal: async (page) => {
     const prompt = page.locator("#ridge-prompt");
     await prompt.fill("status");
