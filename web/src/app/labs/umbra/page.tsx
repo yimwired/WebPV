@@ -23,7 +23,7 @@ const body = IBM_Plex_Sans_Thai({
 });
 
 export const metadata = pageMetadata({
-  title: "Umbra | The Lab · Film",
+  title: "Umbra | The Lab · Yim",
   description:
     "Surrealism study: a composite studio whose scene is lit by real trigonometry. Move the sun and every shadow is redrawn from the angle. One object is cut from another photograph and kept its own light, and the page measures how far out it is. A fictional studio.",
   path: "/labs/umbra",

@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Longtail | The Lab · Film",
+  title: "Longtail | The Lab · Yim",
   description:
     "Day tour operator style study: pick a tour, set the party, and the booking panel quotes the total and the deposit live.",
   path: "/labs/longtail",

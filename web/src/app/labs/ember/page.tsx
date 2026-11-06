@@ -22,7 +22,7 @@ const thai = Kanit({
 });
 
 export const metadata = pageMetadata({
-  title: "Ember | The Lab · Film",
+  title: "Ember | The Lab · Yim",
   description:
     "Thai charcoal grill buffet style study: a loud chain brand page with floating product cards, a scroll-parallax hero and a dialog that grows out of the card you pressed.",
   path: "/labs/ember",

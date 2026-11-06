@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { withCounts } from "@/lib/counts";
 import { SITE_HOST } from "@/lib/site";
 
-export const alt = "Nuttapon Yimnoi (Film), websites you can try before you hire";
+export const alt = "Nuttapon Yimnoi (Yim), websites you can try before you hire";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -46,7 +46,7 @@ export default function Image() {
             color: MUTED,
           }}
         >
-          <div>Nuttapon Yimnoi (Film)</div>
+          <div>Nuttapon Yimnoi (Yim)</div>
           <div>Bangkok</div>
         </div>
 

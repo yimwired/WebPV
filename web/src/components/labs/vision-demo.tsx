@@ -87,7 +87,7 @@ export function VisionDemo() {
           transition={{ duration: 1, delay: 0.2 }}
           className="relative text-sm font-medium tracking-[0.2em] text-white/60 uppercase"
         >
-          Film Vision
+          Yim Vision
         </motion.p>
 
         <motion.h1

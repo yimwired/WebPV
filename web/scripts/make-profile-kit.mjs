@@ -137,7 +137,7 @@ function bannerHtml() {
       <span class="dot" style="width:9px;height:9px"></span>Web developer · Bangkok
     </p>
     <h1 class="th" style="margin-top:22px;font-size:62px;font-weight:600;line-height:1.16;letter-spacing:-0.01em">
-      ผมทำเว็บที่กดเล่นได้จริง<br>ลองก่อนแล้วค่อยจ้าง
+      เลือกเว็บ<br>เหมือนจิ้มกับข้าว
     </h1>
     <div style="margin-top:30px;padding-top:22px;border-top:1px solid var(--line-strong);display:flex;gap:56px">
       ${[

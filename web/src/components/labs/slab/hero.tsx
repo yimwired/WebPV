@@ -43,9 +43,9 @@ export function Hero({ accent }: HeroProps) {
             className="mt-5 max-w-3xl text-[clamp(2.4rem,8vw,5rem)] font-extrabold uppercase leading-[0.95]"
             style={{ color: COLOR.ink }}
           >
-            ตัดคลิปให้จบ
+            ตัดให้จบ
             <br />
-            ไม่ใช่ตัดไปเรื่อยๆ
+            ก่อนจะตัดใจ
           </motion.h1>
         </div>
       </motion.div>
@@ -58,8 +58,8 @@ export function Hero({ accent }: HeroProps) {
             className="max-w-xl text-base font-medium leading-relaxed sm:text-lg"
             style={{ color: COLOR.ink }}
           >
-            สามคอร์สที่สอนสิ่งที่คนตัดคลิปติดจริง จังหวะ สี และเสียง
-            เรียนจบแล้วทำงานเร็วขึ้น ไม่ใช่รู้ปุ่มเยอะขึ้น
+            สามคอร์ส สามเรื่องที่คนตัดคลิปติดกันทุกคน จังหวะ สี เสียง
+            เรียนแล้วเลิกนั่งโต้รุ่งกับคลิปเดียว
           </motion.p>
 
           <motion.div variants={reveal} transition={revealTransition} className="mt-8 flex flex-wrap gap-4">

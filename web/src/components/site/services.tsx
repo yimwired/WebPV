@@ -24,7 +24,7 @@ const OFFERING_IDS = ["websites", "automation", "dashboards", "ai"] as const;
 const [frontLab, backLab] = resolvedCategories.slice(0, 2).map((category) => category.labs[0]);
 
 const sectionTitle =
-  "text-[32px] leading-[1.15] font-medium tracking-[-0.025em] text-balance sm:text-[44px] lg:text-[48px]";
+  "text-[32px] leading-[1.15] [:lang(th)_&]:leading-[1.25] font-medium tracking-[-0.025em] text-balance sm:text-[44px] lg:text-[48px]";
 
 /**
  * What Film builds, laid out the way the home page reads: the headline over a

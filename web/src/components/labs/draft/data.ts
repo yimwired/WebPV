@@ -85,7 +85,7 @@ export const SHEET = {
   drawing: "ผังจัดวางเฟอร์นิเจอร์",
   number: "A-203",
   revision: "ร่างครั้งที่ 3",
-  drawnBy: "ฟิล์ม",
+  drawnBy: "ยิ้ม",
 };
 
 export const baht = (value: number) => value.toLocaleString("th-TH");

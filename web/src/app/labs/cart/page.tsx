@@ -15,7 +15,7 @@ const display = Kanit({
 });
 
 export const metadata = pageMetadata({
-  title: "Cart | The Lab · Film",
+  title: "Cart | The Lab · Yim",
   description:
     "Single product style study: off-black retail, bundle tiles that price themselves, and a noise control that demonstrates the feature instead of claiming it.",
   path: "/labs/cart",

@@ -10,7 +10,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata = pageMetadata({
-  title: "Trine | The Lab · Film",
+  title: "Trine | The Lab · Yim",
   description:
     "Jewellery product study: a photographed hand with the ring rebuilt in WebGL, turnable by hand, and a metal picker that recolours it live.",
   path: "/labs/trine",

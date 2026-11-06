@@ -215,7 +215,7 @@ export function PasteDemo() {
             className="max-w-2xl text-sm"
             style={{ color: COLOR.inkMuted, lineHeight: `${LINE_HEIGHT}px`, ...bodyStyle }}
           >
-            ฟ้าและต้นเป็นคู่สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของ Film
+            ฟ้าและต้นเป็นคู่สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของยิ้ม
             ชื่อแขก โต๊ะ และกำหนดการแต่งขึ้นมาทั้งหมด รูปเป็นภาพสต็อกของคนที่ไม่เกี่ยวกับงานนี้
             และช่องค้นชื่อไม่ได้ต่อกับฐานข้อมูลจริง
           </p>
@@ -233,7 +233,7 @@ export function PasteDemo() {
               className="inline-flex items-center py-1.5 text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
               style={{ color: COLOR.ink, outlineColor: COLOR.stamp }}
             >
-              ดูพอร์ตของ Film
+              ดูพอร์ตของยิ้ม
             </Link>
           </div>
         </div>

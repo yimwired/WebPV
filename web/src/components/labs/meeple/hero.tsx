@@ -96,7 +96,7 @@ export function Hero() {
           <motion.h1
             variants={reveal}
             transition={revealTransition}
-            className="mt-6 text-[clamp(2.2rem,7vw,3.75rem)] font-bold leading-[1.15]"
+            className="mt-6 text-[clamp(2.2rem,7vw,3.75rem)] font-bold leading-[1.36]"
             style={{ color: COLOR.ink }}
           >
             {/* Two complete lines. Left to wrap on its own the second one broke

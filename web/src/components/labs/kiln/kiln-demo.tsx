@@ -219,7 +219,7 @@ export function KilnDemo() {
             ดินเผา
           </p>
           <p className="mt-6 max-w-xl text-sm leading-relaxed" style={{ color: COLOR.onInkMuted }}>
-            ดินเผาเป็นแบรนด์สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของ Film ชื่อชิ้นงาน
+            ดินเผาเป็นแบรนด์สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของยิ้ม ชื่อชิ้นงาน
             ราคา และตำหนิที่ชี้ไว้แต่งขึ้นมาทั้งหมด รูปเป็นภาพสต็อกที่ใช้แทนภาพจริงของสตูดิโอ
           </p>
 
@@ -236,7 +236,7 @@ export function KilnDemo() {
               className="inline-flex items-center py-1.5 text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
               style={{ color: COLOR.paper, outlineColor: COLOR.onInkMuted }}
             >
-              ดูพอร์ตของ Film
+              ดูพอร์ตของยิ้ม
             </Link>
           </div>
         </div>

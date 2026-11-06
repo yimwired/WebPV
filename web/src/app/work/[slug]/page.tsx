@@ -26,7 +26,7 @@ export async function generateMetadata({
   const project = projects.find((p) => p.id === slug);
 
   return pageMetadata({
-    title: `${cs.title} case study | Film`,
+    title: `${cs.title} case study | Yim`,
     description: project?.description ?? cs.subtitle,
     path: `/work/${slug}`,
   });

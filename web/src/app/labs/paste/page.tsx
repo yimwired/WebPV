@@ -26,7 +26,7 @@ const body = Maitree({
 });
 
 export const metadata = pageMetadata({
-  title: "Paste | The Lab · Film",
+  title: "Paste | The Lab · Yim",
   description:
     "Scrapbook style study: a wedding invitation made of taped-down instant photos and ruled paper, doing the one thing a paper invitation cannot. Type your name and it tells you your table.",
   path: "/labs/paste",

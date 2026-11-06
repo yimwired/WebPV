@@ -44,7 +44,7 @@ const playpen = Playpen_Sans_Thai({
   preload: false,
 });
 
-const SITE_TITLE = "Film | Websites you can try before you hire";
+const SITE_TITLE = "Yim | Websites you can try before you hire";
 const SHARE_DESCRIPTION = withCounts(
   "{labs} live examples to try first, then yours, built solo from the first call to launch.",
 );
@@ -52,7 +52,7 @@ const SHARE_DESCRIPTION = withCounts(
 export const metadata: Metadata = {
   title: SITE_TITLE,
   description: withCounts(
-    "Nuttapon Yimnoi (Film), Bangkok. Websites in Next.js and React, with {labs} live examples you can try before you hire. Built solo, end to end.",
+    "Nuttapon Yimnoi (Yim), Bangkok. Websites in Next.js and React, with {labs} live examples you can try before you hire. Built solo, end to end.",
   ),
   // the one place the host is set: SITE_URL in lib/site.ts
   metadataBase: new URL(SITE_URL),

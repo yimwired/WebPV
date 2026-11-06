@@ -120,7 +120,7 @@ const TOURS: Tour[] = [
 const TRUST = [
   { h: "ยกเลิกฟรีก่อน 24 ชม.", p: "คืนเต็มจำนวน ไม่ต้องให้เหตุผล" },
   { h: "จ่ายมัดจำ 30% ก็จองได้", p: "ที่เหลือจ่ายวันขึ้นเรือ" },
-  { h: "เรืออกจริงทุกรอบ", p: "ถ้าเราเลื่อนเพราะอากาศ คืนเงินเต็ม" },
+  { h: "เรือออกทุกรอบ", p: "ถ้าเราเลื่อนเพราะอากาศ คืนเงินเต็ม" },
 ];
 
 const baht = (value: number) => value.toLocaleString("th-TH");
@@ -187,9 +187,9 @@ export function LongtailDemo() {
             transition={{ duration: 0.65, delay: 0.08, ease }}
             className="mt-4 max-w-2xl text-3xl leading-tight font-semibold tracking-tight sm:text-5xl"
           >
-            ออกเรือเช้ากว่าคนอื่น
+            ตื่นเช้าอีกนิด
             <br />
-            กลับก่อนหาดจะแน่น
+            ได้หาดทั้งหาด
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 14 }}

@@ -22,7 +22,7 @@ const SHARE_CARD = {
   url: `${SITE_URL}/opengraph-image`,
   width: 1200,
   height: 630,
-  alt: "Film: websites you can try before you hire",
+  alt: "Yim: websites you can try before you hire",
 };
 
 interface PageSeo {

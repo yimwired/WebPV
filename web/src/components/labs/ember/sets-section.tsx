@@ -55,10 +55,10 @@ export function SetsSection({ onOpen }: SetsSectionProps) {
           <motion.h2
             variants={reveal}
             transition={revealTransition}
-            className="mt-3 text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-tight"
+            className="mt-3 text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-[1.35]"
             style={{ color: COLOR.ink, ...thaiStyle }}
           >
-            เลือกชุด แล้วนั่งได้ยาว 2 ชั่วโมง
+            เลือกชุด แล้วนั่งได้ยาว 2{"\u00a0"}ชั่วโมง
           </motion.h2>
           <motion.p
             variants={reveal}

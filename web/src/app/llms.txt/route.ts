@@ -31,7 +31,7 @@ export function GET() {
     );
   });
 
-  const body = `# Film — Nuttapon Yimnoi
+  const body = `# Yim - Nuttapon Yimnoi
 
 > Web developer and software engineer in Bangkok. Builds websites in Next.js and React, with ${labs.length} live examples a client can try before hiring, and the trading systems, AI agents and dashboards he runs himself, solo and end to end. ${projects.length} projects shipped. Available for freelance work; prices for websites are published, everything else is quoted per project.
 
@@ -42,7 +42,7 @@ Languages: English and Thai, every page in both.
 ## Pages
 
 ${line("Home", "/", `Overview, the ${projects.length} projects, background and contact.`)}
-${line("Services", "/services", "What Film takes on: websites and landing pages, automation and bots, dashboards and internal tools, and AI wired into real workflows.")}
+${line("Services", "/services", "What Yim takes on: websites and landing pages, automation and bots, dashboards and internal tools, and AI wired into real workflows.")}
 ${line("Pricing", "/pricing", `Fixed prices for ${pricingTiers.filter(isPriced).length} website packages plus a quoted tier. Automation, dashboards and AI are quoted per project.`)}
 
 ## Case studies

@@ -12,7 +12,7 @@ import { LabSwitcher } from "@/components/labs/lab-switcher";
 const script = Grand_Hotel({ subsets: ["latin"], weight: "400" });
 
 export const metadata = pageMetadata({
-  title: "Contour | The Lab · Film",
+  title: "Contour | The Lab · Yim",
   description:
     "Beverage packaging study: one drink in three pack sizes, lathed in WebGL from published dimensions, with the labels painted in the browser. An unofficial concept.",
   path: "/labs/contour",

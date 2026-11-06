@@ -226,7 +226,7 @@ export function Showcase() {
         <h2
           className={cn(
             "text-[34px] font-medium tracking-[-0.025em] text-balance sm:text-[48px] lg:text-[54px]",
-            isThai ? "leading-[1.25]" : "leading-[1.1]",
+            isThai ? "leading-[1.3]" : "leading-[1.1]",
           )}
         >
           {isThai ? thaiWrap(t.showcase.title) : t.showcase.title}

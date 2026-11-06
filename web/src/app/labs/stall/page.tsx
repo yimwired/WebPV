@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Stall | The Lab · Film",
+  title: "Stall | The Lab · Yim",
   description:
     "Marketplace style study: accounts, listings, search and filters, with the seller messaged directly and no money held by the site.",
   path: "/labs/stall",

@@ -9,7 +9,7 @@ import { ctaDelay, DUR, EASE, HERO, subtitleDelay } from "./motion";
 import { COLOR, Z, thaiStyle } from "./theme";
 
 /** Two lines, broken where the sentence turns rather than where it wraps. */
-const TITLE = ["ปิ้งบนถ่าน", "ไม่ใช่บนไฟฟ้า"];
+const TITLE = ["กลิ่นแบบนี้", "เตาไฟฟ้าไม่มี"];
 
 export function HeroSection() {
   return (

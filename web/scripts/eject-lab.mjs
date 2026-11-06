@@ -344,7 +344,7 @@ const PAGE = await buildPage();
 
 const README = `# ${labName}
 
-เว็บนี้แยกออกมาจาก The Lab ของ Film ด้วย \`scripts/eject-lab.mjs\`
+เว็บนี้แยกออกมาจาก The Lab ของยิ้ม ด้วย \`scripts/eject-lab.mjs\`
 ตัวเลือกที่ลูกค้าเลือกคือสไตล์ **${labName}**
 
 ## รันเครื่องตัวเอง

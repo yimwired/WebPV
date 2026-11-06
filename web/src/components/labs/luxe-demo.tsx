@@ -40,7 +40,7 @@ export function LuxeDemo({ serifClass }: { serifClass: string }) {
           className="text-[11px] tracking-[0.45em] uppercase"
           style={{ color: GOLD }}
         >
-          Maison de Film
+          Maison de Yim
         </motion.p>
 
         <motion.h1

@@ -261,7 +261,7 @@ export function CounterDemo() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.08, ease }}
-            className="mt-4 text-4xl leading-[1.15] font-semibold tracking-tight sm:text-6xl"
+            className="mt-4 text-4xl leading-[1.25] font-semibold tracking-tight sm:text-6xl"
           >
             กับข้าวบ้านๆ
             <br />
@@ -499,7 +499,7 @@ export function CounterDemo() {
           <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-end">
             <div>
               <h2 className="max-w-lg text-2xl font-semibold tracking-tight sm:text-3xl">
-                หน้านี้ แต่เป็นร้านคุณ
+                อยากได้แบบนี้ให้ร้านคุณบ้างไหม
               </h2>
               <p
                 className="mt-3 max-w-md leading-relaxed"

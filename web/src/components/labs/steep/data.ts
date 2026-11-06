@@ -231,7 +231,7 @@ export const SHOP = {
   latin: "THE STEEPING ROOM",
   street: "ถนนเจริญกรุง พระนคร",
   since: "ตั้งร้าน พ.ศ. ๒๔๗๑",
-  keeper: "ฟิล์ม ผู้ปรุง",
+  keeper: "ยิ้ม ผู้ปรุง",
 };
 
 /** Grams read better without a trailing zero: 1.5 g, but 2 g. */

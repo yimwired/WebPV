@@ -48,7 +48,7 @@ if (init) {
       "ฟอนต์ลิขสิทธิ์",
       "เขียนข้อความยาว",
     ],
-    from: "Nuttapon Yimnoi (Film)",
+    from: "Nuttapon Yimnoi (Yim)",
     payTo: "พร้อมเพย์ 0xx-xxx-xxxx",
     validDays: 14,
   };
@@ -180,7 +180,7 @@ const HTML = `<!doctype html>
     วันที่ ${thaiDate(issued)}
   </div>
   <div style="text-align:right">
-    ${quote.from ?? "Nuttapon Yimnoi (Film)"}<br>
+    ${quote.from ?? "Nuttapon Yimnoi (Yim)"}<br>
     yimwired@gmail.com<br>
     webpv.yimwired.workers.dev
   </div>

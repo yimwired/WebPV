@@ -89,7 +89,7 @@ export function Footer() {
 
         <div className="border-line text-muted-foreground mt-20 flex flex-col items-center justify-between gap-3 border-t pt-6 text-[14px] sm:flex-row">
           <span>
-            © {new Date().getFullYear()} Film. {t.footer.rights}
+            © {new Date().getFullYear()} Yim. {t.footer.rights}
           </span>
           <span>{t.footer.builtWith}</span>
         </div>

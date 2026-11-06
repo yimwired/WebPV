@@ -15,7 +15,7 @@ const sans = Kanit({
 });
 
 export const metadata = pageMetadata({
-  title: "Slab | The Lab · Film",
+  title: "Slab | The Lab · Yim",
   description:
     "Neo-brutalist style study: hard borders, flat offset shadows, controls that land on their own shadow, and a palette the visitor can repaint from the top bar.",
   path: "/labs/slab",

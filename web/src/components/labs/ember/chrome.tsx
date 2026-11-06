@@ -136,7 +136,7 @@ export function EmberFooter() {
           className="mt-16 max-w-2xl text-xs leading-relaxed"
           style={{ color: COLOR.onCharMuted, ...thaiStyle }}
         >
-          เตาแดงเป็นแบรนด์สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของ Film ที่อยู่ เบอร์โทร
+          เตาแดงเป็นแบรนด์สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของยิ้ม ที่อยู่ เบอร์โทร
           และราคาทั้งหมดแต่งขึ้นมา รูปทั้งหมดเป็นภาพสต็อกที่ใช้แทนภาพจริงของร้าน ไม่มีร้านตามที่อยู่ในหน้านี้
         </p>
 
@@ -153,7 +153,7 @@ export function EmberFooter() {
             className="inline-flex items-center py-1.5 text-sm font-semibold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
             style={{ color: COLOR.onChar, outlineColor: COLOR.ember }}
           >
-            ดูพอร์ตของ Film
+            ดูพอร์ตของยิ้ม
           </Link>
         </div>
 

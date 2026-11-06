@@ -23,7 +23,7 @@ export function About() {
     >
       <div className="border-line mx-auto grid max-w-[1180px] gap-12 border-t pt-16 sm:pt-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
         <Reveal>
-          <h2 className="text-[32px] leading-[1.1] font-medium tracking-[-0.025em] sm:text-[44px]">
+          <h2 className="text-[32px] leading-[1.1] font-medium tracking-[-0.025em] [:lang(th)_&]:leading-[1.3] sm:text-[44px]">
             {t.about.title}
           </h2>
           <div className="text-muted-foreground mt-6 space-y-4 text-[17px] leading-relaxed">
@@ -56,10 +56,10 @@ export function About() {
                   aria-hidden
                   className="bg-brand text-background grid h-16 w-16 shrink-0 place-items-center rounded-full text-[26px] font-semibold"
                 >
-                  F
+                  Y
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[22px] leading-tight font-medium tracking-tight">
+                  <p className="text-[22px] leading-snug font-medium tracking-tight">
                     {t.about.name}{" "}
                     <span className="text-muted-foreground">({t.about.nickname})</span>
                   </p>

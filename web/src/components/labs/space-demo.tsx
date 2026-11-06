@@ -160,7 +160,7 @@ export function SpaceDemo() {
           transition={{ duration: 0.8, delay: 0.5, ease }}
           className="mt-6 max-w-xl text-sm leading-relaxed text-slate-400"
         >
-          Mission commander: Film. Payload: trading systems, AI agent fleets,
+          Mission commander: Yim. Payload: trading systems, AI agent fleets,
           dashboards and content machines, all built solo, all operational.
         </motion.p>
 

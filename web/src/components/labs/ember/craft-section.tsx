@@ -50,10 +50,11 @@ export function CraftSection() {
             <motion.h2
               variants={reveal}
               transition={revealTransition}
-              className="mt-4 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-[1.12]"
+              className="mt-4 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-[1.25]"
               style={{ color: COLOR.onChar, ...thaiStyle }}
             >
-              ไขมันหยดลงถ่าน แล้วกลับขึ้นมาเป็นควัน
+              ไขมันหยดลงถ่าน{" "}
+              <span className="inline-block">แล้วกลับขึ้นมาเป็นควัน</span>
             </motion.h2>
 
             <motion.p

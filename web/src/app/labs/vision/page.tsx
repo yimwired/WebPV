@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Vision | The Lab · Film",
+  title: "Vision | The Lab · Yim",
   description:
     "Cinematic spatial style study: pure black, scroll-driven statements, floating glass windows.",
   path: "/labs/vision",

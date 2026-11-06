@@ -151,7 +151,7 @@ export function PrismDemo() {
       >
         <div className="mx-auto max-w-6xl border-t pt-10" style={{ borderColor: PAGE.line }}>
           <p className="max-w-2xl text-sm leading-relaxed" style={{ color: PAGE.muted }}>
-            Lumen เป็นแอปสมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของ Film ชื่อเพลงกับชื่อศิลปินแต่งขึ้นมา
+            Lumen เป็นแอปสมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของยิ้ม ชื่อเพลงกับชื่อศิลปินแต่งขึ้นมา
             ปกอัลบั้มเป็นภาพสต็อกที่ใช้แทนภาพจริง
           </p>
 
@@ -174,7 +174,7 @@ export function PrismDemo() {
               className="inline-flex items-center py-1.5 text-sm font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
               style={{ color: PAGE.text, outlineColor: PAGE.accent }}
             >
-              ดูพอร์ตของ Film
+              ดูพอร์ตของยิ้ม
             </Link>
           </div>
         </div>
