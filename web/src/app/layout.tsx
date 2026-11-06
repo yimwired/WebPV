@@ -36,10 +36,12 @@ const googleSans = Google_Sans({
 // beats a note that changes face. Not preloaded: its two files are 308KB, three
 // quarters of what the home page preloaded, and every first visit fetched them
 // ahead of the headline for notes that sit beside the content. A note now asks
-// for its face when it is laid out.
+// for its face when it is laid out. One weight, because the notes only ever use
+// regular and the variable file carries the whole 100 to 800 range.
 const playpen = Playpen_Sans_Thai({
   variable: "--font-hand",
   subsets: ["latin", "thai"],
+  weight: "400",
   display: "block",
   preload: false,
 });

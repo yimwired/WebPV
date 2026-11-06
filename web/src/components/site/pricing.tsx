@@ -105,7 +105,7 @@ export function Pricing() {
         <div className="mx-auto grid max-w-[1320px] gap-5 md:grid-cols-2 xl:grid-cols-4">
           {ladder.map((tier, i) => (
             <Reveal key={tier.id} delay={i * 0.05} className="h-full">
-              <TierCard tier={tier} />
+              <TierCard tier={tier} largestOnPhone={i === 0} />
             </Reveal>
           ))}
         </div>
@@ -287,7 +287,7 @@ function Points({ points }: { points: readonly string[] }) {
  * midnight, the way a dark section is, which makes it the one card that
  * stands forward without a badge doing all the work.
  */
-function TierCard({ tier }: { tier: PricedTier }) {
+function TierCard({ tier, largestOnPhone = false }: { tier: PricedTier; largestOnPhone?: boolean }) {
   const { t } = useLocale();
   const p = t.pricing;
   const copy = p.tiers[tier.id];
@@ -315,6 +315,10 @@ function TierCard({ tier }: { tier: PricedTier }) {
             alt=""
             fill
             sizes="(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 310px"
+            // The first card's picture is what a phone times this page by, and
+            // a lazy image waits for layout before it even asks.
+            loading={largestOnPhone ? "eager" : "lazy"}
+            fetchPriority={largestOnPhone ? "high" : "auto"}
             className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
           />
           <span className="bg-card text-foreground shadow-float absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium">
