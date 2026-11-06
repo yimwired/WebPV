@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface StaticLabFrameProps {
   /** file under /public/lab-demos, e.g. "sable.html" */
@@ -27,12 +27,25 @@ interface StaticLabFrameProps {
 export function StaticLabFrame({ file, title, backdrop }: StaticLabFrameProps) {
   const [loaded, setLoaded] = useState(false);
 
+  // A frame that finishes before this page hydrates never fires onLoad, and the
+  // demo would stay invisible behind its backdrop for good. A cached demo on a
+  // slow device does exactly that, so ask the frame itself once React arrives.
+  const catchEarlyLoad = useCallback((frame: HTMLIFrameElement | null) => {
+    const demo = frame?.contentDocument;
+    if (demo && demo.URL !== "about:blank" && demo.readyState === "complete") {
+      setLoaded(true);
+    }
+  }, []);
+
   return (
     <main
       className="fixed inset-0 overflow-hidden"
       style={{ background: backdrop }}
     >
+      {/* The frame's own headings belong to its document, not this page. */}
+      <h1 className="sr-only">{title}</h1>
       <iframe
+        ref={catchEarlyLoad}
         src={`/lab-demos/${file}`}
         title={title}
         onLoad={() => setLoaded(true)}
