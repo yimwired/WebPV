@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { withCounts } from "@/lib/counts";
 import { labBestFor, labKind } from "@/lib/labs";
-import { labCardSrc, labStillSrc } from "@/lib/lab-images";
+import { labCardSrc, labStillSrc, labThumbSrc } from "@/lib/lab-images";
 import { currentPrice, onLaunchPrice } from "@/lib/pricing";
 import { resolvedCategories, type ResolvedCategory } from "@/lib/showcase";
 import { useLocale } from "@/lib/i18n";
@@ -147,7 +147,7 @@ function CategoryCard({ category }: { category: ResolvedCategory }) {
               >
                 <LabPicture
                   lab={lab}
-                  src={labCardSrc(lab.slug)}
+                  src={labThumbSrc(lab.slug)}
                   sizes="96px"
                   className="h-[72px] w-[96px] shrink-0 rounded-[12px]"
                 />

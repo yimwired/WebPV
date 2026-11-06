@@ -230,3 +230,8 @@ await writeFile(
 );
 
 console.log(`  ${MANIFEST}`);
+
+// The thumbnails are cut from these cards, so cut them here or a reshoot leaves
+// the small copies showing the old picture.
+const { stdout } = await run("node", ["scripts/make-lab-thumbs.mjs"]);
+console.log(`  ${stdout.trim()}`);

@@ -1,10 +1,10 @@
 "use client";
 
-import { useSyncExternalStore, type CSSProperties } from "react";
+import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { labBySlug, labKind } from "@/lib/labs";
-import { labStillShape, labStillSrc } from "@/lib/lab-images";
+import { labStillShape, labStillSrc, labThumbSrc } from "@/lib/lab-images";
 import { useLocale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -56,25 +56,57 @@ const aspectClass = {
   wide: "aspect-[16/10]",
 } as const;
 
+/** How long after the cards appear a screen without hover fetches what they open. */
+const SETTLE_MS = 3000;
+
+/**
+ * True once a screen with nothing to hover with has had time to settle. A phone
+ * gives no sign of which card comes next, and a tap on a card with nothing
+ * fetched took 1160ms against 780ms on a throttled phone (2026-11-06), so the
+ * fetch still happens, only clear of the first paint and not for anyone who
+ * leaves in the first few seconds.
+ */
+function useSettledWithoutHover(): boolean {
+  const [settled, setSettled] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia("(hover: hover)").matches) return;
+    const timer = window.setTimeout(() => setSettled(true), SETTLE_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return settled;
+}
+
 /** The card itself: a still of the demo, its name and the business it plays. */
 function LabCard({
   slug,
   width,
   compact,
+  fetchAhead,
 }: {
   slug: string;
   width: number;
   compact: boolean;
+  fetchAhead: boolean;
 }) {
   const { locale } = useLocale();
   const lab = labBySlug(slug);
   // Labs with an upright still made for the home page show it; the rest show
-  // their 16:10 gallery card, which is what labStillSrc falls back to.
+  // their 16:10 gallery card at thumbnail size, since a card is at most 210px wide.
   const shape = labStillShape(slug) ?? "wide";
+  const [reachedFor, setReachedFor] = useState(false);
 
   return (
     <Link
       href={`/labs/${lab.slug}`}
+      // Every card on screen is a different demo, and each demo brings its own
+      // scripts and fonts. Prefetching them all on arrival competed with the
+      // page's own first paint, so a card fetches its demo once a pointer is on
+      // it, or once the page has settled where there is no pointer. Not on touch
+      // start: a thumb landing here is usually starting a scroll.
+      prefetch={reachedFor || fetchAhead ? null : false}
+      onMouseEnter={() => setReachedFor(true)}
       // The lanes repeat the showcase below, which is where keyboard and
       // screen reader users meet these demos. Here they would be dozens of
       // tab stops between the hero's buttons and the rest of the page.
@@ -95,7 +127,7 @@ function LabCard({
         }}
       >
         <Image
-          src={labStillSrc(slug)}
+          src={labStillShape(slug) ? labStillSrc(slug) : labThumbSrc(slug)}
           alt=""
           fill
           sizes={`${width}px`}
@@ -141,6 +173,7 @@ function DriftLane({
   style?: CSSProperties;
 }) {
   const set = Array.from({ length: copies }, () => lane.slugs).flat();
+  const settled = useSettledWithoutHover();
 
   return (
     <div className={cn("drift-lane", className)} style={style}>
@@ -154,7 +187,7 @@ function DriftLane({
         {[0, 1].map((half) =>
           set.map((slug, i) => (
             <div key={`${half}-${i}`} className={compact ? "pb-2.5" : "pb-6"}>
-              <LabCard slug={slug} width={width} compact={compact} />
+              <LabCard slug={slug} width={width} compact={compact} fetchAhead={settled} />
             </div>
           )),
         )}
