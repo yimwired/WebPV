@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Meridian | The Lab · Film",
+  title: "Meridian | The Lab · Yim",
   description:
     "Hardware launch study: machined aluminium in pure CSS, a scroll-pinned walkthrough and a configurator that recolours every deck on the page.",
   path: "/labs/meridian",

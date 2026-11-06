@@ -157,7 +157,7 @@ export const STUDIO = {
   name: "อุมบรา",
   latin: "UMBRA",
   line: "ภาพประกอบโฆษณาและงานคอมโพสิต",
-  keeper: "ฟิล์ม",
+  keeper: "ยิ้ม",
 };
 
 /** Decimetres, written the way the studio writes them. */

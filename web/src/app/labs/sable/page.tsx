@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Sable | The Lab · Film",
+  title: "Sable | The Lab · Yim",
   description:
     "Product page study: ink on paper, a CSS-drawn e-ink slate, and a text field that drives the panel at the hardware's real 41 ms latency.",
   path: "/labs/sable",

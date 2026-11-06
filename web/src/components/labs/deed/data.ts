@@ -103,7 +103,7 @@ export const PROJECT = {
   name: "เดอะ ดีด ลาดพร้าว 71",
   line: "คอนโดมิเนียม 8 ชั้น 2 อาคาร 214 ยูนิต",
   handover: "โอนได้ไตรมาส 3 ปี 2569",
-  seller: "ฟิล์ม",
+  seller: "ยิ้ม",
 };
 
 export const baht = (value: number) =>

@@ -23,7 +23,7 @@ export function MinimalDemo() {
           transition={{ duration: 0.6 }}
           className="grid grid-cols-2 gap-4 border-b border-neutral-900 py-6 font-mono text-[11px] tracking-widest uppercase sm:grid-cols-4"
         >
-          <span>Film</span>
+          <span>Yim</span>
           <span className="text-neutral-600">Portfolio, index</span>
           <span className="hidden text-neutral-600 sm:block">BKK / remote</span>
           <span className="text-right" style={{ color: RED }}>
@@ -141,7 +141,7 @@ export function MinimalDemo() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-16 flex items-center justify-between font-mono text-[11px] tracking-widest text-neutral-500 uppercase"
           >
-            <span>© 2026 Film</span>
+            <span>© 2026 Yim</span>
             <span className="h-3 w-3" style={{ background: RED }} />
             <span>Set in Geist</span>
           </motion.footer>

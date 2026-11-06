@@ -7,6 +7,7 @@ import { labBySlug } from "@/lib/labs";
 import { labCardSrc } from "@/lib/lab-images";
 import { lighthouse } from "@/lib/lighthouse";
 import { useLocale } from "@/lib/i18n";
+import { thaiWrap } from "@/lib/thai-text";
 import { cn } from "@/lib/utils";
 import { Sweep } from "./marks";
 
@@ -249,7 +250,7 @@ function Cell({
  * section reads as one set of plans rather than four colours.
  */
 export function Platform() {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const cells = t.platform.cells;
 
   return (
@@ -260,9 +261,9 @@ export function Platform() {
     >
       <h2
         id="platform-title"
-        className="mx-auto max-w-3xl text-center text-[32px] leading-[1.15] font-medium tracking-[-0.025em] text-balance sm:text-[46px] lg:text-[52px]"
+        className="mx-auto max-w-3xl text-center text-[32px] leading-[1.15] font-medium tracking-[-0.025em] text-balance [:lang(th)_&]:leading-[1.3] sm:text-[46px] lg:text-[52px]"
       >
-        {t.platform.title}
+        {locale === "th" ? thaiWrap(t.platform.title) : t.platform.title}
       </h2>
 
       <div className="mx-auto mt-14 grid max-w-[1180px] gap-x-6 gap-y-14 sm:mt-20 lg:grid-cols-3">

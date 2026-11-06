@@ -41,7 +41,7 @@ export function DimensionDemo() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-[11px] tracking-[0.5em] text-slate-400 uppercase"
           >
-            Film · spatial index
+            Yim · spatial index
           </motion.p>
 
           <div className="mt-auto pb-6">

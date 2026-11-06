@@ -22,7 +22,7 @@ export interface Lab {
   /** the business in two or three words, for the cards around the home hero */
   kind?: string;
   /** Thai copy for the listed labs; archived ones fall back to English */
-  th?: { bestFor: string; kind?: string };
+  th?: { bestFor: string; kind?: string; vibe?: string; description?: string; buildTime?: string };
   /** honest build estimate for a site in this direction */
   buildTime: string;
 }
@@ -30,6 +30,17 @@ export interface Lab {
 /** Who a lab suits, in the visitor's language where a translation exists. */
 export function labBestFor(lab: Lab, locale: Locale): string {
   return locale === "th" && lab.th ? lab.th.bestFor : lab.bestFor;
+}
+
+/** A gallery card's copy, in the visitor's language where a translation exists. */
+export function labCard(lab: Lab, locale: Locale) {
+  const th = locale === "th" ? lab.th : undefined;
+  return {
+    vibe: th?.vibe ?? lab.vibe,
+    description: th?.description ?? lab.description,
+    bestFor: th?.bestFor ?? lab.bestFor,
+    buildTime: th?.buildTime ?? lab.buildTime,
+  };
 }
 
 /** The kind of business a lab is dressed as, falling back to its vibe. */
@@ -56,7 +67,14 @@ export const labs: Lab[] = [
     preview: { from: "#0b0505", to: "#a3170d" },
     bestFor: "Keyboard shops, gaming and tech brands, anything sold on how it feels to press",
     kind: "Keyboard shop",
-    th: { bestFor: "ร้านคีย์บอร์ด แบรนด์เกมมิ่งและแก็ดเจ็ต ของที่ขายกันด้วยฟีลตอนกด", kind: "ร้านคีย์บอร์ด" },
+    th: {
+      bestFor: "ร้านคีย์บอร์ด แบรนด์เกมมิ่งและแก็ดเจ็ต ของที่ขายกันด้วยฟีลตอนกด",
+      kind: "ร้านคีย์บอร์ด",
+      vibe: "ลูกบอลคีย์แคป เล่นด้วยคีย์บอร์ดจริง",
+      description:
+        "ลูกบอลจากคีย์แคปสองร้อยกว่าปุ่ม ลากหมุนเล่นได้ กดแป้นไหนบนคีย์บอร์ดของคุณ ปุ่มนั้นบนลูกก็ยุบตาม ทั้งไทยและอังกฤษ เสียงคลิกอัดมาจากสวิตช์ Cherry MX Blue ของแท้ สายคีย์บอร์ดเปิดแล้วจะไม่ยอมปิด",
+      buildTime: "ราวหนึ่งสัปดาห์ เวลาส่วนใหญ่หมดไปกับการไล่แสงบนปุ่ม",
+    },
     buildTime: "About a week, and the shading is most of it",
   },
   {
@@ -69,7 +87,14 @@ export const labs: Lab[] = [
     preview: { from: "#0b0b0c", to: "#3b55ff" },
     bestFor: "Title cards, covers, wedding and event names, any brand that sells a feeling",
     kind: "Weddings and events",
-    th: { bestFor: "ไตเติลการ์ด ปก ชื่องานแต่งหรืออีเวนต์ แบรนด์ที่ขายความรู้สึก", kind: "งานแต่งและอีเวนต์" },
+    th: {
+      bestFor: "ไตเติลการ์ด ปก ชื่องานแต่งหรืออีเวนต์ งานที่เน้นอารมณ์มากกว่าข้อมูล",
+      kind: "งานแต่งและอีเวนต์",
+      vibe: "พิมพ์แล้วสวนงอก",
+      description:
+        "พิมพ์คำไหน กุหลาบก็งอกจากคำนั้น เถาวัลย์พันตัวอักษรทั้งไทยและอังกฤษ ลบแล้วเหี่ยว เลือกสีได้ 10 ชุด เซฟเป็นรูปหรือส่งลิงก์ให้คนอื่นดูสวนเดียวกันได้",
+      buildTime: "ราวหนึ่งสัปดาห์ เวลาส่วนใหญ่อยู่ที่จังหวะงอก",
+    },
     buildTime: "About a week, and the growth choreography is most of it",
   },
   {
@@ -82,7 +107,14 @@ export const labs: Lab[] = [
     preview: { from: "#25d07a", to: "#0d0b0a" },
     bestFor: "Festivals, temple fairs, club nights, anything with stages and a clock",
     kind: "Music festival",
-    th: { bestFor: "เทศกาลดนตรี งานวัด ปาร์ตี้ งานไหนก็ได้ที่มีหลายเวทีกับตารางเวลา", kind: "เทศกาลดนตรี" },
+    th: {
+      bestFor: "เทศกาลดนตรี งานวัด ปาร์ตี้ งานไหนก็ได้ที่มีหลายเวทีกับตารางเวลา",
+      kind: "เทศกาลดนตรี",
+      vibe: "โปสเตอร์เทศกาล เสียงดังเต็มหน้า",
+      description:
+        "เทศกาลดนตรีสองวันสามเวที เลือกวงที่อยากดู แล้วหน้าเว็บบอกเลยว่าวงไหนเล่นชนกัน เสียไปกี่นาที เดินข้ามเวทีทันไหม โปสเตอร์ตอบเรื่องพวกนี้ไม่ได้",
+      buildTime: "ราวหนึ่งสัปดาห์ เวลาส่วนใหญ่อยู่ที่ตารางวง",
+    },
     buildTime: "About a week, and the running order is most of it",
   },
   {
@@ -96,7 +128,14 @@ export const labs: Lab[] = [
     bestFor:
       "Creative developers, motion studios, anyone selling the interaction itself",
     kind: "Motion studio",
-    th: { bestFor: "ครีเอทีฟ dev สตูดิโอ motion ใครก็ตามที่ขายตัว interaction เอง", kind: "สตูดิโอ motion" },
+    th: {
+      bestFor: "ครีเอทีฟ dev สตูดิโอ motion คนที่อยากให้เว็บเล่นกับคนดูได้",
+      kind: "สตูดิโอ motion",
+      vibe: "หน้าเว็บที่มองตามเมาส์",
+      description:
+        "หน้าเว็บสตูดิโอที่หัวตัวละครหันตามเมาส์ คำนวณจากโมเดลหัวจริง เลยไม่ดูเป็นภาพบิดๆ เลื่อนเมาส์ไปทางไหน มันก็มองตามไปทางนั้น",
+      buildTime: "สามวันถ้าใช้ภาพเวกเตอร์ หนึ่งสัปดาห์ถ้ามีฟุตเทจให้ตัด",
+    },
     buildTime: "Three days as vectors, a week once there is footage to cut",
   },
   {
@@ -109,7 +148,14 @@ export const labs: Lab[] = [
     preview: { from: "#f2e9d8", to: "#eaa93c" },
     bestFor: "Cafes, clubs, game shops, anywhere the choice is the hard part",
     kind: "Board game cafe",
-    th: { bestFor: "คาเฟ่บอร์ดเกม คลับ ร้านเกม ร้านไหนก็ได้ที่ลูกค้าเลือกไม่ถูก", kind: "คาเฟ่บอร์ดเกม" },
+    th: {
+      bestFor: "คาเฟ่บอร์ดเกม คลับ ร้านเกม ร้านไหนก็ได้ที่ลูกค้าเลือกไม่ถูก",
+      kind: "คาเฟ่บอร์ดเกม",
+      vibe: "พิกเซลอาร์ตวาดมือ",
+      description:
+        "คาเฟ่บอร์ดเกมที่ชั้นวางช่วยพนักงานตอบได้ มากี่คน มีเวลาเท่าไหร่ เคยเล่นไหม กล่องไหนเล่นไม่ได้ก็บอกว่าติดข้อไหน ภาพทุกอันเป็นพิกเซลวาดมือขนาด 16 ช่อง",
+      buildTime: "ราวหนึ่งสัปดาห์ ส่วนใหญ่หมดไปกับการวาดพิกเซล",
+    },
     buildTime: "About a week, and the sprites are most of it",
   },
   {
@@ -123,7 +169,14 @@ export const labs: Lab[] = [
     bestFor:
       "Courses, startups, agencies, anything that would rather be seen than trusted quietly",
     kind: "Online course",
-    th: { bestFor: "คอร์สออนไลน์ สตาร์ทอัพ เอเจนซี แบรนด์ที่อยากโดดเด่นมากกว่าเรียบร้อย", kind: "คอร์สออนไลน์" },
+    th: {
+      bestFor: "คอร์สออนไลน์ สตาร์ทอัพ เอเจนซี แบรนด์ที่อยากโดดเด่นมากกว่าเรียบร้อย",
+      kind: "คอร์สออนไลน์",
+      vibe: "ขอบหนา สีจัด เงาทึบ",
+      description:
+        "เว็บคอร์สออนไลน์หน้าตาดุ ขอบหนา เงาทึบ สีจัด กดเปลี่ยนคอร์สแล้วสีทั้งหน้าเปลี่ยนตาม จะได้เห็นก่อนว่าสีแรงขนาดนี้ไหวไหม",
+      buildTime: "สามถึงสี่วัน ไม่ต้องใช้รูปถ่ายเลย",
+    },
     buildTime: "Three to four days, and no photography at all",
   },
   {
@@ -137,7 +190,14 @@ export const labs: Lab[] = [
     bestFor:
       "Restaurant chains, street food brands, anywhere with branches and a menu",
     kind: "Grill restaurant chain",
-    th: { bestFor: "เชนร้านอาหาร แบรนด์สตรีทฟู้ด ร้านที่มีหลายสาขากับเมนูยาวๆ", kind: "เชนปิ้งย่าง" },
+    th: {
+      bestFor: "เชนร้านอาหาร แบรนด์สตรีทฟู้ด ร้านที่มีหลายสาขากับเมนูยาวๆ",
+      kind: "เชนปิ้งย่าง",
+      vibe: "แบรนด์อาหาร เปิดเต็มเสียง",
+      description:
+        "บุฟเฟต์หมูกระทะเตาถ่าน ขายแบบที่แบรนด์อาหารไทยขายกัน ตัวใหญ่ สีแดงพริก สติกเกอร์เต็มหน้า กดชุดหรือสาขาแล้วหน้าต่างเด้งออกมาจากการ์ดที่กด",
+      buildTime: "ราวหนึ่งสัปดาห์ เมื่อถ่ายรูปอาหารเสร็จแล้ว",
+    },
     buildTime: "About a week once the food is photographed",
   },
   {
@@ -151,7 +211,14 @@ export const labs: Lab[] = [
     bestFor:
       "Launching one product: gadgets, appliances, anything with a spec sheet",
     kind: "Product launch",
-    th: { bestFor: "เปิดตัวสินค้าชิ้นเดียว แก็ดเจ็ต เครื่องใช้ไฟฟ้า อะไรก็ได้ที่มีสเปกให้โชว์", kind: "เปิดตัวสินค้า" },
+    th: {
+      bestFor: "เปิดตัวสินค้าชิ้นเดียว แก็ดเจ็ต เครื่องใช้ไฟฟ้า อะไรก็ได้ที่มีสเปกให้โชว์",
+      kind: "เปิดตัวสินค้า",
+      vibe: "เปิดตัวสินค้า เล่าตามการเลื่อน",
+      description:
+        "โคมไฟตั้งโต๊ะพับได้หนึ่งรุ่น ขายแบบหน้าเปิดตัวสินค้า เล่าทีละเรื่อง เลื่อนถึงแล้วคลิปโคมไฟกางเอง ลากแถบปรับสีไฟแล้วแสงในรูปเปลี่ยนตาม",
+      buildTime: "ราวสิบวัน บวกเวลาถ่ายสินค้า",
+    },
     buildTime: "About ten days, plus the product shots",
   },
   {
@@ -164,7 +231,14 @@ export const labs: Lab[] = [
     preview: { from: "#f4f2ef", to: "#dcd8d2" },
     bestFor: "Jewellery, watches, anything sold on one hero object",
     kind: "Jewellery",
-    th: { bestFor: "เครื่องประดับ นาฬิกา แบรนด์ที่มีสินค้าพระเอกชิ้นเดียว", kind: "เครื่องประดับ" },
+    th: {
+      bestFor: "เครื่องประดับ นาฬิกา แบรนด์ที่มีสินค้าพระเอกชิ้นเดียว",
+      kind: "เครื่องประดับ",
+      vibe: "เครื่องประดับ ภาพนิ่ง",
+      description:
+        "เอาแหวนออกจากรูปมือ แล้วปั้นใหม่เป็น 3D วางกลับที่เดิม ลากหมุนดูได้ เลือกสีทองได้ทั้งสามวง",
+      buildTime: "สองสัปดาห์ งานหลักคือโมเดลแหวน",
+    },
     buildTime: "Two weeks, the 3D object is the work",
   },
   {
@@ -177,7 +251,14 @@ export const labs: Lab[] = [
     preview: { from: "#141416", to: "#0b0b0c" },
     bestFor: "One hero product, dropshipping, a launch, a pre-order",
     kind: "Single product shop",
-    th: { bestFor: "สินค้าตัวเดียว dropship เปิดตัวของใหม่ หรือรับพรีออเดอร์", kind: "ร้านสินค้าตัวเดียว" },
+    th: {
+      bestFor: "สินค้าตัวเดียว dropship เปิดตัวของใหม่ หรือรับพรีออเดอร์",
+      kind: "ร้านสินค้าตัวเดียว",
+      vibe: "สินค้าเดียว หน้าเดียว",
+      description:
+        "หน้าขายสินค้าตัวเดียวแบบที่คนขายออนไลน์ใช้กัน เลือกจำนวนแล้วราคาคิดให้เอง มีตัวลองปรับเสียงให้เห็นว่าตัดเสียงยังไง และไม่มีตัวนับถอยหลังหลอกๆ",
+      buildTime: "สี่วัน เมื่อมีรูปสินค้าแล้ว",
+    },
     buildTime: "Four days once the product photos exist",
   },
   {
@@ -190,7 +271,14 @@ export const labs: Lab[] = [
     preview: { from: "#fbf7f0", to: "#e8ddc9" },
     bestFor: "Restaurants, cafes, bakeries, anywhere with a menu and a phone",
     kind: "Restaurant",
-    th: { bestFor: "ร้านอาหาร คาเฟ่ ร้านเบเกอรี่ ร้านไหนก็ได้ที่มีเมนูกับเบอร์โทร", kind: "ร้านอาหาร" },
+    th: {
+      bestFor: "ร้านอาหาร คาเฟ่ ร้านเบเกอรี่ ร้านไหนก็ได้ที่มีเมนูกับเบอร์โทร",
+      kind: "ร้านอาหาร",
+      vibe: "เมนูร้านอาหาร ลิงก์เดียว",
+      description:
+        "หน้าเดียวที่ร้านอาหารต้องมี เมนูกับราคาวันนี้ ป้ายบอกว่าตอนนี้เปิดหรือปิดตามนาฬิกาของคนดู และเบอร์โทรที่ติดจอตลอด",
+      buildTime: "สามวัน เมื่อมีเมนูแล้ว",
+    },
     buildTime: "Three days once the menu exists",
   },
   {
@@ -203,7 +291,14 @@ export const labs: Lab[] = [
     preview: { from: "#0e262a", to: "#07191c" },
     bestFor: "Tours, boat charters, dive shops, anything sold by the seat",
     kind: "Day tours",
-    th: { bestFor: "ทัวร์ เรือเช่า ร้านดำน้ำ อะไรก็ได้ที่ขายเป็นที่นั่ง", kind: "ทัวร์รายวัน" },
+    th: {
+      bestFor: "ทัวร์ เรือเช่า ร้านดำน้ำ อะไรก็ได้ที่ขายเป็นที่นั่ง",
+      kind: "ทัวร์รายวัน",
+      vibe: "ทัวร์รายวัน จองได้เลย",
+      description:
+        "หน้าจองทัวร์เรือ เลือกทริป ใส่จำนวนผู้ใหญ่กับเด็ก เพิ่มรถรับส่ง แล้วเห็นราคารวมกับมัดจำ 30% ทันที",
+      buildTime: "สามถึงห้าสัปดาห์ ถ้ามีระบบจองหลังบ้าน",
+    },
     buildTime: "Three to five weeks with a booking back end",
   },
   {
@@ -216,7 +311,14 @@ export const labs: Lab[] = [
     preview: { from: "#171a20", to: "#0e1013" },
     bestFor: "Classifieds, second-hand goods, in-game accounts and items",
     kind: "Marketplace",
-    th: { bestFor: "ประกาศซื้อขาย ของมือสอง ไอดีเกมและไอเทม", kind: "ตลาดซื้อขาย" },
+    th: {
+      bestFor: "ประกาศซื้อขาย ของมือสอง ไอดีเกมและไอเทม",
+      kind: "ตลาดซื้อขาย",
+      vibe: "ตลาดซื้อขาย สมัครแล้วลงขายได้",
+      description:
+        "ตลาดซื้อขายแบบบ้านๆ ที่คนถามหากันบ่อย สมัครสมาชิก ลงประกาศ ค้นหา กรองได้ คนซื้อทักคนขายเอง เว็บไม่ถือเงินให้ใคร",
+      buildTime: "สองถึงสามสัปดาห์ งานหลักคือระบบสมาชิก",
+    },
     buildTime: "Two to three weeks, the accounts are the work",
   },
   {
@@ -229,7 +331,14 @@ export const labs: Lab[] = [
     preview: { from: "#fafafa", to: "#e5e5e5" },
     bestFor: "Consultants, writers and studios selling clarity",
     kind: "Consultant",
-    th: { bestFor: "ที่ปรึกษา นักเขียน สตูดิโอ คนที่ขายความชัดเจน", kind: "ที่ปรึกษา" },
+    th: {
+      bestFor: "ที่ปรึกษา นักเขียน สตูดิโอ งานที่อยากให้ดูสะอาด อ่านง่าย",
+      kind: "ที่ปรึกษา",
+      vibe: "พื้นขาว กริดเป๊ะ",
+      description:
+        "พื้นขาว กริดเป๊ะ แดงจุดเดียว เหมาะกับหน้ารวมงานที่ไม่อยากให้อะไรแย่งซีน",
+      buildTime: "ไม่เกินหนึ่งสัปดาห์",
+    },
     buildTime: "Under a week",
   },
 ];

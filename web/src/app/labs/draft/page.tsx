@@ -23,7 +23,7 @@ const hand = Itim({
 });
 
 export const metadata = pageMetadata({
-  title: "Draft | The Lab · Film",
+  title: "Draft | The Lab · Yim",
   description:
     "Conceptual sketch study: an interior studio that publishes the working drawing instead of the render. Set your room's real dimensions and the plan redraws to scale, measures the walkway left between the furniture, and writes in the margin which piece does not fit and by how many centimetres. A fictional studio.",
   path: "/labs/draft",

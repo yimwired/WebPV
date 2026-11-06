@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Deep Space | The Lab · Film",
+  title: "Deep Space | The Lab · Yim",
   description:
     "Sci-fi HUD style study: live canvas starfield, glowing planet, mission-log typography.",
   path: "/labs/space",

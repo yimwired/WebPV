@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 import { LabSwitcher } from "@/components/labs/lab-switcher";
 
 export const metadata = pageMetadata({
-  title: "Dimension | The Lab · Film",
+  title: "Dimension | The Lab · Yim",
   description:
     "Real-time 3D style study: WebGL chrome, iridescent lighting, drag-to-orbit hero.",
   path: "/labs/dimension",

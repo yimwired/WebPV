@@ -23,7 +23,7 @@ const body = Bai_Jamjuree({
 });
 
 export const metadata = pageMetadata({
-  title: "Clash | The Lab · Film",
+  title: "Clash | The Lab · Yim",
   description:
     "Maximalist festival study: three stages, twenty-four sets, and a running order that answers the only question a lineup poster never does. Pick the sets you want and the page names every clash, how many minutes it costs, and whether you can walk it in time. A fictional festival.",
   path: "/labs/clash",

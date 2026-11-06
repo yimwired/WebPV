@@ -15,7 +15,7 @@ const sans = IBM_Plex_Sans_Thai({
 });
 
 export const metadata = pageMetadata({
-  title: "Prism | The Lab · Film",
+  title: "Prism | The Lab · Yim",
   description:
     "Glass study: refraction at the rim, a chromatic fringe, a specular edge and a sheet that flips mode to keep its text readable. Switch each layer off and see what it was doing.",
   path: "/labs/prism",

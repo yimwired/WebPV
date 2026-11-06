@@ -441,9 +441,9 @@ export function ClashDemo() {
           {/* The break is set by hand: Thai has no spaces between words, so
               the line box breaks wherever it fits and this one landed between
               คำถาม and คนดู, which reads as two unrelated sentences. */}
-          <p className="max-w-xl font-[family-name:var(--font-clash-display)] text-[clamp(1.6rem,4.6vw,2.8rem)] leading-[1.05] font-bold text-[#0d0b0a]">
-            <span className="block">หน้าอีเวนต์ที่ตอบคำถามคนดู</span>
-            <span className="block">ไม่ใช่แค่แปะผังเวที</span>
+          <p className="max-w-xl font-[family-name:var(--font-clash-display)] text-[clamp(1.6rem,4.6vw,2.8rem)] leading-[1.18] font-bold text-[#0d0b0a]">
+            <span className="block">วงไหนชนวงไหน</span>
+            <span className="block">ให้หน้าเว็บตอบแทนแอดมิน</span>
           </p>
           <Link
             href="/services"

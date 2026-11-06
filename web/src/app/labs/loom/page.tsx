@@ -16,7 +16,7 @@ const trirong = Trirong({
 });
 
 export const metadata = pageMetadata({
-  title: "Loom | The Lab · Film",
+  title: "Loom | The Lab · Yim",
   description:
     "Bohemian style study for a three-room guesthouse: pick your nights and the panel prices them direct and through a booking agent side by side, so the commission the owner pays is finally a number the guest can see.",
   path: "/labs/loom",

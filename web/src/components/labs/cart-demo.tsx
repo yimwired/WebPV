@@ -115,7 +115,7 @@ const BENEFITS = [
     src: "/lab-demos/cart/outdoors.webp",
     alt: "ใส่หูฟังกลางแจ้ง",
     stat: "4.2 กรัม",
-    h: "เหงื่อกับฝนไม่ใช่ปัญหา",
+    h: "ฝนสาดเหงื่อแตกก็ยังฟังได้",
     p: "มาตรฐาน IPX5 วิ่งกลางแดดหรือโดนฝนสาดระหว่างเดินก็ยังทำงานปกติ ตัวหูฟังหนักข้างละ 4.2 กรัม ใส่วิ่งแล้วไม่หลุด",
   },
 ];
@@ -316,12 +316,12 @@ export function CartDemo() {
             className="mt-10 text-center"
           >
             <h1
-              className="text-4xl leading-[1.05] font-semibold tracking-tight sm:text-6xl"
+              className="text-4xl leading-[1.4] font-semibold tracking-tight sm:text-6xl"
               style={DISPLAY}
             >
-              เงียบลงทันที
+              ใส่ปุ๊บ
               <br />
-              ที่ใส่
+              เงียบปั๊บ
             </h1>
             <p
               className="mx-auto mt-5 max-w-md leading-relaxed"
@@ -502,7 +502,7 @@ export function CartDemo() {
       <section className="px-5 py-16 sm:px-8">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1fr_1.2fr] md:gap-16">
           <h2
-            className="text-2xl leading-tight font-semibold tracking-tight sm:text-4xl"
+            className="text-2xl leading-[1.45] font-semibold tracking-tight sm:text-4xl"
             style={DISPLAY}
           >
             ซื้อหูฟังถูกๆ มาแล้ว

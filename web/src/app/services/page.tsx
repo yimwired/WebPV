@@ -4,9 +4,9 @@ import { Services } from "@/components/site/services";
 import { Footer } from "@/components/site/footer";
 
 export const metadata = pageMetadata({
-  title: "Services | Film",
+  title: "Services | Yim",
   description:
-    "Websites and landing pages, automation and bots, dashboards and internal tools, and AI wired into real workflows. Built and shipped end to end by Film.",
+    "Websites and landing pages, automation and bots, dashboards and internal tools, and AI wired into real workflows. Built and shipped end to end by Yim.",
   path: "/services",
 });
 

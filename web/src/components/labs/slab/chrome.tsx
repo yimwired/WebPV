@@ -86,7 +86,7 @@ export function SlabFooter({ accent }: { accent: Accent }) {
         </div>
 
         <p className="mt-8 max-w-2xl text-sm font-medium leading-relaxed" style={{ color: COLOR.ink }}>
-          ตัดจบเป็นแบรนด์สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของ Film ชื่อคอร์ส ราคา
+          ตัดจบเป็นแบรนด์สมมติ หน้านี้เป็นตัวอย่างงานออกแบบในพอร์ตของยิ้ม ชื่อคอร์ส ราคา
           และเนื้อหาบทเรียนแต่งขึ้นมาทั้งหมด ไม่มีคอร์สนี้ขายอยู่จริง
         </p>
 
@@ -103,7 +103,7 @@ export function SlabFooter({ accent }: { accent: Accent }) {
             className="inline-flex items-center py-1.5 text-sm font-extrabold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
             style={{ color: COLOR.ink, outlineColor: COLOR.ink }}
           >
-            ดูพอร์ตของ Film
+            ดูพอร์ตของยิ้ม
           </Link>
         </div>
       </div>

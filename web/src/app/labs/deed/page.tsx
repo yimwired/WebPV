@@ -22,7 +22,7 @@ const body = Noto_Sans_Thai({
 });
 
 export const metadata = pageMetadata({
-  title: "Deed | The Lab · Film",
+  title: "Deed | The Lab · Yim",
   description:
     "Property study: a condominium site that answers what a listing never does. Give it your income and your deposit and it works the real instalment, says whether a bank would lend and what would fix it, and itemises the cash needed on transfer day. A fictional project.",
   path: "/labs/deed",

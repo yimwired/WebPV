@@ -35,7 +35,7 @@ const ui = Anuphan({
 });
 
 export const metadata = pageMetadata({
-  title: "Trellis | The Lab · Film",
+  title: "Trellis | The Lab · Yim",
   description:
     "Type a word and a garden grows out of its letters. Vines coil around the strokes, in front of one and behind the next, roses settle on their tops, and backspace withers them. Thai works too, tone marks kept clear. Ten palettes, a Poster mode, PNG and SVG export, and a link that regrows the same garden.",
   path: "/labs/trellis",

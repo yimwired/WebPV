@@ -64,7 +64,7 @@ export const projects: Project[] = [
     th: {
       tagline: "เทอร์มินัลเทรดทองอัตโนมัติ XAU/USD",
       description:
-        "บอทเทรดทองบน MT5 ที่รันจริงอยู่ตอนนี้ ใช้ 12 strategy engines สแกนตามจังหวะแต่ละ session คุมความเสี่ยงแบบ real-time พร้อม trade tape และ kill switch ทำเองครบทั้งระบบ",
+        "บอทเทรดทองบน MT5 ที่เปิดรันอยู่ตอนนี้ แบ่งงานให้ 12 engines ดูตามจังหวะแต่ละ session มี trade tape ให้ย้อนดู และ kill switch กดทีเดียวหยุดหมด ผมทำเองทั้งระบบ",
     },
   },
   {
@@ -82,7 +82,7 @@ export const projects: Project[] = [
     th: {
       tagline: "ระบบหลังบ้านสินค้าและคอนเทนต์สำหรับ Shopee",
       description:
-        "เครื่องมือคุมแคตตาล็อกกิฟฟารีนบน Shopee ติดตามรายการสินค้าได้ครบ ให้ AI ช่วยเขียนคำโฆษณา สร้าง prompt รูปกับวิดีโอ ไดคัทรูปอัตโนมัติ เสร็จแล้ว export เป็น CSV ได้เลย",
+        "เครื่องมือคุมแคตตาล็อกกิฟฟารีนบน Shopee รู้ว่าตัวไหนลงแล้วตัวไหนยัง ให้ AI ช่วยเขียนคำโฆษณา สร้าง prompt รูปกับวิดีโอ ไดคัทรูป เสร็จแล้ว export เป็น CSV ได้เลย",
     },
   },
   {
@@ -98,7 +98,7 @@ export const projects: Project[] = [
     accent: "#0f766e",
     image: "/projects/pet-travel.webp",
     th: {
-      tagline: "เว็บจองทัวร์ภูเก็ต ที่กู้กลับมาจากของที่พังไปแล้ว",
+      tagline: "เว็บจองทัวร์ภูเก็ต ที่ผมไปกู้ชีพมา",
       description:
         "หน้าร้าน Next.js ต่อกับ Strapi มีทัวร์ 7 รายการ ฟิลเตอร์ รีวิว และสลิปการจ่ายเงิน ตอนรับมาเว็บขึ้น 500 มาหลายเดือนแล้ว แถม signing key ของตัวเองก็หลุดอยู่ใน repo",
     },
@@ -116,9 +116,9 @@ export const projects: Project[] = [
     accent: "#a78bfa", // violet
     image: "/projects/affiliate.webp",
     th: {
-      tagline: "โพสต์เดียว ไปครบทุกแพลตฟอร์ม",
+      tagline: "คลิปเดียว ลงให้ครบ 4 ที่",
       description:
-        "Affiliate Publisher แค่เข้าคิวสินค้าไว้ ระบบจะสร้าง asset กับวิดีโอจาก prompt ให้ แล้วกระจายโพสต์ขึ้น YouTube TikTok Shopee Shorts และ Lemon8 ในครั้งเดียว พร้อมแจ้งเตือนผ่าน Telegram ทุกความเคลื่อนไหว",
+        "Affiliate Publisher เข้าคิวสินค้าไว้ ระบบเตรียม asset กับวิดีโอจาก prompt ให้ แล้วช่วยลงให้ครบทั้ง YouTube TikTok Shopee Shorts และ Lemon8 ลงอะไรไปแล้วบ้างบอกใน Telegram",
     },
   },
   {
@@ -134,7 +134,7 @@ export const projects: Project[] = [
     accent: "#22d3ee", // cyan
     image: "/projects/jarvis-moon.webp",
     th: {
-      tagline: "กองยาน AI 11 agents ใต้ผู้บัญชาการเดียว",
+      tagline: "กองยาน AI 11 ตัว สั่งด้วยเสียงได้",
       description:
         "MOON FLEET ระบบ commander คุม Claude agents เฉพาะทาง 11 ตัว (scout, researcher, builder, critic, scheduler...) ทำงานผ่าน pipeline ตั้งแต่ research, build, intake ยันโหมด auto พร้อม mission queue แบบสดๆ",
     },

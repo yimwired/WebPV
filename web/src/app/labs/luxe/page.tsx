@@ -10,7 +10,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata = pageMetadata({
-  title: "Maison | The Lab · Film",
+  title: "Maison | The Lab · Yim",
   description:
     "Luxury editorial style study: ivory paper, serif headlines, hairline gold rules.",
   path: "/labs/luxe",

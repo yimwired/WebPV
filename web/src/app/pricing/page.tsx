@@ -5,7 +5,7 @@ import { Pricing } from "@/components/site/pricing";
 import { Footer } from "@/components/site/footer";
 
 export const metadata = pageMetadata({
-  title: "Pricing | Film",
+  title: "Pricing | Yim",
   description:
     "Fixed prices for websites and landing pages, from a Quick page live in three days to a Signature build with custom motion. Automation, dashboards and AI are quoted per project.",
   path: "/pricing",

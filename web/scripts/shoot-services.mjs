@@ -78,15 +78,15 @@ for (const index of [1, 3]) {
 }
 
 // the labs gallery CTAs reach /services and /pricing
-// (label is "What I build", renamed from "See what I build" in 6251edc)
+// (the gallery follows the language now, and the switch above left the site in Thai)
 await page.goto(`${BASE}/labs`, { waitUntil: "load" });
 await page.waitForTimeout(1000);
 await revealAll();
 const labsCosts = await page
-  .getByRole("link", { name: /^What it costs$/ })
+  .getByRole("link", { name: /^(What it costs|ดูราคา)$/ })
   .getAttribute("href");
-console.log(`labs "What it costs" href → ${labsCosts}`);
-await page.getByRole("link", { name: /^What I build$/ }).click();
+console.log(`labs cost link href → ${labsCosts}`);
+await page.getByRole("link", { name: /^(What I build|รับทำอะไรบ้าง)$/ }).click();
 await page.waitForTimeout(1200);
 console.log(`labs CTA → ${new URL(page.url()).pathname}`);
 

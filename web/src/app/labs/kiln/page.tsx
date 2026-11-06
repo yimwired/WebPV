@@ -24,7 +24,7 @@ const sans = IBM_Plex_Sans_Thai({
 });
 
 export const metadata = pageMetadata({
-  title: "Kiln | The Lab · Film",
+  title: "Kiln | The Lab · Yim",
   description:
     "Wabi-sabi style study for a one-off ceramics studio: the flaws on each piece are marked on the photograph and explained, because a handmade shop sells the thing a factory would reject.",
   path: "/labs/kiln",
