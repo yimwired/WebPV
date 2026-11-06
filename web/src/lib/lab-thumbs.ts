@@ -26,12 +26,13 @@ export const labThumbVersions: Record<string, string> = {
   "sable": "d061a1a6",
   "signal": "d68367b9",
   "slab": "3a1692cc",
+  "songtor": "25fa0e53",
   "space": "8e99d2a6",
   "stall": "dac280a2",
   "terminal": "55a8a403",
   "thock": "d89abe29",
   "trellis": "d19861a4",
-  "trine": "c619902c",
+  "trine": "a38c9657",
   "unfold": "52c5445c",
   "vision": "e3678817"
 };

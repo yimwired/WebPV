@@ -23,7 +23,8 @@ export interface ShowcaseCategory {
 // and Slab fit Starter's five days; Stall's accounts take Standard's two
 // weeks; Longtail is Standard as a front end, and its three to five weeks
 // with a booking back end is Signature's timeline; Trine's 3D object is the
-// Signature build the pricing copy names outright.
+// Signature build the pricing copy names outright. Songtor sits beside Longtail
+// because both sell a journey and end in a request; no group is closer to freight.
 export const showcaseCategories: ShowcaseCategory[] = [
   {
     id: "food",
@@ -35,7 +36,7 @@ export const showcaseCategories: ShowcaseCategory[] = [
   },
   {
     id: "tours",
-    labs: ["longtail"],
+    labs: ["longtail", "songtor"],
     packages: [
       { tier: "standard", lab: "longtail" },
       { tier: "signature", lab: "longtail" },

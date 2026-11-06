@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B111C" />
+    <title>ส่งต่อ ไม่ส่งเดช</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230B111C'/%3E%3Crect x='6' y='11' width='20' height='10' fill='%23FF5A1F'/%3E%3C/svg%3E"
+    />
+    <meta
+      name="description"
+      content="เว็บตัวอย่างบริษัทขนส่งสมมติ เลื่อนหน้าเพื่อตามตู้หนึ่งใบตั้งแต่ลานตู้ ถนน ทะเล จนขึ้นเครื่องบิน"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ส่งต่อ ไม่ส่งเดช" />
+    <meta
+      property="og:description"
+      content="เว็บตัวอย่างบริษัทขนส่งสมมติ เลื่อนหน้าเพื่อตามตู้หนึ่งใบตั้งแต่ลานตู้ ถนน ทะเล จนขึ้นเครื่องบิน"
+    />
+    <script type="module" crossorigin src="./assets/index-BArm7-k-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BAbKgcTk.css">
+  </head>
+  <body>
+    <canvas id="stage" aria-hidden="true"></canvas>
+
+    <div class="loader" data-loader aria-hidden="true">
+      <div class="loader-ring"></div>
+      <span class="loader-mark">ส่งต่อ</span>
+    </div>
+
+    <header class="nav">
+      <a class="nav-mark" href="#hero">ส่งต่อ</a>
+      <a class="nav-action" href="#quote">ขอราคา</a>
+    </header>
+
+    <aside class="tracker" aria-label="สถานะตู้ตัวอย่าง">
+      <div class="tracker-id">
+        <span class="tracker-dot" aria-hidden="true"></span>
+        <span class="readout">SGTU 482913-8</span>
+      </div>
+      <div class="tracker-state" data-tracker-leg>รอรับตู้</div>
+      <div class="tracker-figures readout">
+        <span data-tracker-time>วันที่ 1 · 05:40</span>
+        <span data-tracker-distance>0 กม.</span>
+      </div>
+      <nav class="tracker-legs" aria-label="ข้ามไปแต่ละช่วงเดินทาง">
+        <a href="#yard" data-leg-link="yard">ลานตู้</a>
+        <a href="#services" data-leg-link="road">ถนน</a>
+        <a href="#sea" data-leg-link="sea">ทะเล</a>
+        <a href="#air" data-leg-link="air">อากาศ</a>
+      </nav>
+    </aside>
+
+    <div class="globe-tags" data-globe-tags aria-hidden="true"></div>
+
+    <main>
+      <section id="hero" class="beat beat-hero" data-beat="hero" data-fallback="night">
+        <div class="pin">
+          <div class="hero-copy" data-hero-copy>
+            <h1 class="display">
+              <span class="nb">ส่งต่อ</span>
+              <span class="nb">ไม่ส่งเดช</span>
+            </h1>
+            <p class="lede">
+              รถ เรือ เครื่องบิน เอกสารศุลกากร เราทำเองหมดทุกขา มีอะไรโทรเบอร์เดียว
+              ตั้งแต่ลานตู้ยันหน้าโกดังปลายทาง
+            </p>
+            <div class="actions">
+              <a class="button button-signal" href="#quote">ขอราคา</a>
+              <a class="button button-ghost" href="#yard">ตามตู้ใบนี้</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="statement" class="beat beat-statement" data-beat="statement" data-fallback="paper">
+        <div class="statement-body">
+          <h2 class="display rise">
+            <span class="nb">ตู้ค้างทีไร</span>
+            <span class="nb accent-ink">โยนกลองกันทุกที</span>
+          </h2>
+          <p class="lede rise">
+            เรือบอกให้ถามรถ รถบอกให้ถามชิปปิ้ง ชิปปิ้งบอกให้ถามเรือ ของก็นั่งรออยู่อย่างนั้น
+            เราเลยทำเองทุกขา จะได้ไม่มีกลองให้โยน
+          </p>
+        </div>
+        <dl class="figures" data-figures>
+          <div class="figure">
+            <dd class="figure-value" data-count="1840" data-suffix="">1,840</dd>
+            <dt>ตู้ต่อเดือน</dt>
+          </div>
+          <div class="figure">
+            <dd class="figure-value" data-count="97.6" data-decimals="1" data-suffix="%">97.6%</dd>
+            <dt>ถึงตามกำหนด</dt>
+          </div>
+          <div class="figure">
+            <dd class="figure-value" data-count="12" data-suffix=" ปี">12 ปี</dd>
+            <dt>ในสายขนส่ง</dt>
+          </div>
+        </dl>
+        <p class="footnote">เว็บตัวอย่าง บริษัทและตัวเลขเป็นของสมมติ</p>
+      </section>
+
+      <section id="yard" class="beat beat-yard" data-beat="yard" data-fallback="paper">
+        <div class="pin">
+          <div class="yard-copy">
+            <h2 class="headline">ตู้ใบนี้ เริ่มที่ลาดกระบัง</h2>
+            <ul class="ticks" data-yard-ticks>
+              <li>ตรวจสภาพตู้แล้ว</li>
+              <li>ยกขึ้นเทรลเลอร์</li>
+              <li>ล็อกครบ 4 มุม ออกรถได้</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" class="beat beat-services" data-beat="services" data-fallback="night">
+        <div class="pin">
+          <div class="services-panel" data-services>
+            <h2 class="headline headline-inverse">หนักเอาเบาสู้ ทุกตู้</h2>
+            <ul class="service-list">
+              <li><h3>ทางรถ</h3><p>รถเราเอง ลากตู้ก็ได้ กระจายของทั่วประเทศก็ได้</p></li>
+              <li><h3>ทางเรือ</h3><p>เต็มตู้หรือแบ่งตู้ก็จองให้ ไปได้ทุกท่าหลัก</p></li>
+              <li><h3>ทางอากาศ</h3><p>ของรีบ จองวันนี้ บินพรุ่งนี้</p></li>
+              <li><h3>ศุลกากร</h3><p>เดินเอกสารให้ครบ คุณไม่ต้องไปนั่งเฝ้าด่าน</p></li>
+              <li><h3>คลังสินค้า</h3><p>ฝากไว้ก่อนได้ แพ็กให้ แล้วทยอยส่งออกไป</p></li>
+              <li><h3>สินค้าพิเศษ</h3><p>ของหนัก ของยาว ลอดสะพานไม่ผ่าน เราหาทางอ้อมให้</p></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="beat beat-turn" data-beat="turn" data-fallback="paper" aria-hidden="true"></section>
+
+      <section id="road" class="beat beat-road" data-beat="road" data-fallback="paper">
+        <h2 class="display road-title rise"><span class="nb">ถึงไหนแล้ว</span><br /><span class="nb">เปิดดูเองเลย</span></h2>
+        <article class="road-note road-note-right rise">
+          <h3>ไม่มีคำว่าใกล้ถึงแล้ว</h3>
+          <p>เปิดลิงก์เดียว เห็นเลยว่าตู้อยู่ถนนไหน ถึงกี่โมง</p>
+        </article>
+        <article class="road-note road-note-left rise">
+          <h3>ข่าวร้ายก็รีบบอก</h3>
+          <p>เรือเลื่อน ด่านติด <span class="nb">รู้ปุ๊บโทรปั๊บ</span> พร้อมแผนสอง</p>
+        </article>
+        <article class="road-note road-note-right rise">
+          <h3>โทรมาเจอคน</h3>
+          <p>ตีสองก็มีคนรับ ไม่ต้อง<span class="nb">กด 1 กด 2</span> แล้วรอสาย</p>
+        </article>
+      </section>
+
+      <section id="sea" class="beat beat-sea" data-beat="sea" data-fallback="sea">
+        <div class="pin">
+          <div class="sea-marker" data-sea-marker aria-hidden="true">
+            <span class="sea-marker-line"></span>
+            <span class="sea-marker-label">ตู้ของคุณอยู่ตรงนี้</span>
+          </div>
+          <div class="sea-copy" data-sea-copy>
+            <h2 class="display display-inverse">
+              <span class="nb">ลงเรือลำเดียวกัน</span>
+              <span class="nb">ไม่ทิ้งกันกลางทะเล</span>
+            </h2>
+            <ul class="promises">
+              <li><h3>คนเดิมตลอดงาน</h3><p>โทรกี่ทีก็ไม่ต้องเล่าใหม่</p></li>
+              <li><h3>ดูได้ทุกขั้น</h3><p>ตั้งแต่ปิดตู้ ยันเปิดตู้</p></li>
+              <li><h3>เอกสารไม่ตีกลับ</h3><p>เช็กก่อนยื่น ตู้เลยไม่ค้างด่าน</p></li>
+              <li><h3>ไม่มีค่าอะไรก็ไม่รู้</h3><p>บิลใบสุดท้ายเท่าที่คุยกันไว้</p></li>
+              <li><h3>ของเสียหาย ไม่ชิ่ง</h3><p>เคลมกับคนเดิมที่รับงานไว้</p></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="air" class="beat beat-air" data-beat="air" data-fallback="dusk">
+        <div class="pin">
+          <div class="air-copy" data-air-copy>
+            <h2 class="display">
+              <span class="nb">รีบนัก</span>
+              <span class="nb">ก็ติดปีกให้</span>
+            </h2>
+            <p class="lede">
+              สต็อกใกล้หมด เครื่องจักรรออะไหล่ ของส่วนที่รีบเราขึ้นเครื่องให้ก่อน
+              ที่เหลือตามเรือมา งานเดิม คนเดิม ไม่ต้องเริ่มคุยใหม่
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="arrive" class="beat beat-arrive" data-beat="arrive" data-fallback="night">
+        <div id="quote" class="arrive-body">
+          <h2 class="display display-inverse rise"><span class="nb">ที่เหลือ</span> <span class="nb">ส่งต่อให้เรา</span></h2>
+          <p class="lede lede-inverse rise">
+            บอกมาแค่ของอะไร จากไหน ไปไหน เดี๋ยวตอบกลับพร้อมราคาภายในวันทำการ
+          </p>
+          <form class="quote rise" data-quote>
+            <label class="quote-field">
+              <span>ของอะไร</span>
+              <input name="cargo" type="text" required autocomplete="off" placeholder="เครื่องจักร 2 ตู้" />
+            </label>
+            <label class="quote-field">
+              <span>จากไหน</span>
+              <input name="origin" type="text" required autocomplete="off" placeholder="ลาดกระบัง" />
+            </label>
+            <label class="quote-field">
+              <span>ไปไหน</span>
+              <input name="destination" type="text" required autocomplete="off" placeholder="ฮัมบูร์ก" />
+            </label>
+            <button class="button button-signal" type="submit">ขอราคา</button>
+          </form>
+          <p class="demo-note" data-demo-note role="status"></p>
+        </div>
+        <footer class="closing">
+          <div class="closing-mark" aria-hidden="true">ส่งต่อ</div>
+          <p>
+            ส่งต่อเป็นแบรนด์สมมติ ทำขึ้นเพื่อทดลองเว็บเล่าเรื่องตามการเลื่อน ไม่มีบริการจริง ·
+            <a href="https://webpv.yimwired.workers.dev" target="_top">ดูงานอื่นของ Yim</a>
+          </p>
+        </footer>
+      </section>
+    </main>
+
+  </body>
+</html>
