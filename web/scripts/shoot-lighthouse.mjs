@@ -19,7 +19,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import lighthouse from "lighthouse";
-import { launch } from "chrome-launcher";
+import { launch, Launcher } from "chrome-launcher";
 
 const BASE = process.env.SHOOT_URL ?? "http://localhost:3000";
 const OUT = fileURLToPath(new URL("../screenshots/lighthouse", import.meta.url));
@@ -73,7 +73,21 @@ await mkdir(OUT, { recursive: true });
 
 // One browser for every route: a cold launch per page costs more than it buys,
 // and Lighthouse resets its own state between runs anyway.
-const chrome = await launch({ chromeFlags: ["--headless=new", "--no-sandbox"] });
+//
+// chrome-launcher switches off RenderDocument, which no visitor's browser does.
+// On Chrome 156 that one entry held the home page's first paint to about 2300ms
+// where the rest of its list gives about 650ms, on identical bytes and with the
+// main thread busy for under 500ms of it. Lighthouse then counts every request
+// started before that paint into LCP, so the home page lost 12 points to a flag.
+// Chrome keeps only the last --disable-features, so the list is rebuilt rather
+// than added to, and the launcher's other defaults stay as they are.
+const launcherFlags = Launcher.defaultFlags().map((flag) =>
+  flag.startsWith("--disable-features=") ? flag.replace(/,?RenderDocument/, "") : flag,
+);
+const chrome = await launch({
+  ignoreDefaultFlags: true,
+  chromeFlags: [...launcherFlags, "--headless=new", "--no-sandbox"],
+});
 
 const rows = [];
 
