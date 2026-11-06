@@ -9,13 +9,13 @@
 // สร้างจากสคริปต์ ห้ามแก้มือ
 
 export const lighthouse = {
-  "measuredAt": "2026-09-09",
+  "measuredAt": "2026-11-06",
   "target": "https://webpv.yimwired.workers.dev",
   "preset": "mobile",
   "routes": 6,
-  "runsPerRoute": 3,
+  "runsPerRoute": 5,
   "lowest": {
-    "performance": 87,
+    "performance": 91,
     "accessibility": 100,
     "bestPractices": 100,
     "seo": 100
